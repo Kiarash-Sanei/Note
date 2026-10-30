@@ -1,0 +1,3129 @@
+\documentclass[hidelinks]{article}
+
+% Page Layout
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+
+% Colors
+\usepackage[dvipsnames,table]{xcolor}
+
+% Math
+\usepackage{amsmath,amssymb,mathrsfs}
+
+% Lists
+\usepackage{enumitem}
+
+% Tables
+\usepackage{array}
+\usepackage{tabularx}
+
+% Code listings
+\usepackage{listings}
+
+% Section Styling
+\usepackage{titlesec}
+
+% Hyperlinks
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+
+% --------------------------------------------------
+% Color Palette
+% --------------------------------------------------
+\definecolor{carminered}{rgb}{1.0,0.0,0.22}
+\definecolor{capri}{rgb}{0.0,0.75,1.0}
+\definecolor{brightlavender}{rgb}{0.75,0.58,0.89}
+\definecolor{nudelavender}{rgb}{0.78, 0.66, 0.70}
+\definecolor{codebg}{rgb}{0.10,0.10,0.14}
+\definecolor{codekeyword}{rgb}{0.0,0.75,1.0}
+\definecolor{codecomment}{rgb}{0.55,0.78,0.55}
+\definecolor{codestring}{rgb}{0.95,0.65,0.40}
+
+% --------------------------------------------------
+% Dark Theme
+% --------------------------------------------------
+\pagecolor{black}
+\color{white}
+
+% Make table rules visible on a black background
+\arrayrulecolor{brightlavender}
+
+% --------------------------------------------------
+% Section Style
+% --------------------------------------------------
+\titleformat{\section}
+{\bfseries\Large\color{brightlavender}}
+{\thesection}
+{0.5em}
+{}
+
+\titleformat{\subsection}
+{\bfseries\color{Thistle}}
+{\thesubsection}
+{0.5em}
+{}
+
+\titleformat{\subsubsection}
+{\bfseries\color{nudelavender}}
+{\thesubsubsection}
+{0.5em}
+{}
+
+% --------------------------------------------------
+% Bullet Style
+% --------------------------------------------------
+\setlist[itemize,1]{label=$\bullet$}
+\setlist[itemize,2]{label=$\circ$}
+\setlist[itemize,3]{label=$\bullet$}
+\setlist[itemize,4]{label=$\circ$}
+
+% --------------------------------------------------
+% Code Listing Style (dark)
+% --------------------------------------------------
+\lstdefinestyle{darkcode}{
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\small\color{white},
+    keywordstyle=\color{codekeyword}\bfseries,
+    commentstyle=\color{codecomment}\itshape,
+    stringstyle=\color{codestring},
+    numberstyle=\tiny\color{Gray},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    rulecolor=\color{brightlavender},
+    showstringspaces=false,
+    tabsize=4,
+    columns=fullflexible,
+    captionpos=b,
+    aboveskip=10pt,
+    belowskip=8pt,
+}
+\lstset{style=darkcode}
+
+% --------------------------------------------------
+% Title Style
+% --------------------------------------------------
+\title{\color{carminered}\textbf{Computer Networks}}
+\author{\color{Thistle}Kiarash Sanei}
+\date{\color{SkyBlue}June 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{Large}
+\tableofcontents
+\end{Large}
+
+\newpage
+
+% ==================================================================
+\section{Computer Networks and the Internet}
+% ==================================================================
+
+\subsection{The Internet: Two Views}
+
+\subsubsection{The ``nuts-and-bolts'' view}
+The Internet is a vast interconnection of computing devices and the
+infrastructure that links them. It has three structural pieces:
+
+\begin{itemize}
+    \item \textbf{Hosts (end systems):} billions of connected devices
+    running network applications at the Internet's ``edge'' --- laptops,
+    phones, servers, but also cars, sensors, pacemakers, and ``smart''
+    appliances (IoT).
+    \item \textbf{Packet switches:} devices that forward \emph{packets}
+    (chunks of data). The two main kinds are \textbf{routers} (network
+    core) and \textbf{link-layer switches} (access/LAN).
+    \item \textbf{Communication links:} fiber, copper, coaxial cable,
+    radio, and satellite. Each link has a \textbf{transmission rate}
+    (bandwidth) measured in bits/sec.
+\end{itemize}
+
+A \textbf{network} is a collection of devices, routers, and links managed
+by a single organization. The Internet is therefore best described as a
+\textbf{``network of networks''} --- a global mesh of interconnected
+ISPs (Internet Service Providers).
+
+\subsubsection{The ``services'' view}
+Alternatively, the Internet is \emph{infrastructure that provides services
+to distributed applications}: the Web, video streaming, email, games,
+e-commerce, social media, and so on. It provides a \textbf{programming
+interface} (the socket API) that lets applications ``hook into'' the
+Internet's transport service --- much like a postal service offers
+different delivery options.
+
+\subsection{What Is a Protocol?}
+
+A \textbf{protocol} defines the \emph{format} and \emph{order} of messages
+exchanged between communicating entities, plus the \emph{actions} taken on
+message transmission and receipt. Humans use protocols too (``Hi'' $\to$
+``Hi'' $\to$ ``Got the time?'' $\to$ ``2:00''); on the Internet,
+\emph{all} communication activity is governed by protocols, just between
+machines instead of people.
+
+\begin{itemize}
+    \item Examples span every layer: HTTP (Web), TCP, IP, WiFi, 4/5G,
+    Ethernet, and many more.
+    \item Internet standards are published as \textbf{RFCs} (Request for
+    Comments) by the \textbf{IETF} (Internet Engineering Task Force).
+\end{itemize}
+
+\subsection{The Network Edge: Hosts and Access Networks}
+
+\textbf{Hosts} are split into \textbf{clients} (request service) and
+\textbf{servers} (provide service, often housed in data centers). The
+\textbf{access network} physically connects an end system to its first
+(``edge'') router.
+
+\begin{itemize}
+    \item \textbf{Cable (HFC --- hybrid fiber coax):} shares a coaxial
+    distribution network among homes; uses \textbf{frequency-division
+    multiplexing (FDM)} so data and TV travel in different frequency
+    bands. Asymmetric: up to roughly $40$ Mbps--$1.2$ Gbps downstream,
+    $30$--$100$ Mbps upstream. The network device at the head end is the
+    CMTS (Cable Modem Termination System).
+    \item \textbf{DSL (Digital Subscriber Line):} uses the existing
+    telephone line to the central office (DSLAM). \emph{Dedicated} (not
+    shared) line: roughly $24$--$52$ Mbps down, $3.5$--$16$ Mbps up.
+    Voice and data ride different frequencies on the same wire.
+    \item \textbf{Home networks:} a single box typically combines cable/DSL
+    modem, router, NAT, firewall, wired Ethernet ($1$ Gbps), and a WiFi
+    access point ($54$/$450$ Mbps).
+    \item \textbf{Enterprise networks:} a mix of Ethernet (100 Mbps / 1 / 10
+    Gbps) and WiFi connecting switches and routers.
+    \item \textbf{Wireless access:} WLAN/WiFi (802.11, $\sim$10s of meters)
+    vs. wide-area cellular 4G/5G (operator-provided, $\sim$10s of km).
+    \item \textbf{Data-center networks:} high-bandwidth links (10s--100s
+    Gbps) connecting thousands of servers.
+\end{itemize}
+
+\subsubsection{Physical media}
+\textbf{Guided} media carry signals in a solid: twisted pair (Cat 5/6
+copper), coaxial cable, fiber optic (glass, light pulses; 10s--100s Gbps,
+very low error rate, immune to electromagnetic noise). \textbf{Unguided}
+media let signals propagate freely: radio. Radio link types include WiFi,
+cellular, Bluetooth, terrestrial microwave, and satellite (geostationary
+satellites add $\sim$270 ms end-to-end delay).
+
+\subsection{The Network Core: Packet vs.\ Circuit Switching}
+
+The core is a mesh of interconnected routers. There are two fundamental
+ways to share core links among many application-level conversations.
+
+\subsubsection{Circuit switching}
+Resources (a ``circuit'') are \textbf{reserved} end-to-end for the duration
+of a call.
+\begin{enumerate}
+    \item \textbf{Setup:} establish a circuit (e.g.\ when you dial a phone
+    number); state is created in each switch along the path.
+    \item \textbf{Communicate:} send data over the dedicated, guaranteed
+    circuit.
+    \item \textbf{Teardown:} release the circuit and remove the state.
+\end{enumerate}
+Resources are dedicated (no sharing $\Rightarrow$ guaranteed performance),
+but a circuit sits \emph{idle} if the call has nothing to send. Two
+multiplexing techniques:
+\begin{itemize}
+    \item \textbf{FDM:} the frequency spectrum is divided into bands; each
+    call gets its own band.
+    \item \textbf{TDM:} time is divided into frames, each frame into slots;
+    each call gets a periodic slot and transmits at the full link rate
+    \emph{during} its slot. Slot position within the frame identifies the
+    conversation.
+\end{itemize}
+
+\subsubsection{Packet switching}
+Used in the Internet. Messages are broken into \textbf{packets}, each
+carrying a header (control info such as source/destination addresses).
+\begin{itemize}
+    \item \textbf{Store-and-forward:} a router must receive the \emph{entire}
+    packet before it can begin transmitting it onto the next link.
+    \item \textbf{No reserved capacity:} each packet is forwarded
+    independently using the router's \textbf{forwarding table} (keyed on the
+    destination address in the header).
+    \item \textbf{Queues:} each output link has a buffer/queue; packets wait
+    their turn. If a queue is full, arriving packets are \textbf{dropped}
+    (lost).
+\end{itemize}
+
+\subsection{Two Key Network-Core Functions}
+
+\begin{itemize}
+    \item \textbf{Forwarding (``switching''):} a \emph{local} action ---
+    move an arriving packet from an input link to the correct output link,
+    consulting the local forwarding table.
+    \item \textbf{Routing:} a \emph{global} action --- routing algorithms
+    determine the end-to-end source--destination paths that packets take.
+\end{itemize}
+
+\subsection{Sharing the Network: Statistical Multiplexing}
+
+Many \emph{flows} (streams of packets between two hosts) must share routers
+and links. Two ways to allocate resources:
+\begin{itemize}
+    \item \textbf{Static allocation:} give each user a fixed share. Must
+    provision for everyone's \emph{peak} demand $\Rightarrow$ wasteful.
+    \item \textbf{Statistical multiplexing:} allocate dynamically, on
+    demand. More efficient because
+    \[
+        \text{peak of aggregate demand} \;<\; \text{aggregate of peak demands.}
+    \]
+\end{itemize}
+
+\noindent\textbf{Example.} Alice needs 10 units in the morning and 2 the
+rest of the time; Bob needs 10 at night and 2 otherwise. Static: each gets
+10 always $\Rightarrow$ provision 20. Dynamic: hand out 10 to whoever peaks
+and 2 to the other $\Rightarrow$ provision only 12.
+
+\medskip
+\noindent The two canonical ways to implement multiplexing map directly onto
+the two switching styles:
+\begin{itemize}
+    \item \textbf{Reservations via circuit switching:} explicitly reserve,
+    use, then release resources (the ``restaurant reservation'' analogy).
+    \item \textbf{Best-effort via packet switching:} just send packets and
+    ``hope for the best'' (``first-come, first-served'').
+\end{itemize}
+
+\subsubsection{Why packet switching usually wins}
+Consider a $1$ Gbps link with users that each need $100$ Mbps when active,
+and are active only $10\%$ of the time.
+\begin{itemize}
+    \item \textbf{Circuit switching:} can support only $1000/100 = 10$ users
+    (each statically reserved).
+    \item \textbf{Packet switching:} with $35$ users, the probability that
+    more than $10$ are simultaneously active is $< 0.0004$, so the link
+    almost never overflows.
+\end{itemize}
+The per-user active count follows a \textbf{binomial distribution}: with $n$
+independent users each active with probability $p$,
+\[
+    P(X = k) = \binom{n}{k}\, p^{k}\,(1-p)^{\,n-k}, \qquad
+    P(X > 10) = \sum_{k=11}^{n} \binom{n}{k} p^{k}(1-p)^{\,n-k}.
+\]
+Packet switching is \textbf{great for bursty data} (resource sharing,
+no call setup) but allows \textbf{congestion} (delay and loss from buffer
+overflow), so it needs protocols for reliable transfer and congestion
+control.
+
+\subsection{Performance: Delay, Loss, Throughput}
+
+\subsubsection{Four sources of nodal delay}
+\[
+    d_{\text{nodal}} = d_{\text{proc}} + d_{\text{queue}}
+                     + d_{\text{trans}} + d_{\text{prop}}
+\]
+\begin{itemize}
+    \item $d_{\text{proc}}$ --- \textbf{processing}: check bit errors,
+    determine output link. Typically $<$ microseconds.
+    \item $d_{\text{queue}}$ --- \textbf{queueing}: time waiting at the
+    output link; depends on congestion.
+    \item $d_{\text{trans}}$ --- \textbf{transmission}: time to push all $L$
+    bits onto the link at rate $R$:
+    \(\; d_{\text{trans}} = L/R.\)
+    \item $d_{\text{prop}}$ --- \textbf{propagation}: time for a bit to
+    travel the physical link of length $d$ at speed
+    $s \approx 2\times 10^{8}$ m/s:
+    \(\; d_{\text{prop}} = d/s.\)
+\end{itemize}
+
+\noindent\textbf{Transmission vs.\ propagation are different things.}
+The caravan analogy: cars $=$ bits, a caravan $=$ a packet, a toll booth $=$
+a link/router. ``Pushing'' the whole caravan through a booth is transmission
+delay; a car driving between booths is propagation delay.
+
+\subsubsection{Traffic intensity and queueing}
+With average packet arrival rate $a$, packet length $L$, and link rate $R$,
+the \textbf{traffic intensity} is $La/R$:
+\[
+    \frac{La}{R}\!\approx 0 \;\Rightarrow\; \text{small avg.\ queueing delay},
+    \quad
+    \frac{La}{R}\!\to 1 \;\Rightarrow\; \text{large delay},
+    \quad
+    \frac{La}{R} > 1 \;\Rightarrow\; \text{delay} \to \infty.
+\]
+\textbf{Rule of thumb:} design so that traffic intensity stays comfortably
+below 1.
+
+\subsubsection{Packet loss}
+Router buffers are finite. When a packet arrives to a \emph{full} buffer it
+is dropped. A lost packet may be retransmitted by the previous node, by the
+source end system, or not at all.
+
+\subsubsection{Throughput}
+\textbf{Throughput} is the rate (bits/time) at which bits actually reach the
+receiver (instantaneous vs.\ average). On a path with link rates
+$R_s$ (server side) and $R_c$ (client side), end-to-end throughput is set by
+the \textbf{bottleneck link}:
+\[
+    \text{throughput} = \min(R_s, R_c).
+\]
+If $N$ connections fairly share a backbone link of rate $R$, the per-connection
+throughput is
+\[
+    \min\!\left(R_c,\; R_s,\; \frac{R}{N}\right),
+\]
+and in practice $R_c$ or $R_s$ (the access links) is usually the bottleneck.
+
+\subsubsection{Traceroute}
+\texttt{traceroute} measures delay to each router on the path: it sends three
+probes with increasing TTL ($=i$) so probe $i$ expires at router $i$, which
+returns an error; the sender times the round trip. \texttt{*} means no reply.
+
+\subsection{Protocol Layers and the Internet Stack}
+
+Networks are complex (hosts, routers, many media, applications). Layering
+imposes structure and \textbf{modularity}: each layer relies on services from
+the layer below and provides services to the layer above. A change inside one
+layer (e.g.\ swapping a Layer-2 protocol) is transparent to the others ---
+just as changing the airline gate procedure doesn't affect baggage handling.
+
+\subsubsection{The five-layer Internet stack}
+\begin{itemize}
+    \item \textbf{Application} --- network applications and their protocols:
+    HTTP, IMAP, SMTP, DNS. Unit: \emph{message}.
+    \item \textbf{Transport} --- process-to-process data transfer:
+    TCP, UDP. Unit: \emph{segment}.
+    \item \textbf{Network} --- routing of datagrams source-to-destination:
+    IP and routing protocols. Unit: \emph{datagram}.
+    \item \textbf{Link} --- data transfer between neighboring nodes:
+    Ethernet, 802.11 (WiFi), PPP. Unit: \emph{frame}.
+    \item \textbf{Physical} --- bits ``on the wire.''
+\end{itemize}
+(The OSI model adds \emph{presentation} and \emph{session} layers, 6 and 5,
+now effectively obsolete on the Internet.)
+
+\subsubsection{The narrow waist}
+\textbf{IP is the only protocol at the network layer} --- every host and
+router speaks IP. This single ``narrow waist'' unifies the Internet and lets
+arbitrary link-layer technologies below and arbitrary applications above
+interoperate (the ``hourglass'').
+
+\subsubsection{Encapsulation}
+As a message descends the stack, each layer wraps the unit from above in its
+own header (Matryoshka-doll style):
+\[
+    \underbrace{M}_{\text{message}}
+    \;\to\; \underbrace{[H_t\,|\,M]}_{\text{segment}}
+    \;\to\; \underbrace{[H_n\,|\,H_t\,|\,M]}_{\text{datagram}}
+    \;\to\; \underbrace{[H_l\,|\,H_n\,|\,H_t\,|\,M]}_{\text{frame}}.
+\]
+At the destination, headers are \emph{peeled} off going up. Key insight from
+the ``postal/CEO secretary'' analogy: \textbf{each layer only reads the header
+written by its peer at the same layer.} Layer-3 (IP) destination is always the
+final endpoint; the Layer-2 header changes hop-by-hop.
+
+\subsubsection{Who implements which layers}
+\begin{itemize}
+    \item \textbf{End hosts} implement \emph{all} layers (1--7). In hardware
+    (the NIC): layers 1--2. In the OS: layers 3--4. In applications: layer 7.
+    \item \textbf{Routers} implement only layers 1--3: they parse and forward,
+    rewriting the Layer-2 header for the next hop, but do not provide reliable
+    delivery (4) or touch application data (7).
+\end{itemize}
+
+\subsubsection{Layer 3 is best-effort}
+The network layer offers a \textbf{best-effort} service model: packets are
+size-limited and may be lost, reordered, or corrupted; the network ``tries its
+best'' but gives no guarantee and won't even tell you when delivery fails.
+Higher layers (transport) must add reliability if the application needs it.
+
+\subsection{Network Security (Introduction)}
+
+The Internet was originally designed for ``a group of mutually trusting users
+attached to a transparent network,'' so security has always been retrofitted.
+
+\begin{itemize}
+    \item \textbf{Packet sniffing:} a promiscuous NIC on a broadcast medium
+    (shared Ethernet, WiFi) records all passing packets --- including
+    cleartext passwords. (Wireshark is a benign sniffer used in labs.)
+    \item \textbf{IP spoofing:} inject packets with a forged source address.
+    \item \textbf{Denial of Service (DoS):} overwhelm a target (server,
+    bandwidth) with bogus traffic, often from a \emph{botnet} of compromised
+    hosts (DDoS).
+\end{itemize}
+
+\noindent\textbf{Lines of defense:} authentication (e.g.\ SIM hardware
+identity), confidentiality (encryption), integrity (digital signatures),
+access restrictions (VPNs, passwords), and \textbf{firewalls}
+(``off-by-default'' middleboxes that filter traffic and react to DoS).
+
+\subsection{A Brief History}
+
+\begin{itemize}
+    \item \textbf{1950s--60s, Cold War:} the US wanted a communications
+    system that could survive a nuclear attack. \textbf{ARPA} (1958, a
+    response to Sputnik; later DARPA) funded large-scale networking research.
+    \item \textbf{Paul Baran (RAND, early 1960s):} survivable comms via
+    \emph{decentralized architecture} (no single point of failure),
+    \emph{message blocks} (packets sent independently and reassembled), and
+    \emph{hot-potato routing} (forward as fast as possible).
+    \item \textbf{Donald Davies (UK):} coined the term ``packet.''
+    \textbf{Leonard Kleinrock (MIT, 1961--62):} packet-switching theory.
+    \textbf{Licklider:} vision of a ``galactic network.''
+    \item \textbf{Kleinrock $\to$ Roberts:} Roberts wrote the ARPANET plan
+    (1967); DARPA's 1968 RFQ for the packet switches (Interface Message
+    Processors, IMPs) was won by \textbf{BBN}.
+    \item \textbf{1969:} first nodes --- UCLA (Kleinrock's Network Measurement
+    Center) and SRI. The first host-to-host message (``LO\dots'' then the
+    system crashed) was sent UCLA$\to$SRI; UCSB and Utah followed.
+    \item \textbf{1970:} the Network Working Group (Crocker) finished NCP,
+    the first host-to-host protocol. \textbf{1972:} Kahn demoed ARPANET at
+    ICCC; Ray Tomlinson (BBN) wrote email.
+    \item \textbf{Open-architecture / internetworking:} Kahn's four ground
+    rules --- (1) each network stands on its own, (2) best-effort delivery
+    with source retransmission, (3) simple stateless ``black boxes''
+    (gateways/routers), (4) no global control. Kahn \& Cerf's 1974 paper
+    defined \textbf{TCP/IP}, later split into IP (addressing/forwarding),
+    TCP (reliability), and UDP (direct access to IP).
+    \item \textbf{Documentation:} Crocker started the \textbf{RFC} series
+    (1969); the \textbf{IETF} (founded 1986) makes voluntary standards
+    published as RFCs.
+\end{itemize}
+
+% ==================================================================
+\section{The Application Layer}
+% ==================================================================
+
+\subsection{Principles of Network Applications}
+
+You write applications that run on \emph{end systems} and communicate over
+the network; you never need to write software for core devices (they don't
+run user applications). Two dominant architectures:
+
+\begin{itemize}
+    \item \textbf{Client--server:} an always-on server with a permanent IP
+    address (often in a data center for scaling) serves intermittently
+    connected clients. Clients don't talk to each other directly.
+    Examples: HTTP, IMAP, FTP.
+    \item \textbf{Peer-to-peer (P2P):} no always-on server; peers request and
+    provide service to each other. \emph{Self-scaling} (each new peer adds
+    capacity \emph{and} demand) but harder to manage (peers churn and change
+    IPs). Example: BitTorrent.
+\end{itemize}
+
+\subsubsection{Processes, sockets, and addressing}
+A \textbf{process} is a running program. Processes on different hosts
+communicate by exchanging messages through \textbf{sockets} --- the
+``door'' between the application and the transport layer. To be addressable,
+a process needs an \textbf{IP address} (identifies the host) \emph{and} a
+\textbf{port number} (identifies the process/socket on that host), because
+many processes run on one host. Example well-known ports: HTTP $=80$,
+SMTP $=25$, DNS $=53$.
+
+\subsubsection{What an application-layer protocol defines}
+The types of messages (request/response), message \emph{syntax} (fields and
+how they're delineated), message \emph{semantics} (meaning of fields), and
+\emph{rules} for when/how to send and respond. \textbf{Open} protocols are
+defined in RFCs (HTTP, SMTP) and enable interoperability;
+\textbf{proprietary} protocols are closed (e.g.\ some video-conferencing
+codecs).
+
+\subsection{What Transport Service Does an App Need?}
+
+Apps care about four dimensions:
+\begin{itemize}
+    \item \textbf{Data integrity:} file transfer needs 100\% reliability;
+    audio tolerates some loss.
+    \item \textbf{Timing:} interactive games / telephony need low delay.
+    \item \textbf{Throughput:} multimedia needs a minimum rate;
+    ``elastic'' apps use whatever they get.
+    \item \textbf{Security:} encryption, integrity, authentication.
+\end{itemize}
+
+\subsubsection{TCP vs.\ UDP at a glance}
+\begin{itemize}
+    \item \textbf{TCP:} reliable, in-order delivery; flow control;
+    congestion control; connection setup. Does \emph{not} guarantee timing
+    or minimum throughput.
+    \item \textbf{UDP:} unreliable, unordered; no setup, no flow/congestion
+    control. Minimal overhead. ``Why bother?'' --- it's fast and works under
+    congestion, and apps can add their own reliability on top (HTTP/3 does
+    exactly this).
+\end{itemize}
+
+\subsubsection{Securing TCP: TLS}
+Vanilla TCP/UDP sockets send cleartext. \textbf{TLS} (Transport Layer
+Security) is implemented in the \emph{application layer} (apps link a TLS
+library that uses TCP underneath); it provides encrypted connections, data
+integrity, and endpoint authentication.
+
+\subsection{Socket Programming (Completing the Roadmap)}
+
+The slides list socket programming with UDP and TCP but don't show code.
+Here are minimal Python examples that make the client--server paradigm
+concrete.
+
+\subsubsection{UDP: connectionless}
+There is no handshake; every datagram is self-contained and must carry the
+destination address.
+
+\begin{lstlisting}[language=Python, caption={UDP echo server and client}]
+# --- UDP server ---
+from socket import socket, AF_INET, SOCK_DGRAM
+
+server_port = 12000
+s = socket(AF_INET, SOCK_DGRAM)        # SOCK_DGRAM = UDP
+s.bind(('', server_port))              # listen on all interfaces
+print("UDP server ready")
+
+while True:
+    message, client_addr = s.recvfrom(2048)   # blocks for a datagram
+    reply = message.decode().upper()
+    s.sendto(reply.encode(), client_addr)     # must specify dest each time
+
+# --- UDP client ---
+from socket import socket, AF_INET, SOCK_DGRAM
+
+server_name, server_port = 'localhost', 12000
+s = socket(AF_INET, SOCK_DGRAM)
+msg = input("Input lowercase sentence: ")
+s.sendto(msg.encode(), (server_name, server_port))
+reply, _ = s.recvfrom(2048)
+print(reply.decode())
+s.close()
+\end{lstlisting}
+
+\subsubsection{TCP: connection-oriented}
+The server has a \emph{welcoming} socket; \texttt{accept()} returns a
+\emph{new} connection socket dedicated to that one client (this is the
+4-tuple demultiplexing we'll see in the transport layer).
+
+\begin{lstlisting}[language=Python, caption={TCP echo server and client}]
+# --- TCP server ---
+from socket import socket, AF_INET, SOCK_STREAM
+
+server_port = 12000
+welcome = socket(AF_INET, SOCK_STREAM)    # SOCK_STREAM = TCP
+welcome.bind(('', server_port))
+welcome.listen(1)                         # backlog of pending connections
+print("TCP server ready")
+
+while True:
+    conn, addr = welcome.accept()         # new socket per client
+    sentence = conn.recv(1024).decode()
+    conn.send(sentence.upper().encode())
+    conn.close()
+
+# --- TCP client ---
+from socket import socket, AF_INET, SOCK_STREAM
+
+server_name, server_port = 'localhost', 12000
+s = socket(AF_INET, SOCK_STREAM)
+s.connect((server_name, server_port))     # triggers the 3-way handshake
+s.send(input("Input sentence: ").encode())
+print(s.recv(1024).decode())
+s.close()
+\end{lstlisting}
+
+\subsection{Web and HTTP}
+
+A \textbf{web page} consists of objects (an HTML base file plus referenced
+objects --- JPEGs, scripts, etc.), each addressable by a \textbf{URL} of the
+form \texttt{host\-name/path\-name}. \textbf{HTTP} (HyperText Transfer
+Protocol) is the Web's application-layer protocol, developed by Tim
+Berners-Lee at CERN in 1989 (HTTP/0.9 in 1991, HTTP/1.0 in 1996, HTTP/1.1 in
+1997).
+
+\begin{itemize}
+    \item \textbf{Client--server, over TCP:} client opens a TCP connection to
+    port 80, exchanges request/response messages, then the connection closes.
+    \item \textbf{Stateless:} the server keeps \emph{no} memory of past client
+    requests. Stateful protocols are complex --- after a crash, the two sides'
+    views of ``state'' can diverge and must be reconciled.
+\end{itemize}
+
+\subsubsection{Non-persistent vs.\ persistent HTTP}
+\begin{itemize}
+    \item \textbf{Non-persistent (HTTP/1.0):} at most one object per TCP
+    connection. Each object costs roughly $2\,RTT$ (one RTT to set up TCP,
+    one for the request + first bytes) plus the file's transmission time.
+    \[
+        T_{\text{non-persistent (per object)}} = 2\,RTT + T_{\text{transmit}}.
+    \]
+    \item \textbf{Persistent (HTTP/1.1):} the server leaves the connection
+    open; multiple objects reuse it. As little as one RTT for all referenced
+    objects.
+\end{itemize}
+
+\subsubsection{HTTP message format}
+Requests are ASCII (human-readable). A request line (method, URL, version)
+is followed by header lines; methods include \texttt{GET}, \texttt{POST}
+(form data in the entity body), \texttt{HEAD} (headers only), and
+\texttt{PUT} (upload/replace).
+
+\begin{lstlisting}[caption={A raw HTTP/1.1 GET request (CRLF = \textbackslash r\textbackslash n)}]
+GET /index.html HTTP/1.1
+Host: www-net.cs.umass.edu
+User-Agent: Mozilla/5.0 (...) Firefox/80.0
+Accept: text/html,application/xhtml+xml
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Connection: keep-alive
+                         <-- a blank line (just CRLF) ends the headers
+\end{lstlisting}
+
+A response begins with a \textbf{status line} (version, status code,
+phrase), then headers, then the data. Common status codes:
+\textbf{200} OK, \textbf{301} Moved Permanently (new URL in
+\texttt{Location:}), \textbf{400} Bad Request, \textbf{404} Not Found,
+\textbf{505} HTTP Version Not Supported.
+
+\subsubsection{Trying HTTP by hand}
+You can speak HTTP manually with \texttt{netcat}/\texttt{ncat}:
+
+\begin{lstlisting}[language=bash, caption={Manual HTTP request over a raw TCP connection}]
+# Open a TCP connection to port 80, then type the request:
+nc -c -v gaia.cs.umass.edu 80        # macOS
+ncat -C gaia.cs.umass.edu 80         # Windows
+
+GET /kurose_ross/interactive/index.php HTTP/1.1
+Host: gaia.cs.umass.edu
+                                     # press Enter twice (blank line)
+\end{lstlisting}
+
+\noindent A more typical programmatic fetch:
+
+\begin{lstlisting}[language=Python, caption={A raw HTTP GET via a socket}]
+from socket import socket, AF_INET, SOCK_STREAM
+
+host = 'gaia.cs.umass.edu'
+s = socket(AF_INET, SOCK_STREAM)
+s.connect((host, 80))
+request = (f"GET / HTTP/1.1\r\n"
+           f"Host: {host}\r\n"
+           f"Connection: close\r\n\r\n")   # blank line terminates headers
+s.send(request.encode())
+
+response = b""
+while True:
+    chunk = s.recv(4096)
+    if not chunk:
+        break
+    response += chunk
+s.close()
+print(response.decode(errors='replace')[:500])
+\end{lstlisting}
+
+\subsection{Maintaining State: Cookies}
+
+HTTP itself is stateless, but sites keep state with \textbf{cookies}, which
+have four components:
+\begin{enumerate}
+    \item A \texttt{Set-Cookie:} header in the HTTP \emph{response}.
+    \item A \texttt{Cookie:} header in subsequent HTTP \emph{requests}.
+    \item A cookie file on the user's host, managed by the browser.
+    \item A back-end database at the site.
+\end{enumerate}
+On a first visit the site creates a unique ID and a database entry; every
+later request carries the ID so the site can ``recognize'' the user.
+
+\begin{itemize}
+    \item \textbf{Uses:} authorization, shopping carts, recommendations,
+    web-email session state.
+    \item \textbf{First-party} cookie: from the site you chose to visit.
+    \textbf{Third-party / tracking} cookie: from an ad/tracker
+    (e.g.\ \texttt{AdX.com}) embedded across many sites, letting a common ID
+    follow you around --- often via an invisible link rather than a visible
+    ad. Increasingly disabled by default and regulated (e.g.\ EU GDPR treats
+    identifying cookies as personal data).
+\end{itemize}
+
+\subsection{Web Caching (Proxy Servers)}
+
+A \textbf{web cache} sits between clients and origin servers, acting as both
+server (to the client) and client (to the origin). The browser sends all
+requests to the cache; on a hit it returns the object directly, on a miss it
+fetches from the origin, caches a copy, and returns it.
+
+\textbf{Why cache?} Reduce client response time (cache is nearer), reduce
+traffic on the institution's access link, and let ``poor'' content providers
+deliver effectively.
+
+\subsubsection{Worked example}
+Origin RTT $=2$ s, object size $=100$ Kbits, request rate $=15$/s, access
+link $=1.54$ Mbps, LAN $=1$ Gbps. Average data rate to browsers
+$=15 \times 100\text{ Kbits} = 1.50$ Mbps.
+\begin{itemize}
+    \item \textbf{No cache:} access-link utilization
+    $=1.50/1.54 \approx 0.97 \Rightarrow$ huge queueing delay
+    (end-to-end delay $=$ 2 s $+$ \emph{minutes} $+ \mu$s).
+    \item \textbf{Faster link (154 Mbps):} utilization $\approx 0.0097$,
+    delay in msec --- but expensive.
+    \item \textbf{Install a cache (hit rate $0.4$):} only $60\%$ of traffic
+    hits the access link $\Rightarrow 0.6 \times 1.50 = 0.9$ Mbps,
+    utilization $0.9/1.54 \approx 0.58 \Rightarrow$ low delay. Average
+    end-to-end delay $\approx 0.6(2.01) + 0.4(\sim\!\text{msec})
+    \approx 1.2$ s --- lower \emph{and} cheaper than the fast link.
+\end{itemize}
+
+\subsubsection{Conditional GET}
+To avoid sending an object the browser already has fresh, the client adds
+\texttt{If-Modified-Since: <date>}. The server replies
+\texttt{304 Not Modified} (no body) if unchanged, or \texttt{200 OK} with the
+object if it changed.
+
+\subsection{HTTP/2 and HTTP/3}
+
+\textbf{HTTP/2} (RFC 7540, 2015) targets reduced delay for multi-object
+pages. HTTP/1.1 introduced pipelined GETs over one TCP connection, but the
+server replies FCFS, so a small object can suffer \textbf{head-of-line (HOL)
+blocking} behind a large one, and TCP loss recovery stalls everything.
+HTTP/2 keeps methods/status codes/most headers but adds:
+\begin{itemize}
+    \item client-specified object \textbf{priority} (not necessarily FCFS),
+    \item server \textbf{push} of unrequested objects,
+    \item dividing objects into \textbf{frames} and \emph{interleaving} them
+    to mitigate HOL blocking.
+\end{itemize}
+
+\textbf{HTTP/3} addresses HTTP/2's remaining problem: a single TCP connection
+means one packet loss still stalls all streams. HTTP/3 runs over
+\textbf{UDP} (via QUIC), adding security plus \emph{per-object} error and
+congestion control.
+
+\subsection{Email: SMTP and IMAP (Completing the Roadmap)}
+
+The chapter roadmap lists ``E-mail, SMTP, IMAP'' but the slides skip it.
+Here is the essential picture.
+
+\begin{itemize}
+    \item \textbf{Components:} user agents (mail clients), mail servers
+    (each with an outgoing \emph{message queue} and per-user \emph{mailbox}),
+    and the \textbf{SMTP} protocol between servers.
+    \item \textbf{SMTP (Simple Mail Transfer Protocol, RFC 5321):} a
+    \emph{push} protocol over TCP \textbf{port 25}; uses persistent
+    connections; commands and replies are 7-bit ASCII; a message ends with a
+    line containing only ``\texttt{.}''.
+    \item \textbf{Retrieval:} SMTP delivers mail \emph{to} the recipient's
+    server, but a user agent \emph{pulls} mail from its mailbox with
+    \textbf{IMAP} (keeps messages on the server, supports folders/search) or
+    the older POP3. Webmail uses HTTP for this last hop.
+\end{itemize}
+
+\begin{lstlisting}[language=bash, caption={A bare SMTP dialog (client lines after the prompts)}]
+telnet mail.example.com 25
+S: 220 mail.example.com ESMTP ready
+C: HELO relay.local
+S: 250 Hello relay.local
+C: MAIL FROM:<alice@example.com>
+S: 250 OK
+C: RCPT TO:<bob@example.com>
+S: 250 OK
+C: DATA
+S: 354 End data with <CRLF>.<CRLF>
+C: Subject: Hi Bob
+C:
+C: Your days are numbered.
+C: .
+S: 250 OK queued
+C: QUIT
+S: 221 Bye
+\end{lstlisting}
+
+\subsection{The Domain Name System (DNS)}
+
+\textbf{DNS} translates human-readable domain names (\texttt{www.google.com})
+into IP addresses (\texttt{74.125.25.99}). It is itself an
+\emph{application-layer} protocol, even though name resolution is a core
+Internet function --- complexity is pushed to the network's edge.
+
+\subsubsection{Goals and why it's not centralized}
+DNS must be \textbf{scalable} (billions of records, trillions of
+queries/day), \textbf{highly available} (no single point of failure),
+and \textbf{fast} (almost every connection begins with a lookup, so a slow
+DNS makes everything slow). Centralizing would fail on all of these
+(single point of failure, traffic volume, distance, maintenance). It is
+read-heavy: far more lookups than updates.
+
+\subsubsection{The hierarchy}
+DNS arranges \textbf{name servers} in a tree; if one can't answer, it
+\emph{delegates} to a child.
+\begin{itemize}
+    \item \textbf{Root servers} (responsible for everything; only 13
+    root-server \emph{names}, \texttt{a}--\texttt{m.root-servers.net}, but
+    thousands of physical servers via \textbf{anycast}).
+    \item \textbf{Top-Level Domain (TLD) servers:} \texttt{.com},
+    \texttt{.org}, \texttt{.edu}, country domains, etc.\ (Verisign/Network
+    Solutions for \texttt{.com}; Educause for \texttt{.edu}). Over 1500 TLDs
+    today.
+    \item \textbf{Authoritative servers:} an organization's own servers with
+    the definitive records for its hosts.
+\end{itemize}
+
+\textbf{Three kinds of hierarchy:} names (dotted), authority (a
+\emph{zone} = an administrative authority that can delegate sub-zones), and
+infrastructure (each server knows only a subset).
+
+\subsubsection{Iterative vs.\ recursive resolution}
+\begin{itemize}
+    \item \textbf{Iterative:} the contacted server replies ``I don't know,
+    but ask \emph{that} server.'' The client walks the tree itself.
+    \item \textbf{Recursive:} the client offloads the whole job to its
+    \textbf{recursive resolver} (e.g.\ ISP-run, or \texttt{8.8.8.8}
+    /Google, \texttt{1.1.1.1}/Cloudflare). The resolver does the iterative
+    queries and returns the final answer. Resolvers build large shared caches
+    and reduce load on name servers. Your machine's \textbf{stub resolver}
+    just asks the recursive resolver.
+\end{itemize}
+Answers are \textbf{cached} for a \textbf{TTL} (e.g.\ 86\,400 s $=$ 24 h).
+
+\subsubsection{Packet format and records}
+DNS runs over \textbf{UDP port 53} (lightweight, no handshake, no
+per-connection state; usually fits one packet). Large transfers (e.g.\ zone
+transfers to secondary servers) fall back to TCP. The header carries a 16-bit
+\textbf{ID} (matches responses to queries; should be random for security),
+\textbf{flags} (QR query/response bit; RD recursion-desired bit), and four
+record \textbf{counts}. The payload holds \textbf{resource records (RRs)}
+--- name--value pairs sorted into Question / Answer / Authority / Additional
+sections.
+
+Record types you should know:
+\begin{itemize}
+    \item \textbf{A} --- name $\to$ IPv4 address.
+    \item \textbf{AAAA} --- name $\to$ IPv6 address.
+    \item \textbf{NS} --- delegates a domain to another name server.
+    \item \textbf{CNAME} --- alias for a canonical name.
+    \item \textbf{MX} --- mail server for a domain (with a priority; try
+    lowest number first).
+\end{itemize}
+
+\subsubsection{Doing it yourself with \texttt{dig}}
+\begin{lstlisting}[language=bash, caption={Walking the hierarchy manually with +norecurse}]
+# Ask the root directly; it delegates to .edu
+$ dig +norecurse eecs.berkeley.edu @198.41.0.4
+;; AUTHORITY SECTION:
+edu.  172800  IN  NS  a.edu-servers.net.
+;; ADDITIONAL SECTION:
+a.edu-servers.net.  172800  IN  A  192.5.6.30   # glue record
+
+# Now ask .edu; it delegates to berkeley.edu
+$ dig +norecurse eecs.berkeley.edu @192.5.6.30
+
+# Finally ask berkeley.edu; it answers authoritatively
+$ dig +norecurse eecs.berkeley.edu @128.32.136.3
+;; ANSWER SECTION:
+eecs.berkeley.edu.  86400  IN  A  23.185.0.1
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption={Resolving names from a program}]
+import socket
+print(socket.gethostbyname('www.google.com'))      # -> e.g. 142.250.x.x
+# Modern, supports IPv6 and more:
+for fam, *_ , sockaddr in socket.getaddrinfo('example.com', 443):
+    print(sockaddr[0])
+\end{lstlisting}
+
+\subsubsection{Other uses of DNS}
+\begin{itemize}
+    \item \textbf{Email} via MX records.
+    \item \textbf{Load balancing:} return multiple A records (client picks
+    one; server shuffles order) for coarse-grained balancing and resiliency.
+    \item \textbf{Geographic load balancing:} return different answers based
+    on the (resolver's) location to steer clients to a ``nearby'' server ---
+    inherently approximate.
+\end{itemize}
+
+\subsubsection{DNS security}
+\textbf{DDoS} on root servers (mitigated by traffic filtering and resolver
+caching of TLD addresses) or the more dangerous TLD servers;
+\textbf{spoofing} / \textbf{cache poisoning} (returning bogus replies).
+\textbf{DNSSEC} (RFC 4033) adds authentication.
+
+\subsection{P2P and BitTorrent}
+
+\subsubsection{File-distribution time: client--server vs.\ P2P}
+Distributing a file of size $F$ to $N$ peers; server upload $u_s$, peer $i$
+upload/download $u_i, d_i$, with $d_{\min}=\min_i d_i$.
+
+\[
+    D_{\text{c-s}} \;\geq\; \max\!\left\{\frac{N F}{u_s},\; \frac{F}{d_{\min}}\right\}
+    \qquad\text{(grows \emph{linearly} in } N\text{)}
+\]
+\[
+    D_{\text{P2P}} \;\geq\; \max\!\left\{\frac{F}{u_s},\; \frac{F}{d_{\min}},\;
+        \frac{N F}{\,u_s + \sum_i u_i\,}\right\}
+\]
+In P2P, demand $N F$ \emph{and} supply $u_s + \sum_i u_i$ both grow with $N$,
+so distribution time scales far better --- the source of P2P's
+\textbf{self-scalability}.
+
+\subsubsection{BitTorrent mechanics}
+\begin{itemize}
+    \item A file is split into \textbf{256-Kb chunks}; a \textbf{torrent} is
+    the group of peers exchanging chunks; a \textbf{tracker} tracks
+    participating peers.
+    \item A new peer registers with the tracker, gets a list of peers,
+    connects to a subset (``neighbors''), and accumulates chunks while
+    uploading what it has. \textbf{Churn:} peers join/leave; a finished peer
+    may leave (selfish) or seed (altruistic).
+    \item \textbf{Requesting --- rarest first:} Alice periodically asks
+    neighbors for their chunk lists and requests the \emph{rarest} missing
+    chunks first.
+    \item \textbf{Sending --- tit-for-tat:} Alice sends to the four peers
+    feeding her fastest (others are ``choked''); re-evaluated every 10 s.
+    Every 30 s she ``optimistically unchokes'' a random peer to discover
+    better partners. Higher upload rate $\Rightarrow$ better trading
+    partners $\Rightarrow$ faster downloads.
+\end{itemize}
+
+\subsection{Video Streaming and CDNs}
+
+Streaming video (Netflix, YouTube, Amazon Prime) was $\sim$80\% of
+residential ISP traffic (2020). Challenges: \textbf{scale} ($\sim$1B users)
+and \textbf{heterogeneity} (wired vs.\ mobile, rich vs.\ poor bandwidth).
+
+\subsubsection{Video basics}
+A video is a sequence of images (e.g.\ 24--30 fps); each image is an array of
+pixels. \textbf{Coding} exploits redundancy to cut bits: \emph{spatial}
+(within an image --- e.g.\ run-length encode a block of identical color) and
+\emph{temporal} (between frames --- send only the difference from the
+previous frame). \textbf{CBR} (constant bit rate) vs.\ \textbf{VBR} (variable
+bit rate). Examples: MPEG-1 $1.5$ Mbps, MPEG-2 $3$--$6$ Mbps, MPEG-4
+$64$ Kbps--$12$ Mbps.
+
+\subsubsection{Playout buffering}
+Network delay is variable (\textbf{jitter}), but playout must be continuous.
+A \textbf{client-side buffer} absorbs jitter: the client pre-fills the buffer
+and plays out at a constant rate while reception varies, adding a
+\textbf{playout delay}.
+
+\subsubsection{DASH (Dynamic Adaptive Streaming over HTTP)}
+\begin{itemize}
+    \item \textbf{Server:} divides the video into \emph{chunks}, encodes each
+    at multiple rates stored in separate files, and provides a
+    \textbf{manifest} listing chunk URLs; files are replicated across CDN
+    nodes.
+    \item \textbf{Client (the ``intelligence''):} periodically estimates
+    available bandwidth and, consulting the manifest, requests one chunk at a
+    time --- choosing \emph{when} (avoid buffer starvation/overflow),
+    \emph{what rate} (highest sustainable quality), and \emph{where} (a CDN
+    node that is close or uncongested).
+\end{itemize}
+
+\subsubsection{Content Distribution Networks}
+A single ``megaserver'' doesn't scale (single point of failure, congestion,
+long paths). A \textbf{CDN} stores copies at many geographically distributed
+sites. Two philosophies:
+\begin{itemize}
+    \item \textbf{Enter deep} (e.g.\ Akamai, $\sim$240k servers in $>$120
+    countries): push servers \emph{deep} into access networks, close to
+    users.
+    \item \textbf{Bring home} (e.g.\ Limelight): fewer, larger clusters in
+    points-of-presence (POPs) near access nets.
+\end{itemize}
+\textbf{Netflix OpenConnect} stores content at CDN nodes; the client gets a
+manifest and pulls each chunk at the highest supportable rate (or a different
+copy if a path is congested). Core \textbf{OTT} (``over the top'') challenges:
+\emph{which} content goes in \emph{which} node, and \emph{from where / at what
+rate} to retrieve it.
+
+% ==================================================================
+\section{The Transport Layer}
+% ==================================================================
+
+\subsection{Services and Principles}
+
+The transport layer provides \textbf{logical end-to-end communication between
+processes}, building on the network layer's host-to-host service.
+\begin{itemize}
+    \item \textbf{Sender:} breaks application messages into
+    \textbf{segments}, passes them to the network layer.
+    \item \textbf{Receiver:} reassembles segments into messages, passes them
+    up to the application.
+\end{itemize}
+
+\noindent\textbf{Household analogy:} 12 kids in Ann's house writing to 12 kids
+in Bill's house. Houses $=$ hosts, kids $=$ processes, letters $=$ messages,
+the postal service $=$ network layer, and \emph{Ann and Bill}
+(who sort mail to the right sibling) $=$ the transport protocol.
+
+\subsection{Multiplexing and Demultiplexing}
+
+\begin{itemize}
+    \item \textbf{Multiplexing (sender):} gather data from multiple sockets,
+    add transport headers.
+    \item \textbf{Demultiplexing (receiver):} use header fields to deliver
+    each segment to the correct socket.
+\end{itemize}
+
+\subsubsection{Connectionless (UDP) demux}
+A UDP socket is identified by the \textbf{2-tuple}
+(\emph{dest IP, dest port}). Two datagrams with the same destination port but
+different source IPs/ports are delivered to the \emph{same} socket.
+
+\subsubsection{Connection-oriented (TCP) demux}
+A TCP socket is identified by the full \textbf{4-tuple}
+(\emph{src IP, src port, dest IP, dest port}). A server therefore supports
+many simultaneous sockets, one per connecting client --- which is exactly why
+\texttt{accept()} returns a fresh socket. Three segments all sent to
+(B, 80) but from different sources demux to different sockets.
+
+\subsection{UDP: User Datagram Protocol (RFC 768)}
+
+``No frills, bare bones, best effort.'' Segments may be lost or delivered
+out of order. Benefits: \textbf{no connection setup} (no RTT penalty),
+\emph{no} connection state, \textbf{small header}, \emph{no} congestion
+control (can blast as fast as desired; functions under congestion).
+\textbf{Uses:} DNS, SNMP, streaming multimedia (loss-tolerant,
+rate-sensitive), and HTTP/3 (which re-adds reliability and congestion control
+at the application layer).
+
+\subsubsection{UDP segment and checksum}
+Header (8 bytes): source port, dest port, length (bytes, incl.\ header),
+checksum. The \textbf{Internet checksum} detects flipped bits:
+
+\begin{itemize}
+    \item \textbf{Sender:} treat the segment (plus a pseudo-header with IP
+    addresses) as a sequence of 16-bit integers; compute the one's-complement
+    sum (a carry out of the top bit is added back --- ``wraparound''); store
+    the one's complement of that sum in the checksum field.
+    \item \textbf{Receiver:} sum all 16-bit words \emph{including} the
+    checksum; the result should be all ones. Not equal $\Rightarrow$ error
+    detected. (It's \textbf{weak} protection: compensating bit flips can leave
+    the checksum unchanged.)
+\end{itemize}
+
+\begin{lstlisting}[language=Python, caption={The 16-bit Internet checksum}]
+def internet_checksum(data: bytes) -> int:
+    if len(data) % 2:                      # pad to an even number of bytes
+        data += b'\x00'
+    total = 0
+    for i in range(0, len(data), 2):
+        word = (data[i] << 8) + data[i + 1]
+        total += word
+        total = (total & 0xFFFF) + (total >> 16)   # fold the carry (wraparound)
+    return ~total & 0xFFFF                  # one's complement
+
+# Verify: summing data + checksum should give 0xFFFF (all ones)
+\end{lstlisting}
+
+\subsection{Principles of Reliable Data Transfer (rdt)}
+
+Goal: provide a \textbf{reliable channel} abstraction to the application on
+top of an \emph{unreliable} network channel. Complexity depends on what the
+channel can do to packets (lose / corrupt / reorder). Neither side knows the
+other's state unless told via a message --- ``that's why we need a protocol.''
+We develop the sender and receiver as \textbf{finite state machines (FSMs)},
+considering unidirectional data (control info still flows both ways).
+
+\begin{itemize}
+    \item \textbf{rdt 1.0:} perfectly reliable channel --- just send and
+    receive.
+    \item \textbf{rdt 2.0:} channel may \emph{flip bits}. Add a
+    \emph{checksum} to detect errors and \textbf{ACK}/\textbf{NAK} feedback:
+    the sender retransmits on a NAK (``stop-and-wait''). \emph{Fatal flaw:}
+    what if the ACK/NAK itself is corrupted?
+    \item \textbf{rdt 2.1:} add a 1-bit \textbf{sequence number} (0/1) so the
+    receiver can discard duplicates; the sender retransmits if the ACK/NAK is
+    corrupted. Two sequence numbers suffice for stop-and-wait.
+    \item \textbf{rdt 2.2:} a \textbf{NAK-free} protocol --- the receiver
+    ACKs the last correctly received packet (including its seq \#); a
+    \emph{duplicate ACK} means ``retransmit.'' (TCP uses this idea.)
+    \item \textbf{rdt 3.0:} channel may also \emph{lose} packets. Add a
+    \textbf{countdown timer}: if no ACK arrives in a ``reasonable'' time,
+    retransmit. A delayed (not lost) packet causes a harmless duplicate that
+    sequence numbers already handle.
+\end{itemize}
+
+\subsubsection{Why stop-and-wait performs terribly}
+With a $1$ Gbps link, $15$ ms one-way prop.\ delay (so $RTT = 30$ ms), and
+$L = 8000$-bit packets: $d_{\text{trans}} = L/R = 8\,\mu$s. Sender utilization:
+\[
+    U_{\text{sender}} = \frac{L/R}{RTT + L/R}
+    = \frac{0.008}{30.008} \approx 0.00027.
+\]
+The protocol --- not the link --- limits performance.
+
+\subsection{Pipelined Protocols}
+
+\textbf{Pipelining:} allow multiple ``in-flight,'' yet-to-be-ACKed packets.
+This needs a larger range of sequence numbers and buffering at sender and/or
+receiver. Three packets in flight improves utilization 3$\times$:
+\[
+    U_{\text{sender}} = \frac{3\,L/R}{RTT + L/R}.
+\]
+
+\subsubsection{Go-Back-N (GBN)}
+\begin{itemize}
+    \item Sender keeps a window of up to $N$ consecutive transmitted-but-unACKed
+    packets, with a $k$-bit sequence number.
+    \item \textbf{Cumulative ACK:} ACK($n$) acknowledges \emph{all} packets up
+    to and including $n$; on receipt the window slides to begin at $n+1$.
+    \item A single timer covers the oldest in-flight packet;
+    \textbf{timeout($n$)} retransmits packet $n$ and \emph{all} higher-seq
+    packets in the window.
+    \item \textbf{Receiver} is simple: it only tracks the next expected seq
+    (\texttt{rcv\_base}), discards out-of-order packets, and re-ACKs the
+    highest in-order seq received.
+\end{itemize}
+
+\subsubsection{Selective Repeat (SR)}
+\begin{itemize}
+    \item The receiver \emph{individually} ACKs each correctly received packet
+    and \emph{buffers} out-of-order packets for later in-order delivery.
+    \item The sender keeps a (conceptual) timer \emph{per} unACKed packet and
+    on timeout retransmits \emph{only} that one packet.
+    \item \textbf{The dilemma:} sequence numbers wrap around. To avoid the
+    receiver mistaking a retransmission for new data, the
+    \textbf{window size must be} $\leq \tfrac{1}{2}$ the sequence-number
+    space. (Receiver windows in $[\texttt{rcvbase}, \texttt{rcvbase}+N-1]$ and
+    $[\texttt{rcvbase}-N, \texttt{rcvbase}-1]$ must not overlap.)
+\end{itemize}
+
+\subsection{TCP: Connection-Oriented Transport (RFCs 793, 1122, 2018, 5681, 7323)}
+
+TCP is point-to-point, reliable, in-order \textbf{byte stream}
+(no message boundaries), \textbf{full-duplex}, connection-oriented
+(handshake first), flow-controlled, and congestion-controlled. It pipelines
+with \textbf{cumulative ACKs} and a window set by flow and congestion
+control. \textbf{MSS} is the maximum segment size (the payload), distinct
+from MTU.
+
+\subsubsection{Segment structure}
+Key fields: source/dest ports; 32-bit \textbf{sequence number}
+(byte-stream number of the first data byte --- counting \emph{bytes}, not
+segments); 32-bit \textbf{acknowledgement number} (next byte expected,
+cumulative); header length; flags (\textbf{ACK}, \textbf{RST}/\textbf{SYN}/
+\textbf{FIN} for connection management, \textbf{C}/\textbf{E} for congestion
+notification); \textbf{receive window} (\texttt{rwnd}, for flow control);
+checksum; options.
+
+\subsubsection{Sequence numbers and ACKs}
+Telnet example: A types `C'. A $\to$ B: \texttt{Seq=42, ACK=79, data='C'}.
+B echoes: \texttt{Seq=79, ACK=43, data='C'}. A acks the echo:
+\texttt{Seq=43, ACK=80}. How a receiver handles out-of-order segments is
+\emph{not} specified by the standard --- it's up to the implementer.
+
+\subsubsection{RTT estimation and timeout}
+The timeout must exceed the RTT, but RTT varies. \texttt{SampleRTT} is
+measured per segment (ignoring retransmissions) and smoothed with an
+\textbf{exponential weighted moving average (EWMA)}:
+\[
+    \text{EstimatedRTT} = (1-\alpha)\,\text{EstimatedRTT}
+                        + \alpha\,\text{SampleRTT},
+    \qquad \alpha = 0.125.
+\]
+A deviation estimate adds a safety margin:
+\[
+    \text{DevRTT} = (1-\beta)\,\text{DevRTT}
+                  + \beta\,|\text{SampleRTT} - \text{EstimatedRTT}|,
+    \qquad \beta = 0.25,
+\]
+\[
+    \boxed{\;\text{TimeoutInterval} = \text{EstimatedRTT} + 4\,\text{DevRTT}\;}.
+\]
+
+\subsubsection{Reliable transfer and fast retransmit}
+A single timer is kept for the oldest unACKed segment. On a \textbf{timeout},
+TCP retransmits the segment that timed out and restarts the timer. A
+cumulative ACK can ``cover'' an earlier lost ACK.
+
+\textbf{Fast retransmit:} a missing segment shows up as repeated cumulative
+ACKs for the same byte. On receiving \textbf{three duplicate ACKs} (``triple
+duplicate''), TCP resends the missing segment \emph{immediately}, without
+waiting for the timeout. The receiver's ACK rules (RFC 5681) include
+\emph{delayed ACKs} (wait up to 500 ms to piggyback) and immediate
+\emph{duplicate ACKs} on out-of-order arrivals.
+
+\subsection{TCP Flow Control}
+
+\emph{Problem:} the network layer may hand data to the receiver faster than
+the application reads it from the socket buffer. \textbf{Flow control} stops
+the sender from overflowing the \emph{receiver}'s buffer:
+\begin{itemize}
+    \item The receiver advertises free buffer space in the \texttt{rwnd}
+    field of every segment.
+    \item The sender limits its in-flight (unACKed) data to $\leq$
+    \texttt{rwnd}, guaranteeing the receive buffer never overflows.
+\end{itemize}
+\textbf{Distinct from congestion control:} flow control protects one
+\emph{receiver}; congestion control protects the \emph{network}.
+
+\subsection{TCP Connection Management}
+
+\subsubsection{Why 2-way handshakes fail}
+A 2-way handshake can't reliably establish state because of variable delays,
+retransmitted/duplicated connection requests, and reordering --- leading to
+\textbf{half-open connections} (server thinks it's connected, no client) or
+duplicate-data acceptance.
+
+\subsubsection{The 3-way handshake}
+\begin{enumerate}
+    \item Client $\to$ server: \texttt{SYN}, \texttt{Seq=x} (choose initial
+    seq $x$).
+    \item Server $\to$ client: \texttt{SYNACK}, \texttt{Seq=y, ACK=x+1}
+    (choose initial seq $y$, ack the SYN).
+    \item Client $\to$ server: \texttt{ACK, ACK=y+1} (may carry data).
+\end{enumerate}
+States transition \texttt{LISTEN} $\to$ \texttt{SYN\_SENT}/\texttt{SYN\_RCVD}
+$\to$ \texttt{ESTAB}. (``On belay? / Belay on. / Climbing.'')
+
+\begin{lstlisting}[language=Python, caption={The socket calls that drive the TCP handshake}]
+# Server
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(('', 12000))
+s.listen(1)
+conn, addr = s.accept()        # completes the 3-way handshake
+
+# Client
+c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+c.connect(('serverName', 12000))   # sends SYN, receives SYNACK, sends ACK
+\end{lstlisting}
+
+\subsubsection{Closing a connection}
+Each side closes its own half by sending a segment with \texttt{FIN=1} and
+responding to a received FIN with an ACK (which may be combined with its own
+FIN). Simultaneous FIN exchanges are handled.
+
+\subsection{Principles of Congestion Control}
+
+\textbf{Congestion:} ``too many sources sending too much data too fast for
+the network to handle.'' Manifestations: long queueing delays and packet loss
+(buffer overflow). A top-10 networking problem --- and \emph{different} from
+flow control.
+
+\begin{itemize}
+    \item \textbf{Scenario 1} (two flows, one router, infinite buffers): as
+    arrival rate $\to R/2$, delay $\to \infty$. Max per-connection throughput
+    is $R/2$.
+    \item \textbf{Scenario 2} (finite buffers, retransmissions): the
+    transport-layer input $\lambda'_{in} \geq \lambda_{in}$ because of
+    retransmissions. Costs of congestion: more work per delivered packet, and
+    \emph{un-needed duplicates} (from premature timeouts) waste capacity and
+    lower achievable throughput.
+    \item \textbf{Scenario 3} (multi-hop): when a packet is dropped
+    \emph{downstream}, all the upstream capacity and buffering already spent
+    on it is wasted.
+\end{itemize}
+
+\noindent\textbf{Two approaches:}
+\begin{itemize}
+    \item \textbf{End-to-end} (TCP): no explicit network feedback; congestion
+    \emph{inferred} from observed loss/delay.
+    \item \textbf{Network-assisted:} routers give direct feedback
+    (e.g.\ TCP ECN, ATM, DECbit), indicating congestion level or an explicit
+    rate.
+\end{itemize}
+
+\subsection{TCP Congestion Control}
+
+\subsubsection{AIMD}
+Senders probe for bandwidth: \textbf{Additive Increase} (raise \texttt{cwnd}
+by 1 MSS every RTT while no loss) and \textbf{Multiplicative Decrease}
+(halve \texttt{cwnd} on a loss event) --- the characteristic ``sawtooth.''
+\begin{itemize}
+    \item \textbf{TCP Reno:} on triple-duplicate-ACK loss, cut to half.
+    \item \textbf{TCP Tahoe:} on a \emph{timeout}, cut all the way to 1 MSS.
+\end{itemize}
+AIMD is a distributed, asynchronous algorithm with good stability and
+network-wide fairness properties.
+
+\subsubsection{Sending rate and the window}
+The sender limits unACKed data to the congestion window:
+\[
+    \text{LastByteSent} - \text{LastByteAcked} \;\leq\; \texttt{cwnd},
+    \qquad \text{TCP rate} \approx \frac{\texttt{cwnd}}{RTT}\ \text{bytes/sec.}
+\]
+
+\subsubsection{Slow start, congestion avoidance, fast recovery}
+\begin{itemize}
+    \item \textbf{Slow start:} begin with \texttt{cwnd}$=1$ MSS and
+    \emph{double} \texttt{cwnd} every RTT (increment per ACK) ---
+    exponential ramp.
+    \item \textbf{Switch to congestion avoidance} when \texttt{cwnd}
+    reaches \texttt{ssthresh}; thereafter increase \emph{linearly}
+    ($+1$ MSS per RTT). On any loss, \texttt{ssthresh} is set to half the
+    \texttt{cwnd} at the loss event.
+    \item \textbf{Loss handling:} timeout $\to$ \texttt{ssthresh}$=$
+    \texttt{cwnd}$/2$, \texttt{cwnd}$=1$ MSS (back to slow start). Triple
+    duplicate ACK $\to$ \texttt{ssthresh}$=$\texttt{cwnd}$/2$,
+    \texttt{cwnd}$=$\texttt{ssthresh}$+3$ (\textbf{fast recovery}).
+\end{itemize}
+
+\subsubsection{TCP throughput}
+Ignoring slow start, if loss occurs at window $W$, the window oscillates
+between $W/2$ and $W$, so the average window is $\tfrac{3}{4}W$:
+\[
+    \text{avg.\ throughput} \approx \frac{3}{4}\cdot\frac{W}{RTT}.
+\]
+The \textbf{Mathis} formula relates throughput to loss probability $L$:
+\[
+    \text{throughput} \approx \frac{1.22 \cdot \text{MSS}}{RTT\,\sqrt{L}}.
+\]
+For ``long, fat pipes'' (e.g.\ 1500-byte segments, $RTT=100$ ms, target
+10 Gbps) you'd need $\sim$83\,333 in-flight segments and a tiny loss rate
+$L \approx 2\times 10^{-10}$ --- motivating high-speed TCP variants.
+
+\subsubsection{TCP CUBIC}
+Instead of pure linear increase, after halving the window on loss, ramp back
+toward $W_{\max}$ (the window at which loss was last seen)
+\emph{quickly at first, then cautiously} as you near $W_{\max}$. Window growth
+is a \emph{cubic} function of the time since the last loss ($K$ is when
+\texttt{cwnd} would reach $W_{\max}$). CUBIC is the Linux default and the most
+popular TCP for busy web servers.
+
+\subsubsection{Delay-based congestion control (and BBR)}
+Goal: ``keep the end-to-end pipe \emph{just} full, but not fuller'' --- keep
+the bottleneck busy without inducing loss/large queues. Track
+$RTT_{\min}$ (uncongested) and compute uncongested throughput
+$=$ \texttt{cwnd}$/RTT_{\min}$:
+\begin{itemize}
+    \item measured throughput close to uncongested $\Rightarrow$ increase
+    \texttt{cwnd} linearly (path not congested);
+    \item measured throughput far below $\Rightarrow$ decrease \texttt{cwnd}
+    (path congested).
+\end{itemize}
+This achieves high throughput with low delay and \emph{without forcing loss}.
+\textbf{BBR} (a delay/bandwidth-based design) is deployed on Google's
+backbone.
+
+\subsubsection{ECN (Explicit Congestion Notification)}
+Network-assisted: a router marks two bits in the IP header (ToS field) to
+signal congestion; the destination sets the \texttt{ECE} bit on its ACK to
+notify the sender. Involves both IP (marking) and TCP (C/E header bits).
+
+\subsubsection{TCP fairness}
+If $K$ sessions share a bottleneck of rate $R$, each ``should'' get $R/K$.
+TCP is fair \emph{under idealized assumptions} (same RTT, fixed number of
+sessions, all in congestion avoidance): additive increase moves both flows
+along a $45^\circ$ line, multiplicative decrease pulls them toward equal
+share. Caveats:
+\begin{itemize}
+    \item \textbf{UDP} apps (some multimedia) ignore congestion control ---
+    there's no ``Internet police.''
+    \item \textbf{Parallel connections:} an app opening many TCP connections
+    grabs a larger share (on a link of rate $R$ with 9 existing connections, a
+    new app asking for 1 TCP gets $R/10$, but asking for 11 gets $R/2$).
+\end{itemize}
+
+% ==================================================================
+\section{The Network Layer: Data Plane}
+% ==================================================================
+
+\subsection{Overview: Data Plane vs.\ Control Plane}
+
+The network layer transports a segment from the sending to the receiving
+host: the sender \textbf{encapsulates} segments into \textbf{datagrams} and
+passes them to the link layer; the receiver delivers segments up to the
+transport layer. Crucially, the network layer runs in \emph{every} Internet
+device --- hosts \emph{and} routers. A router examines header fields of all
+IP datagrams passing through it and moves each from an input port to the
+appropriate output port.
+
+\subsubsection{Two key functions}
+\begin{itemize}
+    \item \textbf{Forwarding} (\emph{local}, per-router): move a packet from a
+    router's input link to the correct output link. Analogy: getting through
+    a \emph{single} highway interchange.
+    \item \textbf{Routing} (\emph{global}): determine the end-to-end path
+    packets take from source to destination, via routing algorithms. Analogy:
+    planning the whole trip.
+\end{itemize}
+
+\subsubsection{The two planes}
+\begin{itemize}
+    \item \textbf{Data plane:} local, per-router; decides how a datagram
+    \emph{arriving} on an input port is forwarded to an output port. Runs in
+    \emph{hardware} at nanosecond timescales.
+    \item \textbf{Control plane:} network-wide logic; decides how a datagram
+    is \emph{routed} end-to-end. Runs in \emph{software} at millisecond
+    timescales. Two approaches:
+    \begin{itemize}
+        \item \textbf{Traditional (per-router):} a routing-algorithm component
+        in \emph{every} router interacts to build forwarding tables.
+        \item \textbf{SDN (Software-Defined Networking):} a \emph{remote}
+        controller computes and installs forwarding tables into all routers.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Network-Layer Service Models}
+
+The design question: \emph{what service model should the ``channel'' that
+carries datagrams offer?} Possible per-datagram guarantees include guaranteed
+delivery or guaranteed delivery within a delay bound (e.g.\ $<40$ ms).
+Per-\emph{flow} guarantees include in-order delivery, a minimum bandwidth, or
+bounded jitter (limits on inter-packet-spacing changes).
+
+\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|l|l|X|X|X|X|}
+\hline
+\textbf{Architecture} & \textbf{Model} & \textbf{Bandwidth} & \textbf{Loss} & \textbf{Order} & \textbf{Timing} \\
+\hline
+Internet & best effort & none & no & no & no \\
+\hline
+ATM & CBR & constant rate & yes & yes & yes \\
+\hline
+ATM & ABR & guaranteed min & no & yes & no \\
+\hline
+Internet & Intserv Guar.\ (RFC 1633) & yes & yes & yes & yes \\
+\hline
+Internet & Diffserv (RFC 2475) & possible & possibly & possibly & no \\
+\hline
+\end{tabularx}
+
+\medskip
+\noindent The Internet's \textbf{best-effort} model makes \emph{no}
+guarantees on delivery, timing/order, or bandwidth --- yet it succeeded
+because its simplicity enabled wide deployment, sufficient bandwidth
+provisioning makes real-time apps ``good enough most of the time,''
+replicated CDN/datacenter services sit close to clients, and congestion
+control of elastic traffic helps. ``It's hard to argue with success.''
+
+\subsection{Inside a Router}
+
+A generic router has \textbf{input ports}, a high-speed \textbf{switching
+fabric}, \textbf{output ports}, and a \textbf{routing processor}. The
+forwarding data plane (hardware, nanoseconds) is separate from the
+routing/management control plane (software, milliseconds). Analogy: a
+roundabout (fabric) with entry stations (input ports), exit roads (output
+ports), and a station manager (routing processor).
+
+\subsubsection{Input port functions}
+\begin{enumerate}
+    \item \textbf{Line termination} (physical layer): bit-level reception.
+    \item \textbf{Link-layer protocol} (e.g.\ Ethernet) receive.
+    \item \textbf{Lookup, forwarding, queueing:} \emph{decentralized
+    switching} --- using header fields, look up the output port in a
+    forwarding table held in \emph{input-port} memory (``match plus
+    action''), ideally at \textbf{line speed}. If datagrams arrive faster
+    than the fabric can absorb them, \textbf{input queueing} occurs.
+\end{enumerate}
+\textbf{Destination-based} forwarding uses only the destination IP address
+(traditional); \textbf{generalized} forwarding uses any set of header fields
+(the SDN ``match+action'' model).
+
+\subsection{Longest Prefix Matching (LPM)}
+
+When looking up a destination, a router uses the \textbf{longest address
+prefix} that matches. Example forwarding table (\texttt{*} = don't-care):
+
+\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|l|X|c|}
+\hline
+\textbf{Prefix} & \textbf{Meaning} & \textbf{Interface} \\
+\hline
+\texttt{11001000 00010111 00010***} & \dots/21 & 0 \\
+\hline
+\texttt{11001000 00010111 00011000} & \dots/24 & 1 \\
+\hline
+\texttt{11001000 00010111 00011***} & \dots/21 & 2 \\
+\hline
+otherwise & default & 3 \\
+\hline
+\end{tabularx}
+
+\medskip
+\noindent A datagram to \texttt{11001000 00010111 00011000 10101010} matches
+both the \dots/21 (interface 2) \emph{and} the \dots/24 (interface 1) entry;
+LPM picks the \textbf{more specific} /24 $\Rightarrow$ \textbf{interface 1}.
+A datagram to \texttt{\dots 00010110 \dots} matches only the first prefix
+$\Rightarrow$ interface 0.
+
+LPM is typically done in hardware with \textbf{TCAM} (Ternary
+Content-Addressable Memory): present an address and it returns the matching
+entry in \emph{one clock cycle} regardless of table size (Cisco Catalyst:
+$\sim$1M entries).
+
+\subsection{Switching Fabrics}
+
+The fabric transfers a packet from an input link to an output link. The
+\textbf{switching rate} (often stated as a multiple of the line rate) should
+ideally be $N$ times the line rate $R$ for $N$ ports (aggregate $NR$). Three
+classic fabric types:
+\begin{itemize}
+    \item \textbf{Via memory (1st generation):} a traditional computer copies
+    the packet into system memory under CPU control --- \emph{two} bus
+    crossings per datagram; speed limited by memory bandwidth.
+    \item \textbf{Via a bus:} the datagram crosses a shared bus directly;
+    speed limited by \textbf{bus contention} (e.g.\ a 32 Gbps bus suffices for
+    access routers).
+    \item \textbf{Via an interconnection network:} e.g.\ a \textbf{crossbar}
+    (originally built to connect multiprocessors); multiple packets can
+    traverse simultaneously, overcoming the single-bus bottleneck.
+\end{itemize}
+
+\subsection{Input Queueing and HOL Blocking}
+
+If the fabric is slower than the combined input rate, packets queue at the
+inputs (delay and loss from input-buffer overflow). Worse,
+\textbf{output-port contention} means only one packet destined to a given
+output can cross at a time; a blocked packet at the \emph{front} of an input
+queue stalls everything behind it --- even packets bound for idle outputs.
+This is \textbf{Head-of-Line (HOL) blocking}.
+
+\subsection{Output Queueing and Buffering}
+
+Buffering is required when datagrams arrive from the fabric faster than the
+output link transmits (rate $R$); overflow causes queueing delay and loss.
+Two policy questions arise: a \textbf{drop policy} (which datagram to drop
+when full) and a \textbf{scheduling discipline} (which queued datagram to
+send next).
+
+\subsubsection{How much buffering?}
+\begin{itemize}
+    \item \textbf{RFC 3439 rule of thumb:} average buffering $\approx$ typical
+    RTT ($\sim$250 ms) $\times$ link capacity $C$
+    (e.g.\ 10 Gbps $\Rightarrow$ 2.5 Gbit buffer).
+    \item \textbf{More recent (with $N$ flows):} buffering
+    $\approx \dfrac{\text{RTT}\times C}{\sqrt{N}}$.
+    \item \textbf{Bufferbloat:} \emph{too much} buffering (common in home
+    routers) inflates delay --- long RTTs give poor real-time performance and
+    sluggish TCP response. Recall delay-based congestion control: ``keep the
+    bottleneck just full enough, but no fuller.''
+\end{itemize}
+
+\subsection{Buffer Management and Packet Scheduling}
+
+\subsubsection{Buffer management}
+\begin{itemize}
+    \item \textbf{Drop:} which packet to drop when the buffer is full ---
+    \emph{tail drop} (drop the arriving packet) or \emph{priority} drop
+    (drop/remove by priority).
+    \item \textbf{Marking:} which packets to \emph{mark} to signal congestion
+    --- ECN, RED (Random Early Detection).
+\end{itemize}
+
+\subsubsection{Scheduling policies}
+\begin{itemize}
+    \item \textbf{FCFS / FIFO:} transmit in order of arrival.
+    \item \textbf{Priority:} classify arrivals into priority classes (using
+    any header fields); always serve the highest-priority non-empty queue,
+    FCFS within a class.
+    \item \textbf{Round Robin (RR):} cyclically scan class queues, sending one
+    packet from each in turn.
+    \item \textbf{Weighted Fair Queueing (WFQ):} generalized RR; each class
+    $i$ has weight $w_i$ and receives a share
+    $\dfrac{w_i}{\sum_j w_j}$ of the link each cycle --- giving a per-class
+    \textbf{minimum bandwidth guarantee}. (Scheduling choices raise
+    net-neutrality questions: who gets the best performance?)
+\end{itemize}
+
+\subsection{IP: The Internet Protocol --- Datagram Format}
+
+The host/router network layer comprises the \textbf{IP protocol}
+(datagram format, addressing, packet-handling conventions), the
+\textbf{ICMP protocol} (error reporting, router signaling), and forwarding
+tables built by routing protocols (OSPF, BGP) or an SDN controller.
+
+Key IPv4 header fields:
+\begin{itemize}
+    \item \textbf{Version}, \textbf{header length}, \textbf{type of service}
+    (Diffserv bits 0--5, ECN bits 6--7).
+    \item \textbf{Total length} (bytes; max 64 KB, typically $\leq$ 1500).
+    \item \textbf{16-bit identifier}, \textbf{flags}, \textbf{fragment
+    offset} --- for fragmentation/reassembly.
+    \item \textbf{TTL} (remaining hops, decremented at each router).
+    \item \textbf{Upper-layer protocol} (e.g.\ TCP, UDP --- used for demux at
+    the destination).
+    \item \textbf{Header checksum}; \textbf{source} and \textbf{destination}
+    32-bit IP addresses; \textbf{options} (rarely used).
+\end{itemize}
+\textbf{Overhead:} 20 bytes IP $+$ 20 bytes TCP $=$ 40 bytes per segment
+(before application data).
+
+\subsection{IP Fragmentation and Reassembly}
+
+Every link has an \textbf{MTU} (Maximum Transmission Unit) --- the largest
+link-level frame it can carry --- and different link types have different
+MTUs. A too-large IP datagram is \textbf{fragmented} within the network into
+several datagrams, and \textbf{reassembled only at the destination}. Header
+fields coordinate this:
+\begin{itemize}
+    \item \textbf{Identifier} --- same value on all fragments of one original
+    datagram.
+    \item \textbf{Flag (MF, ``more fragments'')} --- 1 on all but the last
+    fragment.
+    \item \textbf{Fragment offset} --- position of this fragment's data in the
+    original, \emph{counted in units of 8 bytes}.
+\end{itemize}
+
+\subsubsection{Worked example}
+A 4000-byte datagram (20-byte header, 3980 bytes of data) over a link with
+MTU $=1500$: each fragment carries at most $\lfloor(1500-20)/8\rfloor\times 8
+= 1480$ data bytes.
+
+\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|c|c|c|c|c|}
+\hline
+\textbf{Fragment} & \textbf{length} & \textbf{ID} & \textbf{MF flag} & \textbf{offset} \\
+\hline
+1 & 1500 & x & 1 & 0 \\
+\hline
+2 & 1500 & x & 1 & 185 \quad($1480/8$) \\
+\hline
+3 & 1040 & x & 0 & 370 \quad($2960/8$) \\
+\hline
+\end{tabularx}
+
+\begin{lstlisting}[language=Python, caption={Computing IPv4 fragments (offset in 8-byte units)}]
+def fragment(total_len, mtu, header=20):
+    data_left = total_len - header
+    max_data  = ((mtu - header) // 8) * 8      # payload/frag, multiple of 8
+    frags, offset_bytes = [], 0
+    while data_left > 0:
+        take = min(max_data, data_left)
+        more = 1 if data_left - take > 0 else 0
+        frags.append({'length': take + header,
+                      'offset': offset_bytes // 8,   # counted in 8-byte units
+                      'MF': more})
+        offset_bytes += take
+        data_left    -= take
+    return frags
+
+for f in fragment(4000, 1500):
+    print(f)
+# {'length': 1500, 'offset': 0,   'MF': 1}
+# {'length': 1500, 'offset': 185, 'MF': 1}
+# {'length': 1040, 'offset': 370, 'MF': 0}
+\end{lstlisting}
+
+\subsection{IP Addressing, Subnets, and CIDR}
+
+An \textbf{IP address} is a 32-bit identifier for an \textbf{interface} (the
+connection between a host/router and a physical link). Routers usually have
+several interfaces; a host usually has one or two (wired Ethernet, WiFi).
+Addresses are written in \textbf{dotted-decimal} notation
+(e.g.\ \texttt{223.1.1.1} $=$ \texttt{11011111 00000001 00000001 00000001}).
+
+\subsubsection{Subnets}
+A \textbf{subnet} is a set of interfaces that can reach each other
+\emph{without} passing through an intervening router. Addresses have
+structure: a high-order \textbf{subnet part} (common to all devices in the
+subnet) and a low-order \textbf{host part}. \emph{Recipe:} detach each
+interface from its host/router; each resulting isolated ``island'' is a
+subnet.
+
+\subsubsection{CIDR}
+\textbf{CIDR} (Classless Inter-Domain Routing, ``cider'') lets the subnet
+portion be \emph{any} length: \texttt{a.b.c.d/x}, where $x$ is the number of
+subnet-part bits (the \textbf{subnet mask}). A \texttt{/24} means the first
+24 bits are the subnet part.
+
+\begin{lstlisting}[language=Python, caption={Subnet math and longest-prefix match with the ipaddress module}]
+import ipaddress
+
+net = ipaddress.ip_network('200.23.16.0/23')
+print(net.network_address)     # 200.23.16.0
+print(net.broadcast_address)   # 200.23.17.255
+print(net.netmask)             # 255.255.254.0
+print(net.num_addresses)       # 512   = 2**(32-23)
+print(net.num_addresses - 2)   # 510   usable hosts (minus network+broadcast)
+
+# Longest-prefix match: the most specific matching route wins
+routes = [ipaddress.ip_network(c) for c in ('200.23.16.0/20',
+                                             '200.23.18.0/23')]
+dst = ipaddress.ip_address('200.23.18.55')
+best = max((r for r in routes if dst in r), key=lambda r: r.prefixlen)
+print(best)                    # 200.23.18.0/23  (the /23 beats the /20)
+\end{lstlisting}
+
+\subsection{Getting an Address: DHCP}
+
+Two sub-questions: how a \emph{host} gets its host part, and how a
+\emph{network} gets its subnet part.
+
+\subsubsection{Host part --- DHCP}
+A host's address is either hard-coded by a sysadmin or, more commonly,
+obtained dynamically via \textbf{DHCP} (Dynamic Host Configuration Protocol)
+--- ``plug and play.'' DHCP lets a host obtain an address when it joins a
+network, renew a lease, reuse freed addresses, and support mobile users. The
+four-message exchange (\textbf{DORA}), all broadcast, is:
+\begin{enumerate}
+    \item \textbf{Discover} --- ``is there a DHCP server out there?''
+    (src \texttt{0.0.0.0:68}, dst \texttt{255.255.255.255:67}).
+    \item \textbf{Offer} --- server proposes an address (\texttt{yiaddr}) and
+    lease time.
+    \item \textbf{Request} --- client asks for the offered address.
+    \item \textbf{ACK} --- server confirms.
+\end{enumerate}
+The first two steps can be skipped if a client is reusing a previously
+allocated address (RFC 2131). DHCP returns more than an address: the
+\textbf{first-hop (default) router}, the \textbf{DNS server}, and the
+\textbf{subnet mask}. The whole DHCP message is carried in
+UDP\,$\to$\,IP\,$\to$\,Ethernet and broadcast on the LAN.
+
+\subsubsection{Network part --- ISPs and ICANN}
+A network gets its subnet part as an allocated block of its provider ISP's
+address space. \textbf{ICANN} (via 5 Regional Registries) allocates IP blocks
+and manages the DNS root zone and TLD delegation. The last IPv4 blocks were
+handed to the registries in 2011 --- motivating NAT and IPv6.
+
+\subsection{Hierarchical Addressing and Route Aggregation}
+
+Hierarchical allocation lets an ISP advertise a \emph{single} aggregate route
+(``send me anything beginning \texttt{200.23.16.0/20}'') covering many
+customer organizations --- keeping global routing tables small. If one
+organization moves to a different ISP, that ISP advertises a \textbf{more
+specific} route (e.g.\ \texttt{200.23.18.0/23}); LPM ensures the more specific
+route wins, so traffic still reaches the moved organization.
+
+\subsection{NAT: Network Address Translation}
+
+All devices in a local network share \emph{one} public IPv4 address as far as
+the outside world is concerned. Internally they use a \textbf{private} block
+(\texttt{10.0.0.0/8}, \texttt{172.16.0.0/12}, or \texttt{192.168.0.0/16}) that
+is only meaningful locally.
+
+\textbf{Advantages:} only one ISP-provided address is needed; local addresses
+can change without notifying the outside; the ISP can change without
+renumbering local hosts; and inside devices aren't directly addressable from
+outside (a security side-effect).
+
+\subsubsection{How it works}
+The NAT router transparently rewrites addresses using a \textbf{translation
+table}:
+\begin{itemize}
+    \item \textbf{Outgoing:} replace (source IP, port) with
+    (NAT IP, \emph{new} port), and record the mapping.
+    \item \textbf{Incoming:} replace the destination (NAT IP, new port) with
+    the stored (source IP, port).
+\end{itemize}
+
+\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|X|X|}
+\hline
+\textbf{WAN side (NAT IP, port)} & \textbf{LAN side (host IP, port)} \\
+\hline
+\texttt{138.76.29.7, 5001} & \texttt{10.0.0.1, 3345} \\
+\hline
+\end{tabularx}
+
+\medskip
+\noindent \textbf{Controversy:} NAT makes a network-layer device manipulate
+port numbers (a transport-layer concept), violating the end-to-end argument,
+and complicates \textbf{NAT traversal} (reaching a server \emph{behind} a
+NAT). Purists argue address shortage ``should'' be solved by IPv6 --- but NAT
+is here to stay (home, institutional, and 4G/5G networks).
+
+\subsection{IPv6}
+
+\textbf{Motivation:} the 32-bit IPv4 space was being exhausted; secondary
+goals were faster processing (a fixed 40-byte header) and better handling of
+\emph{flows}.
+
+\subsubsection{Datagram format}
+Fields: version, \textbf{priority}, \textbf{flow label} (identifies datagrams
+in the same flow --- concept loosely defined), payload length, \textbf{next
+header} (upper-layer protocol), \textbf{hop limit}, and \textbf{128-bit}
+source/destination addresses. Compared with IPv4, IPv6 \emph{drops}:
+\begin{itemize}
+    \item the header \textbf{checksum} (speeds router processing),
+    \item in-network \textbf{fragmentation/reassembly},
+    \item \textbf{options} (moved to an upper-layer ``next-header'' chain).
+\end{itemize}
+
+\subsubsection{Transition: tunneling}
+Not all routers can be upgraded at once (no ``flag days''), so IPv4 and IPv6
+must coexist. \textbf{Tunneling} carries an IPv6 datagram as the
+\emph{payload} of an IPv4 datagram between IPv6-capable routers separated by
+IPv4-only infrastructure (a ``packet within a packet''). The entry router
+(dual-stack IPv6/v4) encapsulates the IPv6 datagram in an IPv4 datagram
+addressed to the far tunnel end; the exit router decapsulates and forwards the
+original IPv6 datagram. The inner IPv6 source/destination
+(e.g.\ A$\to$F) are preserved; the outer IPv4 header uses the tunnel
+endpoints (e.g.\ B$\to$E). Tunneling is used widely elsewhere too (4G/5G).
+
+\medskip
+\noindent \textbf{Adoption} is slow (25+ years): $\sim$40\% of Google's
+clients reach it over IPv6 (2023), and $\sim$1/3 of US government domains are
+IPv6-capable.
+
+% ==================================================================
+\section{The Network Layer: Control Plane}
+% ==================================================================
+
+\subsection{Overview: Two Approaches}
+
+The control plane is the network-wide logic that computes the forwarding
+tables the data plane uses. Recall the split: \textbf{forwarding} moves a
+packet from a router's input to the right output (data plane, local, per
+router); \textbf{routing} determines the end-to-end route packets take
+(control plane). Two ways to structure it:
+\begin{itemize}
+    \item \textbf{Per-router control (traditional):} a routing-algorithm
+    component runs in \emph{every} router; the components interact (exchange
+    messages) and each router computes its own forwarding table.
+    \item \textbf{Logically centralized control (SDN):} a remote controller
+    computes forwarding tables and installs them into the routers, which
+    become simple match+action devices.
+\end{itemize}
+Internet instantiations: OSPF and BGP (per-router); OpenFlow with ODL/ONOS
+controllers (SDN); ICMP for control messaging; SNMP and NETCONF/YANG for
+network management.
+
+\subsection{Routing Protocols and the Graph Abstraction}
+
+Goal: find ``good'' (least-cost / fastest / least-congested) paths from source
+to destination hosts through the router network --- a top-10 networking
+problem. Model the network as a graph $G=(N,E)$:
+\begin{itemize}
+    \item $N$ = set of routers, e.g.\ $\{u,v,w,x,y,z\}$; $E$ = set of links.
+    \item $c_{a,b}$ = cost of the direct link $(a,b)$; $c_{a,b}=\infty$ if
+    $a,b$ are not direct neighbors. The operator defines cost: always $1$ (hop
+    count), or inversely related to bandwidth or to congestion.
+    \item Path cost = sum of link costs; we want the \textbf{least-cost path}.
+\end{itemize}
+\textbf{Classification.} \emph{Global} information (link-state): every router
+knows the complete topology and all link costs. \emph{Decentralized}
+(distance-vector): an iterative process where each router initially knows only
+the costs to its attached neighbors and exchanges info with them. Orthogonally,
+routes are \emph{static} (change slowly) or \emph{dynamic} (periodic updates /
+react to cost changes).
+
+\subsection{Link-State Routing: Dijkstra's Algorithm}
+
+Every node floods its link costs network-wide (a \textbf{link-state
+broadcast}), so all nodes learn the identical full topology. Dijkstra computes
+least-cost paths from one \emph{source} to all other nodes (yielding that
+source's forwarding table). It is iterative: after $k$ iterations, the least
+costs to $k$ destinations are final. Notation: $D(v)$ = current least-cost
+estimate to $v$; $p(v)$ = predecessor of $v$ on that path; $N'$ = set of
+finalized nodes.
+
+\begin{lstlisting}[caption={Dijkstra's link-state algorithm (source $u$)}]
+Initialization:
+  N' = {u}
+  for all nodes v:
+     if v adjacent to u:  D(v) = c(u,v)     # direct-neighbor cost only
+     else:                D(v) = infinity
+
+Loop until all nodes in N':
+  find w not in N' with minimum D(w); add w to N'
+  update D(v) for all v adjacent to w and not in N':
+     D(v) = min( D(v),  D(w) + c(w,v) )
+\end{lstlisting}
+
+\subsubsection{Worked example (source $u$)}
+Costs: $c_{u,v}{=}2$, $c_{u,x}{=}1$, $c_{u,w}{=}5$, $c_{v,x}{=}2$,
+$c_{v,w}{=}3$, \\ $c_{x,w}{=}3$, $c_{x,y}{=}1$, $c_{w,y}{=}1$, $c_{w,z}{=}5$,
+$c_{y,z}{=}2$.
+
+\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|c|l|c|c|c|c|c|}
+\hline
+\textbf{Step} & \textbf{$N'$} & \textbf{$D(v),p$} & \textbf{$D(w),p$} & \textbf{$D(x),p$} & \textbf{$D(y),p$} & \textbf{$D(z),p$} \\
+\hline
+0 & $u$      & 2,$u$ & 5,$u$ & \textbf{1,$u$} & $\infty$ & $\infty$ \\
+\hline
+1 & $ux$     & \textbf{2,$u$} & 4,$x$ & & 2,$x$ & $\infty$ \\
+\hline
+2 & $uxy$    & 2,$u$ & 3,$y$ & & & 4,$y$ \\
+\hline
+3 & $uxyv$   & & \textbf{3,$y$} & & & 4,$y$ \\
+\hline
+4 & $uxyvw$  & & & & & \textbf{4,$y$} \\
+\hline
+5 & $uxyvwz$ & & & & & \\
+\hline
+\end{tabularx}
+
+\medskip
+\noindent Resulting least costs from $u$: $x{=}1$, $v{=}2$, $y{=}2$
+($u$-$x$-$y$), $w{=}3$ ($u$-$x$-$y$-$w$), $z{=}4$ ($u$-$x$-$y$-$z$). The
+forwarding table sends $v$ out link $(u,v)$ and everything else out $(u,x)$.
+
+\begin{lstlisting}[language=Python, caption={Dijkstra's least-cost paths}]
+import heapq
+
+def dijkstra(graph, src):          # graph[u] = {v: cost, ...}
+    dist = {n: float('inf') for n in graph}
+    prev = {n: None for n in graph}
+    dist[src] = 0
+    pq = [(0, src)]
+    while pq:
+        d, u = heapq.heappop(pq)
+        if d > dist[u]:            # stale entry
+            continue
+        for v, w in graph[u].items():
+            if d + w < dist[v]:
+                dist[v], prev[v] = d + w, u
+                heapq.heappush(pq, (dist[v], v))
+    return dist, prev
+\end{lstlisting}
+
+\noindent \textbf{Complexity.} $n$ iterations, each checking the remaining
+nodes $\Rightarrow n(n{+}1)/2$ comparisons $= O(n^2)$; $O(n\log n)$ with a
+heap. \textbf{Message complexity:} each router broadcasts its link state
+(each broadcast crosses $O(n)$ links) $\Rightarrow O(n^2)$ overall.
+\textbf{Oscillations} are possible when link costs depend on carried traffic
+(routes ``slosh'' between paths).
+
+\subsection{Distance-Vector Routing: Bellman-Ford}
+
+Based on the \textbf{Bellman-Ford equation} (dynamic programming). Let $D_x(y)$
+be the least cost from $x$ to $y$:
+\[
+    D_x(y) = \min_{v}\big\{\, c_{x,v} + D_v(y) \,\big\},
+\]
+the minimum over all neighbors $v$ of ($x$-to-$v$ direct cost) $+$
+($v$'s least cost to $y$). The neighbor $v$ achieving the minimum is the
+\textbf{next hop}.
+
+\subsubsection{Worked example}
+Reaching $z$ from $u$ with neighbors $v,x,w$, where $D_v(z){=}5$, $D_x(z){=}3$,
+$D_w(z){=}3$ and $c_{u,v}{=}2$, $c_{u,x}{=}1$, $c_{u,w}{=}5$:
+\[
+    D_u(z) = \min\{\,2{+}5,\ 1{+}3,\ 5{+}3\,\} = \min\{7,4,8\} = 4,
+\]
+so the next hop toward $z$ is $x$.
+
+\textbf{The algorithm is iterative, asynchronous, distributed, and
+self-stopping.} Each node keeps its own distance vector plus its neighbors'
+vectors. A local iteration is triggered by a \emph{local link-cost change} or a
+\emph{DV update from a neighbor}; the node recomputes with Bellman-Ford, and
+\emph{only if its DV changed} does it notify its neighbors --- who then repeat,
+only if necessary. No message, no action. Under natural conditions the
+estimates $D_x(y)$ converge to the true least costs $d_x(y)$.
+
+\begin{lstlisting}[language=Python, caption={A distance-vector update at node x (one Bellman-Ford step)}]
+def dv_update(x, link_cost, neighbor_dv, destinations):
+    # link_cost[v]      = cost of the direct x->v link (v a neighbor)
+    # neighbor_dv[v][y] = neighbor v's estimated cost to y
+    Dx = {}
+    for y in destinations:
+        Dx[y] = min(link_cost[v] + neighbor_dv[v][y] for v in link_cost)
+    return Dx        # notify neighbors iff Dx changed
+\end{lstlisting}
+
+\subsubsection{Convergence example (3 nodes)}
+Costs $c_{x,y}{=}2$, $c_{x,z}{=}7$, $c_{y,z}{=}1$. From its neighbors' vectors,
+node $x$ computes
+\[
+    D_x(y)=\min\{c_{x,y}{+}D_y(y),\; c_{x,z}{+}D_z(y)\}=\min\{2{+}0,\,7{+}1\}=2,
+\]
+\[
+    D_x(z)=\min\{c_{x,y}{+}D_y(z),\; c_{x,z}{+}D_z(z)\}=\min\{2{+}1,\,7{+}0\}=3.
+\]
+After exchanging vectors, all three settle (here $D_x=[0,2,3]$). Information
+diffuses one hop per round: a node's state at $t{=}0$ can influence
+computations up to $k$ hops away by $t{=}k$.
+
+\subsubsection{Link-cost changes: good news vs.\ bad news}
+\begin{itemize}
+    \item \textbf{Good news travels fast:} when a link cost \emph{drops}, a
+    node updates its DV and informs neighbors; the news settles in a few
+    rounds.
+    \item \textbf{Bad news travels slowly --- count-to-infinity:} suppose
+    $y$'s link to $x$ jumps to $60$ while $z$ still advertises a cost-$5$ path.
+    $y$ computes ``$6$ via $z$'' and tells $z$; $z$ then computes ``$7$ via
+    $y$'' and tells $y$; $y \to 8$; $z \to 9$; \dots incrementing slowly toward
+    the true cost.
+    \item \textbf{Poisoned reverse:} if $x$ routes to a destination via $z$,
+    $x$ advertises its distance to that destination as $\infty$ to $z$, so $z$
+    won't loop back through $x$. Fixes 2-node loops, not larger ones.
+\end{itemize}
+
+\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+ & \textbf{Link-State (LS)} & \textbf{Distance-Vector (DV)} \\
+\hline
+Knowledge & Full topology (flooded) & Neighbors + their vectors \\
+\hline
+Algorithm & Dijkstra & Bellman-Ford \\
+\hline
+Messages & $O(n^2)$; each floods its link state & Only between neighbors; varies \\
+\hline
+Convergence & $O(n^2)$; possible oscillations & Varies; routing loops, count-to-infinity \\
+\hline
+Robustness & Router can advertise wrong \emph{own} cost; each computes its own table & A router can advertise wrong \emph{path} cost (``low cost to everywhere'' = black-holing); errors \emph{propagate} \\
+\hline
+\end{tabularx}
+
+\subsection{Making Routing Scalable: Autonomous Systems}
+
+The idealized ``all routers identical, flat network'' does not scale: billions
+of destinations can't fit in one table, and exchanging them would swamp links.
+Also, each network's admin wants \textbf{autonomy} over its own routing. So
+routers are aggregated into \textbf{Autonomous Systems (ASes)} / domains:
+\begin{itemize}
+    \item \textbf{Intra-AS (intra-domain):} routing among routers in the same
+    AS; all its routers run the same intra-AS protocol.
+    \item \textbf{Inter-AS (inter-domain):} routing between ASes, done by
+    \textbf{gateway routers} at the AS edge (which also run intra-AS routing).
+\end{itemize}
+Intra-AS routing fills table entries for internal destinations; inter-AS plus
+intra-AS together fill entries for external destinations. When a router in AS1
+receives a datagram for outside AS1, inter-domain routing must (1) learn which
+destinations are reachable through AS2 vs.\ AS3 and (2) propagate that
+reachability to all AS1 routers (so a packet is sent to the right gateway).
+
+\subsection{Intra-AS Routing: RIP, EIGRP, OSPF}
+
+\begin{itemize}
+    \item \textbf{RIP} (RFC 1723): classic distance-vector, DVs exchanged every
+    30 s; no longer widely used.
+    \item \textbf{EIGRP:} DV-based, long Cisco-proprietary (opened in 2013,
+    RFC 7868).
+    \item \textbf{OSPF} (Open Shortest Path First, RFC 2328): the dominant IGP;
+    IS-IS (an ISO standard) is essentially equivalent.
+\end{itemize}
+
+\textbf{OSPF} is ``open'' (publicly specified) and a classic \emph{link-state}
+protocol: each router floods link-state advertisements to all others in the AS
+\emph{directly over IP} (not TCP/UDP), builds the full topology, and runs
+Dijkstra to compute its forwarding table. Cost metrics are configurable
+(bandwidth, delay). All OSPF messages are \textbf{authenticated} to prevent
+malicious intrusion.
+
+\textbf{Hierarchical OSPF} uses two levels --- local \emph{areas} and a
+\emph{backbone}. LSAs are flooded only within an area (or the backbone); each
+node knows its area's detailed topology and only the \emph{direction} to other
+areas.
+\begin{itemize}
+    \item \textbf{Area border routers} summarize their area's distances and
+    advertise them into the backbone.
+    \item \textbf{Backbone routers} run OSPF limited to the backbone.
+    \item \textbf{Boundary routers} connect to other ASes.
+\end{itemize}
+
+\subsection{Inter-AS Routing: BGP}
+
+\textbf{BGP} (Border Gateway Protocol) is the de-facto inter-domain routing
+protocol --- ``the glue that holds the Internet together.'' It lets a subnet
+advertise its existence and the destinations it can reach: ``I am here, here's
+who I can reach, and how.'' BGP gives each AS a way to:
+\begin{itemize}
+    \item obtain destination reachability from neighboring ASes (\textbf{eBGP});
+    \item determine routes based on reachability \emph{and policy};
+    \item propagate reachability to all AS-internal routers (\textbf{iBGP});
+    \item advertise reachability to neighboring networks.
+\end{itemize}
+Gateway routers run \emph{both} eBGP (to other ASes) and iBGP (inside the AS).
+
+\subsubsection{BGP sessions and messages}
+Two BGP peers exchange messages over a semi-permanent \textbf{TCP} connection.
+BGP is a \textbf{path-vector} protocol: advertisements carry \emph{paths} to
+destination prefixes. Messages (RFC 4271): \texttt{OPEN} (open + authenticate
+the peer), \texttt{UPDATE} (advertise a new path or withdraw an old one),
+\texttt{KEEPALIVE} (keep the session alive; also ACKs OPEN),
+\texttt{NOTIFICATION} (report errors / close).
+
+\subsubsection{Path attributes}
+An advertised route $=$ \textbf{prefix} $+$ \textbf{attributes}. Two key
+attributes:
+\begin{itemize}
+    \item \textbf{AS-PATH:} the list of ASes the advertisement has traversed
+    (also used to detect and avoid loops).
+    \item \textbf{NEXT-HOP:} the specific internal-AS router leading toward the
+    next-hop AS.
+\end{itemize}
+\textbf{Policy-based routing:} an \emph{import} policy accepts/declines a
+received path (e.g.\ ``never route through AS $Y$''); an \emph{export} policy
+decides whether to advertise a path onward. When AS3's gateway advertises
+$\langle AS3,X\rangle$ to AS2, AS3 \emph{promises} to forward datagrams toward
+$X$.
+
+\subsubsection{Path propagation and forwarding tables}
+AS2 router 2c receives $\langle AS3,X\rangle$ via eBGP from 3a, propagates
+$\langle AS2,AS3,X\rangle$ inside AS2 via iBGP, and 2a advertises it to AS1 via
+eBGP. AS1's gateway 1c may learn \emph{two} paths to $X$
+($\langle AS2,AS3,X\rangle$ and $\langle AS3,X\rangle$), pick one by policy, and
+flood it via iBGP. To build the actual forwarding table, a router combines BGP
+(``$X$ is reachable via gateway 1c'') with intra-AS OSPF (``to reach 1c, use
+this interface''): $X$-bound traffic leaves on the interface OSPF says leads to
+that gateway.
+
+\subsubsection{Hot-potato routing and policy}
+\textbf{Hot-potato routing:} among multiple gateways that can reach $X$, pick
+the one with least \emph{intra-domain} cost --- get the packet out of your own
+AS as soon as possible, regardless of inter-domain hop count.
+\textbf{Policy example:} an ISP typically routes traffic only to/from its
+\emph{customer} networks and refuses to carry \emph{transit} traffic between
+other ISPs (no revenue). So a provider $B$ that learns a path may choose
+\emph{not} to advertise it if none of the endpoints are $B$'s customers, and a
+dual-homed customer $x$ won't advertise a route that would make it transit
+between two providers.
+
+\textbf{Route selection order} (when multiple routes to a destination exist):
+\begin{enumerate}
+    \item highest \textbf{local-preference} (a policy decision);
+    \item shortest \textbf{AS-PATH};
+    \item closest \textbf{NEXT-HOP} (hot-potato routing);
+    \item additional tie-breakers.
+\end{enumerate}
+
+\subsubsection{Why intra- and inter-AS routing differ}
+\textbf{Policy:} inter-AS admins want control over who routes through them
+(policy dominates); intra-AS is a single admin, so policy matters less.
+\textbf{Scale:} hierarchy shrinks table size and update traffic.
+\textbf{Performance:} intra-AS can optimize for performance; inter-AS is
+dominated by policy.
+
+\subsection{The SDN Control Plane}
+
+SDN separates a \emph{logically centralized} controller from simple data-plane
+switches:
+\begin{itemize}
+    \item \textbf{Generalized forwarding:} switches hold \textbf{flow tables}
+    of \textbf{match+action} rules (\textbf{OpenFlow}); a rule matches header
+    fields across layers 2--4 and acts (forward to port(s), drop, modify a
+    field, or send to the controller).
+    \item \textbf{Controller:} maintains network state and offers a
+    \textbf{southbound} API (e.g.\ OpenFlow) to program switches and a
+    \textbf{northbound} API to control apps (routing, access control, load
+    balancing). Production controllers include OpenDaylight (ODL) and ONOS.
+\end{itemize}
+Benefits: programmability, one place for network-wide logic, and open
+interfaces (no vendor lock-in).
+
+\subsection{ICMP: Internet Control Message Protocol}
+
+Hosts and routers use \textbf{ICMP} to exchange network-level information ---
+error reporting (unreachable host / network / port / protocol) and echo
+request/reply (used by \texttt{ping}). ICMP sits ``above'' IP but its messages
+are carried \emph{in} IP datagrams; each message has a \textbf{type}, a
+\textbf{code}, plus the first 8 bytes of the IP datagram that caused the error.
+
+\renewcommand{\arraystretch}{1.25}
+\noindent\begin{tabularx}{\textwidth}{|c|c|X||c|c|X|}
+\hline
+\textbf{Type} & \textbf{Code} & \textbf{Description} & \textbf{Type} & \textbf{Code} & \textbf{Description} \\
+\hline
+0 & 0 & echo reply (ping) & 3 & 6 & dest.\ network unknown \\
+\hline
+3 & 0 & dest.\ network unreachable & 3 & 7 & dest.\ host unknown \\
+\hline
+3 & 1 & dest.\ host unreachable & 8 & 0 & echo request (ping) \\
+\hline
+3 & 2 & dest.\ protocol unreachable & 9 & 0 & route advertisement \\
+\hline
+3 & 3 & dest.\ port unreachable & 10 & 0 & router discovery \\
+\hline
+4 & 0 & source quench (unused) & 11 & 0 & TTL expired \\
+\hline
+ & & & 12 & 0 & bad IP header \\
+\hline
+\end{tabularx}
+
+\subsubsection{Traceroute via ICMP}
+The source sends sets of UDP segments with increasing TTL (first set TTL$=1$,
+next TTL$=2$, \dots). The datagram in the $n$-th set expires at router $n$,
+which discards it and returns an ICMP \textbf{TTL-expired} (type 11, code 0),
+often naming the router; the source records the RTT. It \emph{stops} when a
+segment finally reaches the destination host, which returns \textbf{port
+unreachable} (type 3, code 3).
+
+\subsection{Network Management: SNMP and NETCONF/YANG (Brief)}
+
+A \textbf{managing server} monitors and controls \textbf{managed devices}, each
+running an \textbf{agent} that exposes a \textbf{MIB} (Management Information
+Base --- the data objects). \textbf{SNMP} carries request/response
+(\texttt{GET}/\texttt{SET}) messages and unsolicited \textbf{trap} messages
+(agent$\to$server event reports). \textbf{NETCONF} (with the \textbf{YANG}
+data-modeling language) is the modern approach to configuring and managing
+devices.
+
+% ==================================================================
+\section{The Link Layer and LANs}
+% ==================================================================
+
+\subsection{Introduction and Services}
+
+Terminology: \textbf{nodes} = hosts and routers; \textbf{links} connect
+adjacent nodes (wired, wireless, LANs); a link-layer (Layer-2) packet is a
+\textbf{frame} that encapsulates a datagram. The link layer's job is to move a
+datagram from one node to a \emph{physically adjacent} node over a single link.
+A datagram may traverse different link protocols on different links (WiFi on the
+first, Ethernet on the next), each offering different services.
+\emph{Transportation analogy:} a trip Princeton$\to$Lausanne (limo, plane,
+train) --- the tourist is the datagram, each leg is a link, each mode is a
+link-layer protocol, and the travel agent is the routing algorithm.
+
+\textbf{Possible services:}
+\begin{itemize}
+    \item \textbf{Framing / link access:} encapsulate the datagram (header +
+    trailer); arbitrate access if the medium is shared; put source/destination
+    \textbf{MAC addresses} (distinct from IP addresses) in the header.
+    \item \textbf{Reliable delivery} between adjacent nodes --- seldom used on
+    low-error wired links, valuable on high-error wireless links. (Why both
+    link-level and end-to-end reliability? To avoid costly end-to-end
+    retransmissions across a single lossy link.)
+    \item \textbf{Flow control}, \textbf{error detection}, \textbf{error
+    correction}, and \textbf{half-/full-duplex} operation.
+\end{itemize}
+The link layer lives in the \textbf{network adapter (NIC)} --- on-chip or a
+card implementing the link and physical layers --- a combination of hardware,
+software, and firmware attached to the host's system bus. Sending side:
+encapsulate, add error-check bits. Receiving side: check for errors, extract
+the datagram, pass it up.
+
+\subsection{Error Detection and Correction}
+
+The sender appends \textbf{EDC} (error-detection-and-correction) bits to the
+data $D$. Detection is \emph{not} 100\% reliable (some errors slip through
+undetected, though rarely); a larger EDC field improves detection/correction.
+\begin{itemize}
+    \item \textbf{Single-bit parity:} one bit makes the number of 1s even (or
+    odd); detects an \emph{odd} number of bit errors only.
+    \item \textbf{Two-dimensional parity:} parity per row \emph{and} per
+    column; \emph{detects and corrects} any single-bit error by locating its
+    row and column --- forward error correction, no retransmission.
+    \item \textbf{Internet checksum:} the one's-complement sum from the
+    transport layer --- software, relatively weak.
+    \item \textbf{CRC (Cyclic Redundancy Check):} stronger, hardware-friendly,
+    used by Ethernet and 802.11 WiFi.
+\end{itemize}
+
+\subsubsection{CRC}
+Given data $D$ and a standard $(r{+}1)$-bit generator $G$, the sender finds the
+$r$-bit remainder
+\[
+    R = \text{remainder}\!\left(\frac{D\cdot 2^{r}}{G}\right)\ (\text{mod } 2),
+\]
+so that $D\cdot 2^{r}\oplus R$ is exactly divisible by $G$ (mod 2); it transmits
+$D\cdot 2^{r}\oplus R$. The receiver divides the received bits by $G$; a
+\emph{nonzero} remainder means an error. CRC detects all burst errors of length
+$\leq r$. \textbf{Example:} $D=101110$, $G=1001$ ($r=3$); mod-2 dividing
+$101110000$ by $1001$ gives $R=011$, so the transmitted frame is
+$101110\,011$.
+
+\begin{lstlisting}[language=Python, caption={Mod-2 (CRC) remainder}]
+def crc_remainder(data_bits, gen_bits):
+    G = int(gen_bits, 2)
+    r = len(gen_bits) - 1
+    reg = int(data_bits, 2) << r            # append r zeros: D * 2^r
+    for i in range(len(data_bits) + r - 1, r - 1, -1):
+        if reg & (1 << i):                  # subtract (XOR) G aligned at bit i
+            reg ^= G << (i - r)
+    return format(reg, f'0{r}b')
+
+print(crc_remainder('101110', '1001'))      # -> '011'
+\end{lstlisting}
+
+\subsection{Multiple Access Protocols}
+
+Two link types: \textbf{point-to-point} (one sender/receiver, e.g.\
+switch-to-host, PPP dial-up) and \textbf{broadcast} (a shared medium: old
+Ethernet, upstream cable HFC, 802.11 WiFi, 4G/5G, satellite). On a broadcast
+link, two or more simultaneous transmissions \textbf{collide} (a node receiving
+two signals at once). A multiple-access (MAC) protocol is a \emph{distributed}
+algorithm that decides when a node may transmit --- and coordination must use
+the shared channel itself (no separate out-of-band channel).
+
+\textbf{Ideal MAC on a rate-$R$ channel:} (1) one active node gets the full
+rate $R$; (2) $M$ active nodes each get $\approx R/M$; (3) fully decentralized
+(no coordinator, no clock sync); (4) simple. Three families:
+
+\subsubsection{Channel partitioning}
+\begin{itemize}
+    \item \textbf{TDMA} (time-division): each station gets a fixed slot per
+    round (slot $=$ one frame time); unused slots go idle (6-station LAN with
+    only 1,3,4 active $\Rightarrow$ slots 2,5,6 wasted).
+    \item \textbf{FDMA} (frequency-division): each station gets a fixed
+    frequency band; idle bands wasted.
+\end{itemize}
+Fair and collision-free, but inefficient at low load (a node is capped at
+$R/N$ even when it is the only one active).
+
+\subsubsection{Random access}
+No coordination; collisions happen and must be recovered from.
+\begin{itemize}
+    \item \textbf{Slotted ALOHA:} synchronized slots (one frame each); a node
+    with a fresh frame transmits in the next slot; on collision it retransmits
+    in each later slot with probability $p$ until success. \emph{Pros:} a lone
+    node uses the full rate; highly decentralized; simple. \emph{Cons:}
+    collisions and idle slots waste slots; needs clock sync.
+    \item \textbf{Pure ALOHA:} unsynchronized (simpler, no slots) but more
+    collisions.
+    \item \textbf{CSMA} (carrier sense): \emph{listen before transmit} --- send
+    only if the channel is idle. Collisions still occur because of propagation
+    delay (two nodes sense idle and both start); the whole colliding frame time
+    is wasted.
+    \item \textbf{CSMA/CD} (collision detection): abort as soon as a collision
+    is heard, cutting wasted time. Used by classic \textbf{Ethernet}. Detection
+    is easy on wire, hard on wireless.
+    \item \textbf{CSMA/CA} (collision avoidance): used by WiFi (802.11), where
+    a node cannot detect collisions while transmitting.
+\end{itemize}
+
+\textbf{Slotted-ALOHA efficiency.} With $N$ nodes each transmitting in a slot
+with probability $p$,
+\[
+    P(\text{a given node succeeds})=p(1-p)^{N-1},\qquad
+    P(\text{some node succeeds})=Np(1-p)^{N-1}.
+\]
+Maximizing over $p$ and letting $N\to\infty$ gives max efficiency
+$1/e\approx 0.37$ --- at best, the channel does useful work 37\% of the time
+(pure ALOHA: $1/(2e)\approx 0.18$).
+
+\begin{lstlisting}[caption={Ethernet CSMA/CD with binary exponential backoff}]
+1. Adapter gets a datagram from the network layer, creates a frame.
+2. Sense the channel: if idle, start transmitting; if busy, wait until idle.
+3. Whole frame sent with no collision  ->  done.
+4. Collision detected while sending     ->  abort, send a jam signal.
+5. Binary exponential backoff: after the m-th collision, pick K uniformly
+   from {0, 1, ..., 2^m - 1}; wait K * 512 bit-times; go to step 2.
+   (More collisions  ->  larger backoff window.)
+\end{lstlisting}
+
+\subsubsection{Taking turns}
+\begin{itemize}
+    \item \textbf{Polling:} a master node invites each node to transmit in turn
+    (polling overhead, latency, single point of failure; Bluetooth uses
+    polling).
+    \item \textbf{Token passing:} a control token is passed node-to-node; only
+    its holder may transmit (token overhead/latency, token loss; FDDI, token
+    ring).
+\end{itemize}
+``Taking turns'' aims for the best of both worlds --- efficient at high load
+(like partitioning) yet low-delay at low load (like random access).
+
+\subsection{MAC Addressing and ARP}
+
+\subsubsection{MAC addresses}
+An interface's \textbf{MAC (LAN / physical / Ethernet) address} is 48 bits
+(most LANs), burned into the NIC ROM (sometimes software-settable), written in
+hex (e.g.\ \texttt{1A-2F-BB-76-09-AD}). Its job: get a frame from one interface
+to another \emph{physically-connected} interface on the same subnet. Allocation
+is administered by \textbf{IEEE} (manufacturers buy address blocks for
+uniqueness). Analogy: \textbf{MAC $=$ Social-Security number} (flat, portable
+--- moves with the adapter), \textbf{IP $=$ postal address} (hierarchical,
+depends on the attached subnet, \emph{not} portable).
+
+\subsubsection{ARP}
+\textbf{ARP} (Address Resolution Protocol) answers: knowing an interface's IP
+address on my LAN, what is its MAC address? Each node keeps an \textbf{ARP
+table} of $\langle$IP, MAC, TTL$\rangle$ entries (TTL typically $\sim$20 min).
+When $A$ wants to send to $B$ but lacks $B$'s MAC:
+\begin{enumerate}
+    \item $A$ \textbf{broadcasts} an ARP query (destination MAC
+    \texttt{FF-FF-FF-FF-FF-FF}) containing $B$'s IP address; all LAN nodes
+    receive it.
+    \item $B$ recognizes its own IP and \textbf{replies (unicast)} to $A$ with
+    its MAC address.
+    \item $A$ caches the $\langle$IP, MAC$\rangle$ mapping (with a TTL) in its
+    ARP table.
+\end{enumerate}
+
+\subsubsection{Routing to another subnet}
+To reach a host $B$ on \emph{another} subnet via first-hop router $R$: $A$ knows
+$B$'s IP, $R$'s IP, and (via ARP) $R$'s MAC. The IP source/destination stay
+$A$/$B$ end-to-end; only the \emph{link-layer} addresses change hop by hop.
+
+\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|l|l|l|X|}
+\hline
+\textbf{Hop} & \textbf{IP src $\to$ dst} & \textbf{MAC src $\to$ dst} & \textbf{Comment} \\
+\hline
+$A \to R$ & $A \to B$ & $\text{MAC}_A \to \text{MAC}_R^{\text{(left)}}$ & Frame carries $A$-to-$B$ datagram; dest MAC is $R$'s \\
+\hline
+$R \to B$ & $A \to B$ & $\text{MAC}_R^{\text{(right)}} \to \text{MAC}_B$ & $R$ removes/re-adds Layer-2 header; dest MAC is $B$'s \\
+\hline
+\end{tabularx}
+
+\medskip
+\noindent Key insight: routers rewrite the Layer-2 header at each hop, while the
+Layer-3 (IP) destination remains the true endpoint $B$ throughout.
+
+\subsection{Ethernet}
+
+The dominant, cheap, simple wired LAN, keeping up with the speed race
+(10 Mbps--400 Gbps). The physical topology evolved from a \textbf{bus} (all
+nodes in one collision domain, popular through the mid-90s) to today's
+\textbf{switched} star: an active Layer-2 switch at the center, each spoke its
+own collision domain, so nodes do not collide.
+
+\subsubsection{Frame structure}
+\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Field} & \textbf{Size} & \textbf{Purpose} \\
+\hline
+Preamble & 8 B & 7 bytes \texttt{10101010} $+$ 1 byte \texttt{10101011}; sync receiver clock \\
+\hline
+Dest.\ MAC & 6 B & If it matches (or is broadcast) pass up to the network layer, else discard \\
+\hline
+Source MAC & 6 B & Sending adapter's address \\
+\hline
+Type & 2 B & Upper-layer protocol (mostly IP) --- for demux at the receiver \\
+\hline
+Data (payload) & 46--1500 B & The IP datagram \\
+\hline
+CRC & 4 B & Error detection; frame dropped if it fails \\
+\hline
+\end{tabularx}
+
+\medskip
+\noindent Ethernet is \textbf{connectionless} (no handshake between NICs) and
+\textbf{unreliable} (the receiving NIC sends no ACK/NAK --- data in dropped
+frames is recovered only if a higher layer such as TCP retransmits). Its MAC
+protocol is \textbf{unslotted CSMA/CD with binary backoff}. The \textbf{802.3}
+family shares one MAC protocol and frame format across many physical
+media/speeds (100BASE-TX copper, 100BASE-FX fiber, \dots).
+
+\subsection{Switches}
+
+A \textbf{switch} is an active link-layer device: it \emph{stores and
+forwards} Ethernet frames, examining each incoming frame's MAC address to
+selectively forward it to one or more outgoing links. It is \textbf{transparent}
+(hosts are unaware of it) and \textbf{plug-and-play / self-learning} (no
+configuration). Because each host has a dedicated full-duplex link to the
+switch, there are no collisions and \textbf{multiple transmissions can happen
+simultaneously} --- e.g.\ A$\to$A$'$ and B$\to$B$'$ at once (but not two frames
+to the same output A$'$). Each link is its own collision domain.
+
+\subsubsection{Switch table and self-learning}
+The switch keeps a \textbf{switch table} of
+$\langle$MAC address, interface, timestamp$\rangle$ (it resembles a routing
+table but is built differently). It \emph{learns} by recording the
+\emph{source} MAC and arriving interface of each frame. Forwarding logic:
+
+\begin{lstlisting}[caption={Switch frame filtering / forwarding}]
+When a frame arrives on an interface:
+  1. record (source MAC, arriving interface) in the switch table
+  2. look up the destination MAC in the switch table
+  3. if an entry is found:
+        if it maps to the arriving interface:   drop (filter)
+        else:                                    forward on that one interface
+     else:
+        flood  (forward on all interfaces except the arriving one)
+\end{lstlisting}
+Interconnected switches self-learn in exactly the same way, so a frame from $A$
+to a distant $G$ is forwarded switch-to-switch toward $G$ once the relevant
+locations have been learned.
+
+\subsubsection{Switches vs.\ routers}
+Both are store-and-forward. A \textbf{switch} is a Layer-2 device: it examines
+link-layer headers and builds its table by \emph{flooding + learning} on MAC
+addresses. A \textbf{router} is a Layer-3 device: it examines network-layer
+headers and computes tables with \emph{routing algorithms} on IP addresses,
+and it isolates broadcast domains.
+
+\subsection{VLANs}
+
+\textbf{Motivation.} A single switched LAN is one broadcast domain: all Layer-2
+broadcast traffic (ARP, DHCP, unknown-MAC floods) must cross the entire LAN
+(scaling, security, and privacy issues), and moving a user's office can force
+an awkward physical/logical mismatch (a CS user physically on the EE switch but
+wanting to stay logically on CS).
+
+\textbf{Port-based VLANs.} A VLAN-capable switch is configured so its ports are
+grouped into isolated virtual LANs --- one physical switch behaves as several
+virtual switches (e.g.\ ports 1--8 $=$ EE, ports 9--15 $=$ CS).
+\textbf{Traffic isolation:} frames to/from ports 1--8 reach only ports 1--8.
+\textbf{Dynamic membership:} ports can be reassigned among VLANs.
+\textbf{Inter-VLAN traffic} goes through a router (just as with separate
+switches; vendors sell combined switch+router boxes).
+
+\textbf{VLANs across switches --- trunking.} A \textbf{trunk port} carries
+frames of \emph{multiple} VLANs between switches. Such frames need a VLAN ID,
+added by \textbf{802.1Q}: a 4-byte tag is inserted after the source-MAC field
+--- a 2-byte Tag Protocol Identifier (\texttt{0x8100}) plus a 2-byte Tag
+Control field (a 12-bit VLAN ID and a 3-bit priority, like IP ToS) --- and the
+CRC is recomputed.
+
+\subsection{Link Virtualization and Data Centers (Brief)}
+
+\textbf{MPLS} (Multi-Protocol Label Switching) forwards on short fixed-length
+\emph{labels} rather than IP longest-prefix match, enabling faster forwarding
+and traffic engineering. \textbf{Data-center networks} interconnect tens of
+thousands of hosts using hierarchical topologies (access / aggregation / core
+tiers, often with rich multipath) for high bisection bandwidth.
+
+\subsection{A Day in the Life of a Web Request (Synthesis)}
+
+Fetching \texttt{www.google.com} exercises the whole stack at once:
+\begin{enumerate}
+    \item \textbf{DHCP} (UDP/IP/Ethernet, broadcast): the laptop obtains its IP
+    address, subnet mask, first-hop router, and DNS server.
+    \item \textbf{ARP:} to reach the DNS server / first-hop router, the host
+    ARPs for the router's MAC.
+    \item \textbf{DNS} (UDP): resolve the name (root $\to$ TLD $\to$
+    authoritative, via the local resolver).
+    \item \textbf{TCP} 3-way handshake to the web server (port 80/443).
+    \item \textbf{HTTP} GET; the response returns down the stack
+    (HTTP$\to$TCP$\to$IP$\to$Ethernet), through switches (self-learning,
+    Layer-2) and routers (LPM forwarding, Layer-2 rewriting) along the way.
+\end{enumerate}
+
+% ==================================================================
+\section{Cheat Sheet}
+% ==================================================================
+
+\subsection{Key Formulas}
+
+\renewcommand{\arraystretch}{1.45}
+\noindent\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Quantity} & \textbf{Formula} \\
+\hline
+Transmission delay & $d_{\text{trans}} = L/R$ \quad ($L$ bits, rate $R$ bps) \\
+\hline
+Propagation delay & $d_{\text{prop}} = d/s$ \quad ($s \approx 2\times 10^{8}$ m/s) \\
+\hline
+Nodal delay & $d_{\text{nodal}} = d_{\text{proc}} + d_{\text{queue}} + d_{\text{trans}} + d_{\text{prop}}$ \\
+\hline
+Traffic intensity & $La/R$ \; ($<1$ good, $\to 1$ large delay, $>1$ unbounded) \\
+\hline
+End-to-end throughput & $\min(R_s, R_c)$; shared: $\min(R_s, R_c, R/N)$ \\
+\hline
+Packet-switch capacity (binomial) & $P(X{=}k)=\binom{n}{k}p^{k}(1-p)^{n-k}$ \\
+\hline
+Non-persistent HTTP (per object) & $2\,RTT + T_{\text{transmit}}$ \\
+\hline
+File dist.\ (client--server) & $D_{\text{c-s}} \geq \max\{NF/u_s,\; F/d_{\min}\}$ \\
+\hline
+File dist.\ (P2P) & $D_{\text{P2P}} \geq \max\{F/u_s,\; F/d_{\min},\; NF/(u_s{+}\textstyle\sum u_i)\}$ \\
+\hline
+EWMA RTT & $\text{EstRTT}=(1{-}\alpha)\text{EstRTT}+\alpha\,\text{SampleRTT}$, $\alpha{=}0.125$ \\
+\hline
+RTT deviation & $\text{DevRTT}=(1{-}\beta)\text{DevRTT}+\beta|\text{SampleRTT}-\text{EstRTT}|$, $\beta{=}0.25$ \\
+\hline
+TCP timeout & $\text{TimeoutInterval}=\text{EstRTT}+4\,\text{DevRTT}$ \\
+\hline
+Stop-and-wait utilization & $U = \dfrac{L/R}{RTT + L/R}$ \\
+\hline
+Pipelined ($n$ packets) & $U = \dfrac{n\,L/R}{RTT + L/R}$ \\
+\hline
+TCP rate & $\approx \texttt{cwnd}/RTT$ \\
+\hline
+TCP avg.\ throughput & $\tfrac{3}{4}\,W/RTT$ \\
+\hline
+TCP throughput vs.\ loss (Mathis) & $1.22\cdot\text{MSS}\,/\,(RTT\sqrt{L})$ \\
+\hline
+SR window constraint & window size $\leq \tfrac{1}{2}\times$ seq-number space \\
+\hline
+Router switching rate (ideal) & $N \times R$ \; ($N$ ports, line rate $R$) \\
+\hline
+Router buffer (RFC 3439) & $\text{RTT} \times C$ \\
+\hline
+Router buffer ($N$ flows) & $\text{RTT} \times C / \sqrt{N}$ \\
+\hline
+WFQ per-class share & $w_i / \textstyle\sum_j w_j$ \\
+\hline
+Hosts in a \texttt{/x} subnet & $2^{\,32-x} - 2$ \; (minus network + broadcast) \\
+\hline
+Fragment offset & (bytes before this fragment) $/\,8$ \\
+\hline
+Max frag.\ payload & $\lfloor (\text{MTU} - 20)/8 \rfloor \times 8$ bytes \\
+\hline
+Bellman-Ford eqn.\ & $d_x(y) = \min_v\{\,c(x,v) + d_v(y)\,\}$ \\
+\hline
+Dijkstra complexity & $O(n^2)$, or $O(n\log n)$ with a heap \\
+\hline
+Slotted ALOHA (max eff.) & $1/e \approx 0.37$ \\
+\hline
+Pure ALOHA (max eff.) & $1/(2e) \approx 0.18$ \\
+\hline
+CSMA/CD efficiency & $\approx \dfrac{1}{1 + 5\,t_{\text{prop}}/t_{\text{trans}}}$ \\
+\hline
+CRC remainder & $R = \text{remainder}(D\!\cdot\!2^{r} / G)\ \bmod 2$ \; ($r{+}1$-bit $G$) \\
+\hline
+\end{tabularx}
+
+\subsection{Well-Known Ports}
+
+\noindent\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Port} & \textbf{Protocol} & \textbf{Transport / notes} \\
+\hline
+20/21 & FTP (data/control) & TCP \\
+\hline
+22 & SSH & TCP \\
+\hline
+25 & SMTP & TCP (mail \emph{between} servers) \\
+\hline
+53 & DNS & UDP (TCP for large transfers) \\
+\hline
+80 & HTTP & TCP \\
+\hline
+143 & IMAP & TCP (mail retrieval) \\
+\hline
+161 & SNMP & UDP \\
+\hline
+443 & HTTPS / HTTP/3 & TCP (TLS) / UDP (QUIC) \\
+\hline
+\end{tabularx}
+
+\subsection{HTTP Methods and Status Codes}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X||l|X|}
+\hline
+\textbf{Method} & \textbf{Purpose} & \textbf{Code} & \textbf{Meaning} \\
+\hline
+GET  & Retrieve object & 200 & OK \\
+\hline
+POST & Send form data in body & 301 & Moved Permanently \\
+\hline
+HEAD & Headers only & 304 & Not Modified (conditional GET) \\
+\hline
+PUT  & Upload / replace object & 400 & Bad Request \\
+\hline
+     &  & 404 & Not Found \\
+\hline
+     &  & 505 & HTTP Version Not Supported \\
+\hline
+\end{tabularx}
+
+\subsection{DNS Record Types}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Type} & \textbf{Maps / does} \\
+\hline
+A     & name $\to$ IPv4 address \\
+\hline
+AAAA  & name $\to$ IPv6 address \\
+\hline
+NS    & delegate a domain to a name server \\
+\hline
+CNAME & alias $\to$ canonical name \\
+\hline
+MX    & domain $\to$ mail server (lower priority number tried first) \\
+\hline
+\end{tabularx}
+
+\subsection{TCP vs.\ UDP}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+ & \textbf{TCP} & \textbf{UDP} \\
+\hline
+Connection & Yes (3-way handshake) & No \\
+\hline
+Reliability & Reliable, in-order byte stream & Best effort, may lose/reorder \\
+\hline
+Flow control & Yes (\texttt{rwnd}) & No \\
+\hline
+Congestion control & Yes (AIMD / CUBIC / BBR) & No \\
+\hline
+Header & 20+ bytes & 8 bytes \\
+\hline
+Demux key & 4-tuple (src/dst IP + port) & 2-tuple (dst IP + port) \\
+\hline
+Typical use & Web, email, file transfer & DNS, SNMP, streaming, HTTP/3 \\
+\hline
+\end{tabularx}
+
+\subsection{Circuit vs.\ Packet Switching}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+ & \textbf{Circuit} & \textbf{Packet} \\
+\hline
+Resources & Reserved (dedicated) & Shared on demand \\
+\hline
+Setup & Required & None \\
+\hline
+Performance & Guaranteed & Best effort (delay/loss) \\
+\hline
+Efficiency & Idle circuits waste capacity & Statistical multiplexing \\
+\hline
+Used by & Traditional telephone net & The Internet \\
+\hline
+\end{tabularx}
+
+\subsection{Go-Back-N vs.\ Selective Repeat}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+ & \textbf{Go-Back-N} & \textbf{Selective Repeat} \\
+\hline
+ACK type & Cumulative & Individual \\
+\hline
+Receiver buffering & None (discard out-of-order) & Buffers out-of-order \\
+\hline
+Timers & One (oldest packet) & One per unACKed packet \\
+\hline
+On loss & Resend window from $n$ onward & Resend only the lost packet \\
+\hline
+\end{tabularx}
+
+\subsection{The Five-Layer Stack (with units and example protocols)}
+
+\noindent\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Layer} & \textbf{Unit} & \textbf{Examples} \\
+\hline
+5. Application & message  & HTTP, SMTP, IMAP, DNS \\
+\hline
+4. Transport   & segment  & TCP, UDP \\
+\hline
+3. Network     & datagram & IP (the ``narrow waist''), routing protocols \\
+\hline
+2. Link        & frame    & Ethernet, 802.11 (WiFi), PPP \\
+\hline
+1. Physical    & bit      & copper, fiber, radio \\
+\hline
+\end{tabularx}
+
+\subsection{TCP Congestion-Control State Reactions}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Event} & \textbf{Action} \\
+\hline
+Connection start & \texttt{cwnd}$=1$ MSS; slow start (double per RTT) \\
+\hline
+\texttt{cwnd} $\geq$ \texttt{ssthresh} & Enter congestion avoidance ($+1$ MSS / RTT) \\
+\hline
+Triple duplicate ACK (Reno) & \texttt{ssthresh}$=$\texttt{cwnd}$/2$; \texttt{cwnd}$=$\texttt{ssthresh}$+3$ (fast recovery) \\
+\hline
+Timeout (Tahoe) & \texttt{ssthresh}$=$\texttt{cwnd}$/2$; \texttt{cwnd}$=1$ MSS; slow start \\
+\hline
+\end{tabularx}
+
+\subsection{Router Data Plane vs.\ Control Plane}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+ & \textbf{Data plane} & \textbf{Control plane} \\
+\hline
+Scope & Local, per-router & Network-wide \\
+\hline
+Job & Forwarding (input $\to$ output port) & Routing (build tables) \\
+\hline
+Implemented in & Hardware & Software \\
+\hline
+Timescale & Nanoseconds & Milliseconds \\
+\hline
+Approaches & Match+action lookup & Per-router alg.\ \emph{or} SDN controller \\
+\hline
+\end{tabularx}
+
+\subsection{Packet Scheduling Policies}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+\textbf{Policy} & \textbf{Rule} & \textbf{Property} \\
+\hline
+FCFS / FIFO & Serve in arrival order & Simple; no isolation \\
+\hline
+Priority & Highest non-empty class first (FCFS within) & Low-priority starvation risk \\
+\hline
+Round Robin & One packet per class, cyclically & Fair-ish, no weights \\
+\hline
+WFQ & Class $i$ gets $w_i/\sum_j w_j$ share & Per-class min-bandwidth guarantee \\
+\hline
+\end{tabularx}
+
+\subsection{IPv4 Header Fields (Quick Reference)}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Field} & \textbf{Purpose} \\
+\hline
+Version / Header len & IP version; header size in 32-bit words \\
+\hline
+Type of Service & Diffserv (bits 0--5) + ECN (bits 6--7) \\
+\hline
+Total length & Datagram size in bytes (max 64 KB) \\
+\hline
+Identifier / Flags / Offset & Fragmentation and reassembly \\
+\hline
+TTL & Max remaining hops (decremented per router) \\
+\hline
+Upper-layer protocol & Demux key (6 = TCP, 17 = UDP) \\
+\hline
+Header checksum & Error check over the header only \\
+\hline
+Source / Dest address & 32-bit endpoints \\
+\hline
+\end{tabularx}
+
+\subsection{CIDR / Subnet Mask Quick Reference}
+
+\noindent\begin{tabularx}{\textwidth}{|l|l|l|X|}
+\hline
+\textbf{Prefix} & \textbf{Mask} & \textbf{Addresses} & \textbf{Usable hosts ($2^{32-x}{-}2$)} \\
+\hline
+/8  & 255.0.0.0       & $2^{24}$ & 16{,}777{,}214 \\
+\hline
+/16 & 255.255.0.0     & $2^{16}$ & 65{,}534 \\
+\hline
+/20 & 255.255.240.0   & $2^{12}$ & 4{,}094 \\
+\hline
+/23 & 255.255.254.0   & $2^{9}$  & 510 \\
+\hline
+/24 & 255.255.255.0   & $2^{8}$  & 254 \\
+\hline
+/30 & 255.255.255.252 & $2^{2}$  & 2 (point-to-point links) \\
+\hline
+\end{tabularx}
+
+\subsection{Private and Special IPv4 Addresses}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Block / address} & \textbf{Use} \\
+\hline
+\texttt{10.0.0.0/8} & Private (RFC 1918) \\
+\hline
+\texttt{172.16.0.0/12} & Private (RFC 1918) \\
+\hline
+\texttt{192.168.0.0/16} & Private (RFC 1918) \\
+\hline
+\texttt{127.0.0.0/8} & Loopback \\
+\hline
+\texttt{0.0.0.0} & ``This host'' / unspecified (DHCP source) \\
+\hline
+\texttt{255.255.255.255} & Limited broadcast (DHCP destination) \\
+\hline
+Ports 67 / 68 & DHCP server / client (over UDP) \\
+\hline
+\end{tabularx}
+
+\subsection{IPv4 vs.\ IPv6}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+ & \textbf{IPv4} & \textbf{IPv6} \\
+\hline
+Address size & 32-bit & 128-bit \\
+\hline
+Header & Variable ($\geq$ 20 B) & Fixed 40 B \\
+\hline
+Checksum & Yes & No (speeds forwarding) \\
+\hline
+Fragmentation & Routers \emph{and} host & Host only (not in-network) \\
+\hline
+Options & In header & ``Next-header'' chain \\
+\hline
+Notation & Dotted decimal & Colon-hex \\
+\hline
+Address setup & DHCP / static & SLAAC / DHCPv6 \\
+\hline
+\end{tabularx}
+
+\subsection{DHCP (DORA) and NAT}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Step / concept} & \textbf{Meaning} \\
+\hline
+Discover & Client broadcasts to find a server \\
+\hline
+Offer & Server proposes address (\texttt{yiaddr}) + lease \\
+\hline
+Request & Client asks for the offered address \\
+\hline
+ACK & Server confirms; also returns router, DNS, mask \\
+\hline
+NAT out & (src IP, port) $\to$ (public IP, new port), record in table \\
+\hline
+NAT in & (public IP, new port) $\to$ stored (src IP, port) \\
+\hline
+\end{tabularx}
+
+\subsection{Routing Algorithms and Protocols}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+ & \textbf{Link-State} & \textbf{Distance-Vector} \\
+\hline
+Knows & Full topology & Neighbors + their vectors \\
+\hline
+Computes with & Dijkstra & Bellman-Ford \\
+\hline
+Talks to & All (flooding) & Neighbors only \\
+\hline
+Weakness & Oscillations & Count-to-infinity \\
+\hline
+Example & OSPF & RIP \\
+\hline
+\end{tabularx}
+
+\medskip
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+ & \textbf{Intra-AS (IGP)} & \textbf{Inter-AS (BGP)} \\
+\hline
+Scope & Within one AS & Between ASes \\
+\hline
+Type & OSPF (LS), RIP (DV) & Path-vector \\
+\hline
+Goal & Least cost & Policy (economics) \\
+\hline
+Key attrs & Link costs, areas & AS-PATH, NEXT-HOP, local-pref \\
+\hline
+Selection & Shortest path & Local-pref $>$ short AS-PATH $>$ hot-potato \\
+\hline
+\end{tabularx}
+
+\subsection{ICMP Common Messages}
+
+\noindent\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Type} & \textbf{Name} & \textbf{Used by / meaning} \\
+\hline
+8 / 0 & Echo request/reply & \texttt{ping} \\
+\hline
+3 & Destination unreachable & network/host/port/frag-needed (codes) \\
+\hline
+11 & TTL expired & \texttt{traceroute} \\
+\hline
+\end{tabularx}
+
+\subsection{Multiple Access Protocols}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+\textbf{Family} & \textbf{Protocols} & \textbf{Idea} \\
+\hline
+Partitioning & TDMA, FDMA & Fixed slots/bands; no collisions, low-load waste \\
+\hline
+Random access & ALOHA, CSMA/CD, CSMA/CA & Contend; detect/avoid \& recover from collisions \\
+\hline
+Taking turns & Polling, token passing & Coordinate whose turn it is \\
+\hline
+\end{tabularx}
+
+\subsection{Error Detection Methods}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Method} & \textbf{Strength} \\
+\hline
+1-bit parity & Detects odd \# of bit errors \\
+\hline
+2-D parity & Detects + \emph{corrects} a single-bit error \\
+\hline
+Internet checksum & Weak; software (transport layer) \\
+\hline
+CRC & Strong; hardware; detects bursts $\leq r$ bits (Ethernet, WiFi) \\
+\hline
+\end{tabularx}
+
+\subsection{Link Layer: MAC vs.\ IP, Switch vs.\ Router}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+ & \textbf{MAC address} & \textbf{IP address} \\
+\hline
+Size & 48-bit & 32-bit (v4) \\
+\hline
+Structure & Flat & Hierarchical \\
+\hline
+Scope & One LAN & End-to-end \\
+\hline
+Assignment & Burned into NIC (portable) & Subnet-dependent (DHCP/static) \\
+\hline
+Resolved by & --- & ARP (IP $\to$ MAC on a LAN) \\
+\hline
+\end{tabularx}
+
+\medskip
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+ & \textbf{Switch (L2)} & \textbf{Router (L3)} \\
+\hline
+Uses & MAC addresses & IP addresses \\
+\hline
+Table built by & Self-learning (source MAC) & Routing algorithms \\
+\hline
+Unknown dest & Flood & Drop / default route \\
+\hline
+Broadcast domain & Does \emph{not} isolate & Isolates \\
+\hline
+Config & Plug-and-play & Needs addressing/routing \\
+\hline
+\end{tabularx}
+
+\subsection{Ethernet Frame Fields}
+
+\noindent\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Field} & \textbf{Size} & \textbf{Purpose} \\
+\hline
+Preamble & 8 B & Clock synchronization \\
+\hline
+Dest / Source MAC & 6 B each & Link-layer addresses \\
+\hline
+Type & 2 B & Upper-layer demux (usually IP) \\
+\hline
+Data (payload) & 46--1500 B & The IP datagram \\
+\hline
+CRC & 4 B & Error detection (frame dropped on failure) \\
+\hline
+\end{tabularx}
+
+\subsection{Intra-AS Routing Protocols}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+\textbf{Protocol} & \textbf{Type} & \textbf{Notes} \\
+\hline
+RIP & Distance-vector & DVs every 30 s; mostly historical \\
+\hline
+EIGRP & Distance-vector & Cisco, opened 2013 \\
+\hline
+OSPF / IS-IS & Link-state (Dijkstra) & Floods LSAs over IP; authenticated; areas \\
+\hline
+\end{tabularx}
+
+\subsection{BGP: Attributes and Route Selection}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Concept} & \textbf{Meaning} \\
+\hline
+eBGP / iBGP & Learn reachability from other ASes / propagate it inside the AS \\
+\hline
+Transport & Semi-permanent TCP session between peers \\
+\hline
+AS-PATH & List of ASes the advert crossed (loop detection) \\
+\hline
+NEXT-HOP & Internal router toward the next-hop AS \\
+\hline
+Messages & OPEN, UPDATE, KEEPALIVE, NOTIFICATION \\
+\hline
+\end{tabularx}
+
+\medskip
+\noindent\textbf{Route selection order:} (1) highest local-preference (policy);
+(2) shortest AS-PATH; (3) closest NEXT-HOP (hot-potato); (4) other tie-breakers.
+\textbf{Hot-potato:} pick the gateway with least \emph{intra}-domain cost.
+
+\subsection{ARP and Switch Self-Learning}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Step / rule} & \textbf{Action} \\
+\hline
+ARP query & Broadcast (dest MAC \texttt{FF-FF-FF-FF-FF-FF}) with target IP \\
+\hline
+ARP reply & Owner unicasts its MAC; requester caches $\langle$IP,MAC,TTL$\rangle$ ($\sim$20 min) \\
+\hline
+Switch learn & Record (source MAC, arriving interface) \\
+\hline
+Dest known, same port & Drop (filter) \\
+\hline
+Dest known, other port & Forward on that one interface \\
+\hline
+Dest unknown / broadcast & Flood (all ports except arriving) \\
+\hline
+\end{tabularx}
+
+\subsection{VLANs and 802.1Q}
+
+\noindent\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Concept} & \textbf{Meaning} \\
+\hline
+Port-based VLAN & One physical switch acts as several virtual switches \\
+\hline
+Traffic isolation & Frames stay within their VLAN's ports \\
+\hline
+Inter-VLAN & Requires a router (Layer 3) \\
+\hline
+Trunk port & Carries multiple VLANs between switches \\
+\hline
+802.1Q tag & 4 B: TPID \texttt{0x8100} + 12-bit VLAN ID + 3-bit priority; CRC recomputed \\
+\hline
+\end{tabularx}
+
+\vfill
+\noindent\textit{\color{Thistle}These notes paraphrase and reorganize the
+lecture material (Kurose \& Ross, 8th ed.; UC Berkeley CS\,168) into a single
+study reference spanning the full exam scope --- Transport (Ch.\,3),
+Network-layer Data Plane (Ch.\,4) and Control Plane (Ch.\,5), and the Link
+Layer (Ch.\,6) --- with added code (sockets, SMTP, checksum, fragmentation,
+subnets, Dijkstra, distance-vector, CRC, CSMA/CD, switch learning) and an
+expanded cheat sheet.}
+
+\end{document}
