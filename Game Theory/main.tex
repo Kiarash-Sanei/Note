@@ -1,0 +1,1479 @@
+\documentclass[hidelinks]{article}
+% Page Layout
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+% Colors
+\usepackage[dvipsnames]{xcolor}
+% Math
+\usepackage{amsmath,amssymb,mathrsfs}
+% Lists
+\usepackage{enumitem}
+% Section Styling
+\usepackage{titlesec}
+% Hyperlinks
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+% --------------------------------------------------
+% Color Palette
+% --------------------------------------------------
+\definecolor{carminered}{rgb}{1.0,0.0,0.22}
+\definecolor{capri}{rgb}{0.0,0.75,1.0}
+\definecolor{brightlavender}{rgb}{0.75,0.58,0.89}
+\definecolor{nudelavender}{rgb}{0.78, 0.66, 0.70}
+% --------------------------------------------------
+% Dark Theme
+% --------------------------------------------------
+\pagecolor{black}
+\color{white}
+% --------------------------------------------------
+% Section Style
+% --------------------------------------------------
+\titleformat{\section}
+  {\bfseries\Large\color{brightlavender}}
+  {\thesection}{0.5em}{}
+
+\titleformat{\subsection}
+  {\bfseries\color{Thistle}}
+  {\thesubsection}{0.5em}{}
+
+\titleformat{\subsubsection}
+  {\bfseries\color{nudelavender}}
+  {\thesubsubsection}{0.5em}{}
+% --------------------------------------------------
+% Bullet Style
+% --------------------------------------------------
+\setlist[itemize,1]{label=$\bullet$}
+\setlist[itemize,2]{label=$\circ$}
+\setlist[itemize,3]{label=$\bullet$}
+\setlist[itemize,4]{label=$\circ$}
+% --------------------------------------------------
+% Title Style
+% --------------------------------------------------
+\title{\color{carminered}\textbf{Game Theory}}
+\author{\color{Thistle}Kiarash Sanei}
+\date{\color{SkyBlue}June, 2026}
+
+\begin{document}
+\maketitle
+\begin{Large}
+\tableofcontents
+\end{Large}
+\newpage
+
+%=================================================
+\section{Simultaneous Games}
+%=================================================
+
+\subsection{What Are Simultaneous Games?}
+
+A \textbf{simultaneous game} is a strategic interaction in which every player chooses an action without observing the choices of any other player. The word ``simultaneous'' does not literally require actions to occur at the same instant of clock time. What matters is the \textit{informational} structure: when you make your decision, you have no knowledge of what the other players have chosen or are choosing.
+
+Simultaneous games capture a wide range of real-world situations:
+\begin{itemize}
+    \item Two firms independently setting prices or quantities for the same market.
+    \item Two countries simultaneously deciding whether to impose tariffs.
+    \item Bidders in a sealed-bid auction submitting offers without seeing each other's bids.
+    \item Players in a one-shot social interaction where no history of play is available.
+\end{itemize}
+
+\subsubsection{Normal Form Representation}
+
+The natural mathematical language for simultaneous games is the \textbf{normal form} (also called the \textbf{strategic form}). It encodes everything we need to know:
+
+\begin{itemize}
+    \item A finite set of \textbf{players} $N = \{1, 2, \ldots, n\}$.
+    \item For each player $i \in N$, a nonempty set of \textbf{pure strategies} $S_i$. A pure strategy is a deterministic choice of action.
+    \item For each player $i$, a \textbf{payoff function} $u_i : S \to \mathbb{R}$, where $S = S_1 \times S_2 \times \cdots \times S_n$ is the set of all possible \textbf{strategy profiles}.
+\end{itemize}
+
+A strategy profile $s = (s_1, s_2, \ldots, s_n)$ specifies one strategy for every player. The payoff to player $i$ under profile $s$ is $u_i(s)$. It is standard to write $s = (s_i, s_{-i})$ to single out player $i$'s strategy $s_i$ and the vector of everyone else's strategies $s_{-i} = (s_j)_{j \neq i}$.
+
+\subsubsection{Two-Player Matrix Games}
+
+For two players with finite strategy sets, the normal form is conveniently displayed as a \textbf{payoff matrix}. Rows correspond to Player 1's strategies, columns to Player 2's strategies, and each cell contains the ordered pair of payoffs $(u_1, u_2)$.
+
+\textbf{Example — Rock-Paper-Scissors:}
+
+\[
+\begin{array}{c|ccc}
+ & \text{Rock} & \text{Paper} & \text{Scissors} \\
+\hline
+\text{Rock}     & (0,0)  & (-1,1) & (1,-1) \\
+\text{Paper}    & (1,-1) & (0,0)  & (-1,1) \\
+\text{Scissors} & (-1,1) & (1,-1) & (0,0) \\
+\end{array}
+\]
+
+This is a zero-sum game: $u_1(s) + u_2(s) = 0$ for every profile $s$. What one player gains, the other loses.
+
+\subsubsection{Assumptions Underlying the Model}
+
+The normal form implicitly assumes:
+\begin{itemize}
+    \item \textbf{Rationality:} Each player maximizes their own payoff.
+    \item \textbf{Complete information:} The payoff functions are common knowledge — every player knows the payoffs, knows every other player knows them, and so on.
+    \item \textbf{Independence:} Players choose strategies independently.
+\end{itemize}
+
+\subsection{Dominant Strategies}
+
+\subsubsection{Strict and Weak Dominance}
+
+A strategy $s_i$ \textbf{strictly dominates} strategy $s_i'$ for player $i$ if:
+\[
+u_i(s_i, s_{-i}) > u_i(s_i', s_{-i}) \qquad \forall\, s_{-i} \in S_{-i}
+\]
+No matter what opponents do, $s_i$ always gives a strictly higher payoff than $s_i'$. A rational player will never play a strictly dominated strategy.
+
+A strategy $s_i$ \textbf{weakly dominates} $s_i'$ if:
+\[
+u_i(s_i, s_{-i}) \geq u_i(s_i', s_{-i}) \qquad \forall\, s_{-i} \in S_{-i}
+\]
+with at least one $s_{-i}$ for which the inequality is strict.
+
+A \textbf{strictly dominant strategy} for player $i$ is one that strictly dominates \textit{every other} strategy available to player $i$. A rational player who possesses a dominant strategy will always choose it — the choice is independent of beliefs about opponents.
+
+\subsubsection{The Prisoner's Dilemma}
+
+Two suspects, each held in separate cells, simultaneously decide to either \textit{Cooperate} (stay silent) or \textit{Defect} (betray). The payoff matrix is:
+
+\[
+\begin{array}{c|cc}
+ & \text{Cooperate} & \text{Defect} \\
+\hline
+\text{Cooperate} & (3,3) & (0,5) \\
+\text{Defect}    & (5,0) & (1,1) \\
+\end{array}
+\]
+
+For Player 1: if Player 2 cooperates, defecting gives $5 > 3$; if Player 2 defects, defecting gives $1 > 0$. So \textit{Defect} strictly dominates \textit{Cooperate} for Player 1. By symmetry the same holds for Player 2.
+
+The outcome is (Defect, Defect) with payoffs $(1,1)$, even though (Cooperate, Cooperate) yielding $(3,3)$ is \textbf{Pareto superior} — both players would be better off cooperating. This is the central tragedy of the Prisoner's Dilemma: individual rationality leads to collective inefficiency.
+
+\subsubsection{Dominance by Mixed Strategies}
+
+A pure strategy $s_i'$ may be dominated not by any single pure strategy, but by a \textbf{mixture} over other pure strategies. If player $i$ randomizes over $S_i \setminus \{s_i'\}$ with some distribution $\sigma_i$, and:
+\[
+U_i(\sigma_i, s_{-i}) > u_i(s_i', s_{-i}) \qquad \forall\, s_{-i} \in S_{-i}
+\]
+then $s_i'$ is \textbf{strictly dominated by the mixed strategy} $\sigma_i$. This is important in the IEDS procedure: one should always check for domination by mixed strategies, not only pure ones.
+
+\textbf{Example:}
+
+\[
+\begin{array}{c|ccc}
+ & L & C & R \\
+\hline
+T & (1,\cdot) & (5,\cdot) & (1,\cdot) \\
+M & (4,\cdot) & (0,\cdot) & (4,\cdot) \\
+B & (2,\cdot) & (2,\cdot) & (2,\cdot) \\
+\end{array}
+\]
+
+Strategy $B$ is not dominated by $T$ or $M$ alone. But the mixture $\frac{1}{2}T + \frac{1}{2}M$ gives expected payoffs $(2.5, 2.5, 2.5)$, which strictly exceeds $B$'s payoff of $(2,2,2)$ in every column. So $B$ is strictly dominated by a mixed strategy.
+
+\subsection{Iterated Elimination of Dominated Strategies (IEDS)}
+
+\subsubsection{The Algorithm}
+
+The IEDS procedure applies the logic of dominance repeatedly:
+
+\begin{enumerate}
+    \item Identify all strictly dominated strategies across all players (including domination by mixed strategies). Remove them from the game.
+    \item In the resulting reduced game, check again for strictly dominated strategies. Some strategies that were undominated before may become dominated once certain opponent strategies are removed.
+    \item Repeat until no strictly dominated strategy remains.
+\end{enumerate}
+
+\textbf{Key properties of strict IEDS:}
+\begin{itemize}
+    \item \textbf{Order independence:} The final set of surviving strategies is the same regardless of the order in which dominated strategies are removed.
+    \item \textbf{Common knowledge of rationality:} IEDS is justified if players are rational, know opponents are rational, know opponents know they are rational, and so on to any depth.
+    \item \textbf{Rationalizability:} The set of strategies that survive IEDS coincides with the set of \textit{rationalizable} strategies — those that are best responses to some belief about opponents' play.
+\end{itemize}
+
+\textbf{Caution for weak IEDS:} The order of elimination \textit{does} matter for weakly dominated strategies. Different elimination orders may yield different surviving sets.
+
+\subsubsection{A Complete IEDS Example}
+
+\[
+\begin{array}{c|ccc}
+ & L & M & R \\
+\hline
+U & (1,0) & (1,3) & (0,1) \\
+D & (0,3) & (0,1) & (2,0) \\
+\end{array}
+\]
+
+Step 1 — Check Player 2's strategies:
+\begin{itemize}
+    \item Compare $L$ and $M$ for Player 2: $L$ gives $(0,3)$ for rows $U,D$; $M$ gives $(3,1)$. Neither dominates the other.
+    \item Compare $M$ and $R$: $M$ gives $(3,1)$ and $R$ gives $(1,0)$. $M$ strictly dominates $R$ for Player 2 (since $3>1$ and $1>0$). \textbf{Eliminate $R$.}
+\end{itemize}
+
+Reduced game after eliminating $R$:
+\[
+\begin{array}{c|cc}
+ & L & M \\
+\hline
+U & (1,0) & (1,3) \\
+D & (0,3) & (0,1) \\
+\end{array}
+\]
+
+Step 2 — Check Player 1's strategies in the reduced game:
+\begin{itemize}
+    \item $U$ gives $(1,1)$ and $D$ gives $(0,0)$ for columns $L,M$. $U$ strictly dominates $D$. \textbf{Eliminate $D$.}
+\end{itemize}
+
+Reduced game: Player 1 plays $U$.
+
+Step 3 — Check Player 2's strategies:
+\begin{itemize}
+    \item With Player 1 locked into $U$: $M$ gives payoff $3$ to Player 2, $L$ gives $0$. \textbf{Eliminate $L$.}
+\end{itemize}
+
+Unique survivor: $(U, M)$ with payoffs $(1,3)$.
+
+\subsection{Nash Equilibrium}
+
+\subsubsection{Definition and Intuition}
+
+The \textbf{Nash Equilibrium} (NE) is the foundational solution concept in game theory, introduced by John Nash in 1950. The idea is \textit{mutual best response}: a strategy profile is a NE if every player's strategy is a best response to the strategies of all other players. No player has a unilateral incentive to deviate.
+
+\textbf{Definition.} A strategy profile $s^* = (s_1^*, \ldots, s_n^*)$ is a \textbf{Nash Equilibrium} if for every player $i$ and every $s_i \in S_i$:
+\[
+u_i(s_i^*, s_{-i}^*) \geq u_i(s_i, s_{-i}^*)
+\]
+
+Equivalently, $s_i^*$ is a best response to $s_{-i}^*$:
+\[
+s_i^* \in \mathrm{BR}_i(s_{-i}^*) := \arg\max_{s_i \in S_i} u_i(s_i, s_{-i}^*)
+\]
+
+\textbf{Intuitions for NE:}
+\begin{itemize}
+    \item \textit{Self-enforcing agreement:} If players could communicate before the game and agree on $s^*$, no one would want to deviate unilaterally.
+    \item \textit{Correct predictions:} If players form correct beliefs about each other's strategies, they will play a NE.
+    \item \textit{Rest point:} If a dynamic process of strategy adjustment converges, it converges to a NE.
+\end{itemize}
+
+\subsubsection{Finding Pure Strategy Nash Equilibria in Matrix Games}
+
+The standard method uses the \textbf{best response underline method}:
+
+\begin{enumerate}
+    \item For each column (fixed strategy of Player 2), find the row(s) that maximize Player 1's payoff. Underline those payoffs.
+    \item For each row (fixed strategy of Player 1), find the column(s) that maximize Player 2's payoff. Underline those payoffs.
+    \item Any cell where \textit{both} entries are underlined is a pure strategy NE.
+\end{enumerate}
+
+\textbf{Example:}
+
+\[
+\begin{array}{c|ccc}
+ & L & C & R \\
+\hline
+T & (\underline{4},\underline{3}) & (2,1) & (3,2) \\
+M & (3,2) & (\underline{5},\underline{4}) & (2,3) \\
+B & (2,1) & (3,3) & (\underline{4},\underline{5}) \\
+\end{array}
+\]
+
+Pure NE: $(T,L)$, $(M,C)$, $(B,R)$. (All three cells have both payoffs underlined.)
+
+\subsubsection{Nash's Existence Theorem}
+
+\textbf{Theorem (Nash, 1950).} Every finite game (finitely many players, finitely many strategies each) has at least one Nash Equilibrium, possibly in mixed strategies.
+
+The proof uses Kakutani's fixed-point theorem: the best response correspondence maps the compact convex set of mixed strategy profiles to itself and has the properties required for a fixed point to exist. That fixed point is the Nash Equilibrium.
+
+\subsubsection{Properties and Limitations}
+
+\begin{itemize}
+    \item Every dominant strategy equilibrium is a NE, but not every NE involves dominant strategies.
+    \item A game may have \textbf{zero, one, or multiple} pure strategy NE.
+    \item NE can be \textbf{inefficient}: the Prisoner's Dilemma NE leaves both players worse off than mutual cooperation.
+    \item NE does not require a unique prediction: when multiple equilibria exist, the theory is silent on which one will be selected. Refinements and equilibrium selection theories address this.
+\end{itemize}
+
+\subsection{Mixed Strategy Nash Equilibrium}
+
+\subsubsection{Mixed Strategies}
+
+A \textbf{mixed strategy} for player $i$ is a probability distribution over $S_i$. Formally, $\sigma_i \in \Delta(S_i)$, where $\Delta(S_i)$ is the simplex of probability measures on $S_i$. For a finite $S_i = \{s_i^1, \ldots, s_i^K\}$, a mixed strategy is a vector $(\sigma_i(s_i^1), \ldots, \sigma_i(s_i^K))$ with $\sigma_i(s_i^k) \geq 0$ and $\sum_k \sigma_i(s_i^k) = 1$.
+
+The \textbf{support} of $\sigma_i$ is the set of pure strategies played with positive probability: $\mathrm{supp}(\sigma_i) = \{s_i : \sigma_i(s_i) > 0\}$.
+
+Pure strategies are special mixed strategies that place probability 1 on a single action.
+
+\subsubsection{Expected Payoffs}
+
+Under a mixed strategy profile $\sigma = (\sigma_1, \ldots, \sigma_n)$, players choose independently. The \textbf{expected payoff} to player $i$ is:
+\[
+U_i(\sigma) = \sum_{s \in S} \left(\prod_{j=1}^n \sigma_j(s_j)\right) u_i(s)
+\]
+
+Because expected utility is multilinear in the $\sigma_j$'s, each player's expected payoff is linear in their own mixed strategy. This linearity has a crucial implication.
+
+\subsubsection{The Indifference Condition}
+
+\textbf{Lemma.} In any Nash Equilibrium $\sigma^*$, every pure strategy in the support of $\sigma_i^*$ must yield the same expected payoff against $\sigma_{-i}^*$. That is, for all $s_i, s_i'$ in $\mathrm{supp}(\sigma_i^*)$:
+\[
+U_i(s_i, \sigma_{-i}^*) = U_i(s_i', \sigma_{-i}^*)
+\]
+
+\textbf{Why?} If one strategy in the support gave a strictly higher expected payoff, the player would profitably deviate by shifting all probability to that strategy. So in equilibrium, all strategies in the support must be equally good.
+
+This gives us a powerful algorithm for computing mixed NE:
+
+\begin{enumerate}
+    \item Guess the support of each player's equilibrium mixed strategy.
+    \item Set up the indifference conditions: each supported strategy must give equal expected payoffs.
+    \item Solve the system of equations for the mixing probabilities.
+    \item Verify that strategies outside the support are not profitable deviations (they must give weakly lower expected payoff).
+\end{enumerate}
+
+\subsubsection{Computing Mixed NE: Matching Pennies}
+
+\[
+\begin{array}{c|cc}
+ & H & T \\
+\hline
+H & (1,-1) & (-1,1) \\
+T & (-1,1) & (1,-1) \\
+\end{array}
+\]
+
+No pure NE exists (check: every cell has one player wanting to deviate). So look for a mixed NE.
+
+Let Player 1 play $H$ with probability $p$ and $T$ with probability $1-p$. Player 2 is indifferent between $H$ and $T$ when:
+\[
+U_2(H) = U_2(T) \implies p(-1) + (1-p)(1) = p(1) + (1-p)(-1)
+\]
+\[
+1 - 2p = 2p - 1 \implies p = \frac{1}{2}
+\]
+
+By symmetry, Player 2 also plays $H$ with probability $q = \frac{1}{2}$.
+
+\textbf{Unique mixed NE:} $\sigma_1 = \sigma_2 = (\frac{1}{2}, \frac{1}{2})$, giving each player expected payoff $0$.
+
+\subsubsection{Computing Mixed NE: Battle of the Sexes}
+
+\[
+\begin{array}{c|cc}
+ & O & F \\
+\hline
+O & (2,1) & (0,0) \\
+F & (0,0) & (1,2) \\
+\end{array}
+\]
+
+There are two pure NE: $(O,O)$ and $(F,F)$. Is there a mixed NE?
+
+Let Player 1 play $O$ with probability $p$, Player 2 play $O$ with probability $q$.
+
+Player 2's indifference: $U_2(O) = U_2(F)$
+\[
+p(1) + (1-p)(0) = p(0) + (1-p)(2) \implies p = \frac{2}{3}
+\]
+
+Player 1's indifference: $U_1(O) = U_1(F)$
+\[
+q(2) + (1-q)(0) = q(0) + (1-q)(1) \implies 2q = 1-q \implies q = \frac{1}{3}
+\]
+
+\textbf{Mixed NE:} $\sigma_1 = (\frac{2}{3}, \frac{1}{3})$, $\sigma_2 = (\frac{1}{3}, \frac{2}{3})$.
+
+Expected payoffs in the mixed NE: $U_1 = 2 \cdot \frac{1}{3} = \frac{2}{3}$, $U_2 = 1 \cdot \frac{2}{3} = \frac{2}{3}$.
+
+Note: both players are \textit{worse off} in the mixed NE ($\frac{2}{3}$ each) than in either pure NE ($2$ or $1$). The mixed NE reflects strategic uncertainty about which pure NE will be played.
+
+\subsection{Coordination Games and Related Concepts}
+
+\subsubsection{Coordination Games}
+
+A \textbf{coordination game} is any game in which at least one equilibrium requires players to make compatible or matching choices. Players have some common interest in coordinating, though they may disagree on \textit{which} equilibrium to coordinate on.
+
+\subsubsection{Stag Hunt}
+
+Two hunters can collaborate to catch a stag (requires both to hunt stag) or individually catch a hare. Payoffs:
+
+\[
+\begin{array}{c|cc}
+ & \text{Stag} & \text{Hare} \\
+\hline
+\text{Stag} & (4,4) & (0,2) \\
+\text{Hare} & (2,0) & (2,2) \\
+\end{array}
+\]
+
+\begin{itemize}
+    \item \textbf{Pure NE:} (Stag, Stag) and (Hare, Hare).
+    \item (Stag, Stag) is \textbf{Pareto dominant}: it gives the highest payoffs.
+    \item (Hare, Hare) is \textbf{risk dominant}: it is the safer choice, giving payoff $2$ regardless of the opponent's action.
+    \item \textbf{Mixed NE:} Player 2 is indifferent when $4p + 0(1-p) = 2p + 2(1-p) \implies 4p = 2 \implies p = \frac{1}{2}$. Mixed NE: each plays Stag with probability $\frac{1}{2}$.
+\end{itemize}
+
+The Stag Hunt captures the tension between efficiency and security. Which equilibrium players coordinate on depends on their trust in each other and the broader social context.
+
+\subsubsection{Battle of the Sexes}
+
+A couple wants to spend the evening together but disagrees on the venue. The husband prefers Opera (O), the wife prefers Football (F), but both prefer attending together over attending separately.
+
+Two pure NE and one mixed NE (computed above). This is a \textbf{conflict coordination game}: players share interest in coordination but have conflicting preferences over which equilibrium.
+
+\subsubsection{Focal Points (Schelling Points)}
+
+When multiple Nash Equilibria exist, the theory provides no guidance on which one rational players will select. Thomas Schelling argued that in practice, players use \textbf{focal points} — equilibria that seem natural, prominent, or ``obvious'' due to context, culture, or framing.
+
+\textbf{Classic experiment:} Ask two strangers (who cannot communicate) where in New York City they would meet if they had to find each other. Most answered ``noon, at Grand Central Station.'' No equilibrium analysis selects this — it is focal by cultural convention.
+
+Focal points are not part of the formal model but matter enormously in applications.
+
+\subsubsection{Cournot Duopoly: A Continuous Game}
+
+Two firms simultaneously choose quantities $q_1, q_2 \geq 0$. Market inverse demand: $P = a - q_1 - q_2$. Constant marginal cost $c < a$.
+
+\textbf{Firm $i$'s optimization:}
+\[
+\max_{q_i} \; \pi_i = (a - q_i - q_j - c) q_i
+\]
+\[
+\frac{\partial \pi_i}{\partial q_i} = a - 2q_i - q_j - c = 0 \implies q_i^*(q_j) = \frac{a-c-q_j}{2}
+\]
+
+This is Firm $i$'s \textbf{best response function} (reaction function).
+
+\textbf{Nash Equilibrium:} Both best responses must hold simultaneously:
+\[
+q_1^* = \frac{a-c-q_2^*}{2}, \qquad q_2^* = \frac{a-c-q_1^*}{2}
+\]
+
+Substituting: $q_1^* = \frac{a-c - \frac{a-c-q_1^*}{2}}{2} \implies q_1^* = \frac{a-c}{3}$.
+
+By symmetry: $q_1^* = q_2^* = \frac{a-c}{3}$.
+
+\textbf{Market price:} $P^* = a - \frac{2(a-c)}{3} = \frac{a+2c}{3}$.
+
+\textbf{Each firm's profit:} $\pi_i^* = \left(\frac{a-c}{3}\right)^2$.
+
+Compare to monopoly quantity $q_m = \frac{a-c}{2}$: Cournot output exceeds monopoly but is less than competitive. The firms would jointly prefer to produce $\frac{a-c}{2}$ total, but that requires coordination and cannot be sustained as a Nash Equilibrium in the one-shot game.
+
+\newpage
+%=================================================
+\section{Dynamic Games}
+%=================================================
+
+\subsection{From Simultaneous to Sequential}
+
+In many strategic situations, players do not move simultaneously. One player may act first, the other observes that action and then responds. Or players may alternate moves over time. These are \textbf{dynamic games} (also called \textbf{sequential games} or \textbf{extensive form games}).
+
+The key features that distinguish dynamic games from simultaneous ones:
+\begin{itemize}
+    \item The \textbf{order of moves} matters.
+    \item Players may have \textbf{more information} when they move: they might observe prior actions.
+    \item The relevant equilibrium concept must capture \textbf{credibility} of strategies — what a player will rationally do at each decision point.
+    \item Actions taken early can serve as \textbf{commitments} that alter subsequent play.
+\end{itemize}
+
+\subsection{Extensive Form and Game Trees}
+
+\subsubsection{Components of the Extensive Form}
+
+A dynamic game is formally described by its \textbf{extensive form}:
+
+\begin{itemize}
+    \item \textbf{Players:} $N = \{1, \ldots, n\}$ plus possibly \textit{Nature} (a non-strategic player who makes random moves).
+    \item \textbf{Game tree:} A finite directed tree with a unique initial node (root). Nodes represent points in the game where a decision is made or an outcome is reached.
+    \item \textbf{Decision nodes:} Non-terminal nodes where a player (or Nature) makes a choice. At each decision node, the player who moves and the set of available \textbf{actions} (branches) are specified.
+    \item \textbf{Terminal nodes:} Leaf nodes representing possible outcomes. Each terminal node is assigned a \textbf{payoff vector} $(u_1, \ldots, u_n)$.
+    \item \textbf{Information sets:} A partition of each player's decision nodes into \textbf{information sets}. An information set $h$ for player $i$ groups together nodes that player $i$ cannot distinguish — either because they move simultaneously in some subpart, or because they lack information about prior moves.
+\end{itemize}
+
+\subsubsection{Perfect vs. Imperfect Information}
+
+\begin{itemize}
+    \item \textbf{Perfect information:} Every information set is a singleton — at every point in the game, the player who moves knows exactly which node they are at (i.e., knows the full history of all prior moves). Chess is a perfect information game.
+    \item \textbf{Imperfect information:} Some information sets contain multiple nodes. The player cannot distinguish which node they are at when they must act. Poker, simultaneous moves embedded in a larger game, and many economic models involve imperfect information.
+\end{itemize}
+
+\subsubsection{Strategies in Extensive Form Games}
+
+A \textbf{pure strategy} for player $i$ in an extensive form game is a complete contingent plan: it specifies an action for player $i$ at \textit{every} information set of player $i$, including information sets that may never be reached in equilibrium. This completeness is critical for equilibrium analysis.
+
+The number of pure strategies for player $i$ is $\prod_{h \in H_i} |A(h)|$, where $H_i$ is the set of player $i$'s information sets and $A(h)$ is the set of actions available at information set $h$.
+
+\textbf{Example:} If player $i$ has two information sets, each with two actions, they have $2 \times 2 = 4$ pure strategies.
+
+\subsubsection{Example: The Entry Deterrence Game}
+
+An \textbf{Incumbent} (I) monopolizes a market. A potential \textbf{Entrant} (E) decides whether to Enter ($In$) or Stay Out ($Out$). If the entrant enters, the incumbent decides to either \textbf{Fight} ($F$) or \textbf{Accommodate} ($A$).
+
+\textbf{Terminal payoffs} (Entrant, Incumbent):
+\begin{itemize}
+    \item $Out$: $(0, 2)$
+    \item $In, F$: $(-1, -1)$
+    \item $In, A$: $(1, 1)$
+\end{itemize}
+
+\textbf{Pure strategies:}
+\begin{itemize}
+    \item Entrant: $\{In, Out\}$ (one information set, two actions).
+    \item Incumbent: $\{F, A\}$ (one information set — reached only if $In$ — with two actions).
+\end{itemize}
+
+\textbf{Normal form:}
+\[
+\begin{array}{c|cc}
+ & F & A \\
+\hline
+In & (-1,-1) & (1,1) \\
+Out & (0,2) & (0,2) \\
+\end{array}
+\]
+
+\textbf{Nash Equilibria of the normal form:}
+\begin{itemize}
+    \item $(In, A)$: Entrant plays $In$, Incumbent plays $A$. Entrant's best response to $A$ is $In$ ($1 > 0$). Incumbent's best response to $In$ is $A$ ($1 > -1$). \textbf{NE.}
+    \item $(Out, F)$: Entrant plays $Out$, Incumbent plays $F$. Entrant's best response to $F$ is $Out$ ($0 > -1$). Incumbent's best response to $Out$: any strategy (node never reached) — $F$ is weakly optimal. \textbf{NE.}
+\end{itemize}
+
+But $(Out, F)$ rests on an \textbf{incredible threat}: if the Entrant entered, the Incumbent would not actually fight (since $-1 < 1$). The threat to Fight is only a threat; it would not be carried out. This motivates the need for subgame perfection.
+
+\subsection{Backward Induction and Subgame Perfect Equilibrium}
+
+\subsubsection{Backward Induction Algorithm}
+
+\textbf{Backward induction} is the primary tool for solving finite perfect-information games. It works by ``rolling back'' the tree from the terminal nodes:
+
+\begin{enumerate}
+    \item \textbf{Identify the penultimate nodes}: Find all decision nodes whose successors are all terminal nodes (i.e., the last decision nodes before the game ends).
+    \item \textbf{Assign optimal actions}: At each such node, the player chooses the action that maximizes their payoff. Record this action and replace the subtree with the resulting payoff vector.
+    \item \textbf{Move one step back}: The node now acts as a terminal node with the computed payoffs.
+    \item \textbf{Repeat}: Continue the process until the root is reached.
+\end{enumerate}
+
+The resulting strategy profile (one action per decision node per player) constitutes a \textbf{Subgame Perfect Equilibrium} (SPE).
+
+\textbf{Entry Deterrence by backward induction:}
+\begin{itemize}
+    \item At the Incumbent's node (reached after $In$): Fight gives $-1$, Accommodate gives $1$. Incumbent chooses $A$.
+    \item Replace the Incumbent's subtree with payoffs $(1,1)$.
+    \item At the Entrant's node: $In$ gives $1$, $Out$ gives $0$. Entrant chooses $In$.
+\end{itemize}
+
+Backward induction SPE: $(In, A)$. The non-credible equilibrium $(Out, F)$ is eliminated.
+
+\subsubsection{Definition of Subgame Perfect Equilibrium}
+
+\textbf{Definition (Selten, 1965).} A \textbf{subgame} of an extensive form game is a subset of the game tree that:
+\begin{itemize}
+    \item Starts at a single decision node $v$ that is a singleton information set.
+    \item Contains all nodes and branches reachable from $v$.
+    \item For every information set $h$: either all nodes of $h$ are in the subgame, or none are (no information set is split).
+\end{itemize}
+
+The entire game is always a subgame of itself. In perfect-information games, every decision node initiates a subgame.
+
+\textbf{Definition.} A strategy profile $\sigma^*$ is a \textbf{Subgame Perfect Nash Equilibrium (SPE)} if, for every subgame $\Gamma'$ of the game, the restriction of $\sigma^*$ to $\Gamma'$ constitutes a Nash Equilibrium of $\Gamma'$.
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Every SPE is a NE, but not every NE is an SPE.
+    \item SPE eliminates NE sustained by non-credible threats or off-path irrational behavior.
+    \item Every finite perfect-information game has at least one (generically unique) SPE, found by backward induction.
+    \item In games with imperfect information, backward induction alone does not suffice — one needs belief systems and the notion of Perfect Bayesian Equilibrium.
+\end{itemize}
+
+\subsubsection{The One-Stage Deviation Principle}
+
+Checking whether a strategy profile is an SPE by verifying the NE condition in every subgame is often tedious. The \textbf{One-Stage Deviation Principle} offers a more efficient check:
+
+\textbf{Theorem.} A strategy profile $\sigma^*$ in a finite or discounted infinite horizon game is an SPE if and only if there is no player $i$ and information set $h$ such that player $i$ can profitably deviate at $h$ while playing according to $\sigma^*$ at all future information sets.
+
+In other words: $\sigma^*$ is an SPE if and only if no player gains by changing their action in exactly one period, holding all other behavior fixed. This ``single deviation'' is all that needs to be checked.
+
+\subsubsection{The Centipede Game}
+
+A two-player game played over $T$ rounds. In each round, the current player can either \textbf{Stop} (ending the game) or \textbf{Continue} (passing control to the other player). The payoffs grow if players continue, but the player who stops takes a larger share.
+
+\[
+\text{Stop immediately: } (1, 0) \;\xrightarrow{\text{Continue}}\; (0, 3) \;\xrightarrow{\text{Continue}}\; (4, 1) \;\xrightarrow{\text{Continue}}\; \cdots
+\]
+
+\textbf{Backward induction:} In the last period, the current player stops (to get the larger share). Knowing this, in the second-to-last period, the current player also stops. By induction, the unique SPE is to stop at the very first node.
+
+This is the \textbf{Centipede Paradox}: backward induction predicts immediate termination, even though both players would benefit enormously from continuous cooperation. Experimentally, real players typically continue for many rounds. This raises deep questions about whether backward induction captures actual human behavior and whether common knowledge of rationality is a realistic assumption.
+
+\subsection{Backward Induction with Continuous Strategy Sets}
+
+\subsubsection{General Approach}
+
+When strategy sets are continuous (e.g., quantities, prices, bids), the same backward induction logic applies but requires solving optimization problems at each stage.
+
+\textbf{Method:}
+\begin{enumerate}
+    \item \textbf{Last stage:} Let the last-mover's strategy be a function of all preceding actions. Solve their optimization problem to get the best response function $s_n^*(s_1, \ldots, s_{n-1})$.
+    \item \textbf{Penultimate stage:} Substitute the last-mover's best response into the penultimate player's payoff. Optimize over their strategy, obtaining $s_{n-1}^*(s_1, \ldots, s_{n-2})$.
+    \item \textbf{Repeat backward:} Continue until the first mover's optimal strategy is determined.
+    \item \textbf{Roll forward:} Substitute back to find all equilibrium strategies.
+\end{enumerate}
+
+\subsubsection{The Stackelberg Model}
+
+Two firms (leader 1 and follower 2) compete in quantities. Leader moves first; follower observes $q_1$ and then chooses $q_2$. Market inverse demand: $P = a - q_1 - q_2$. Constant marginal cost $c$.
+
+\textbf{Stage 2 — Follower's best response:}
+\[
+\max_{q_2 \geq 0} \; (a - q_1 - q_2 - c)q_2
+\]
+\[
+\frac{\partial \pi_2}{\partial q_2} = a - q_1 - 2q_2 - c = 0 \implies q_2^*(q_1) = \frac{a - c - q_1}{2}
+\]
+
+\textbf{Stage 1 — Leader anticipates follower's response:}
+\[
+\max_{q_1 \geq 0} \; (a - q_1 - q_2^*(q_1) - c) q_1 = \max_{q_1} \; \left(a - q_1 - \frac{a-c-q_1}{2} - c\right) q_1 = \max_{q_1} \; \frac{(a-c-q_1)q_1}{2}
+\]
+\[
+\frac{d}{dq_1}\left[\frac{(a-c)q_1 - q_1^2}{2}\right] = \frac{a-c-2q_1}{2} = 0 \implies q_1^* = \frac{a-c}{2}
+\]
+\[
+q_2^* = \frac{a-c - \frac{a-c}{2}}{2} = \frac{a-c}{4}
+\]
+
+\textbf{Comparison with Cournot:}
+
+\[
+\begin{array}{l|ll}
+ & \text{Cournot (simultaneous)} & \text{Stackelberg (sequential)} \\
+\hline
+q_1 & \frac{a-c}{3} & \frac{a-c}{2} \quad (+50\%) \\
+q_2 & \frac{a-c}{3} & \frac{a-c}{4} \quad (-25\%) \\
+Q   & \frac{2(a-c)}{3} & \frac{3(a-c)}{4} \\
+P   & \frac{a+2c}{3} & \frac{a+3c}{4} \\
+\pi_1 & \left(\frac{a-c}{3}\right)^2 & \frac{(a-c)^2}{8} \quad (\text{higher}) \\
+\pi_2 & \left(\frac{a-c}{3}\right)^2 & \frac{(a-c)^2}{16} \quad (\text{lower}) \\
+\end{array}
+\]
+
+The leader benefits from \textbf{first-mover advantage}: by committing to a large quantity, the leader forces the follower to produce less. Total output is higher in Stackelberg, so prices are lower and consumers benefit.
+
+\subsubsection{Commitment Value and First-Mover Advantage}
+
+The Stackelberg result illustrates a general principle: \textbf{the ability to commit to a strategy before the opponent can respond is valuable}. By moving first and producing $q_1^* = \frac{a-c}{2}$, the leader commits credibly — the follower observes $q_1$ and responds optimally, which the leader has already accounted for.
+
+In simultaneous games, commitment is not possible. The value of the first move comes precisely from the ability to observe and respond being asymmetrically distributed.
+
+\subsection{Complete Subgames and Subgame Perfection}
+
+\subsubsection{Identifying Subgames}
+
+To apply SPE analysis, one must correctly identify all subgames. Recall: a subgame begins at a singleton information set and includes all successors without splitting any information set.
+
+\textbf{Consequence:} In games with imperfect information, many nodes do not initiate subgames. For example, in a simultaneous-move game embedded in a larger sequential game, the simultaneous-move portion typically does not constitute a proper subgame (the information sets are not singletons). This limits the applicability of backward induction and motivates Perfect Bayesian Equilibrium.
+
+\subsubsection{Multi-Stage Games with Observable Actions}
+
+An important class of games: in each stage, all players simultaneously choose actions, and the \textit{outcome} (combination of actions) is publicly observed before the next stage. These are \textbf{multi-stage games with observable actions}.
+
+\begin{itemize}
+    \item Every history initiates a proper subgame.
+    \item SPE can be characterized using the One-Stage Deviation Principle.
+    \item Examples: repeated games, sequential bargaining, arms race models.
+\end{itemize}
+
+\newpage
+%=================================================
+\section{Refinement of Equilibrium}
+%=================================================
+
+\subsection{Why Refine Nash Equilibrium?}
+
+Even after restricting attention to Subgame Perfect Equilibria, many dynamic games with \textbf{incomplete information} or \textbf{simultaneous moves within a larger game} still have multiple equilibria. Some of these rest on implausible beliefs about what would happen after events that don't occur in equilibrium (off-equilibrium-path beliefs).
+
+\textbf{Refinements} are additional criteria — beyond NE or SPE — used to:
+\begin{itemize}
+    \item Eliminate equilibria sustained by unreasonable off-path beliefs.
+    \item Select among equilibria based on their plausibility or robustness.
+    \item Capture the idea that rational players should form beliefs that are consistent with equilibrium reasoning.
+\end{itemize}
+
+The most important refinements for dynamic games with incomplete information are Perfect Bayesian Equilibrium, Sequential Equilibrium, and the Cho-Kreps Intuitive Criterion.
+
+\subsection{Bayesian Nash Equilibrium and Games of Incomplete Information}
+
+\subsubsection{Harsanyi's Type Space Framework}
+
+Incomplete information means some players have private information. John Harsanyi (1967--1968) showed how to model this through \textbf{types}:
+
+\begin{itemize}
+    \item Each player $i$ has a \textbf{type} $\theta_i \in \Theta_i$ that encodes their private information (e.g., their cost, valuation, signal).
+    \item Types are drawn by Nature from a joint distribution $p(\theta_1, \ldots, \theta_n)$.
+    \item Each player observes only their own type.
+    \item Everything else (the distribution $p$, the strategy sets, the payoff functions) is common knowledge.
+\end{itemize}
+
+\textbf{Strategy:} In a Bayesian game, a \textbf{pure strategy} for player $i$ is a function $s_i : \Theta_i \to A_i$ mapping each type to an action. It specifies what player $i$ does for every possible realization of their type.
+
+\subsubsection{Bayesian Nash Equilibrium}
+
+\textbf{Definition.} A strategy profile $(s_1^*(\cdot), \ldots, s_n^*(\cdot))$ is a \textbf{Bayesian Nash Equilibrium (BNE)} if for every player $i$ and every type $\theta_i \in \Theta_i$:
+\[
+s_i^*(\theta_i) \in \arg\max_{a_i \in A_i} \; \mathbb{E}_{\theta_{-i}}\left[u_i(a_i, s_{-i}^*(\theta_{-i}), \theta_i, \theta_{-i}) \mid \theta_i\right]
+\]
+
+Each type of each player maximizes their expected utility, taking as given the strategies of all other types of all other players, and forming beliefs about opponents' types using Bayes' rule.
+
+\textbf{Example — First Price Sealed-Bid Auction:}
+
+Two bidders, each with a private valuation $v_i$ drawn uniformly from $[0,1]$. Each submits a bid $b_i$. The highest bidder wins and pays their bid.
+
+\textbf{BNE:} Each bidder uses the symmetric strategy $b_i^*(v_i) = \frac{v_i}{2}$.
+
+\textit{Verification:} Bidder 1 with valuation $v_1$ bids $b_1$. They win when $b_1 > b_2^*(v_2) = \frac{v_2}{2}$, i.e., when $v_2 < 2b_1$ (probability $2b_1$ for $b_1 \leq \frac{1}{2}$). Expected payoff: $(v_1 - b_1) \cdot 2b_1$. Optimizing: $\frac{\partial}{\partial b_1}[(v_1 - b_1)2b_1] = 2v_1 - 4b_1 = 0 \implies b_1^* = \frac{v_1}{2}$. $\checkmark$
+
+\subsection{Signaling Games and Equilibria}
+
+\subsubsection{Structure of Signaling Games}
+
+A \textbf{signaling game} is a two-stage game involving a privately informed \textbf{Sender} (S) and an uninformed \textbf{Receiver} (R):
+
+\begin{enumerate}
+    \item \textbf{Nature} draws the Sender's type $\theta \in \Theta$ with probability $p(\theta)$. The Sender observes $\theta$; the Receiver does not.
+    \item The \textbf{Sender} chooses a message (signal) $m \in M$.
+    \item The \textbf{Receiver} observes $m$ (but not $\theta$) and chooses an action $a \in A$.
+    \item Payoffs: $u_S(\theta, m, a)$ for the Sender; $u_R(\theta, m, a)$ for the Receiver.
+\end{enumerate}
+
+Signaling games model:
+\begin{itemize}
+    \item Job market signaling (education as a signal of ability).
+    \item Corporate dividend policy (signaling firm value).
+    \item Political rhetoric (signaling policy intentions).
+    \item Biological signaling (peacock tails signaling genetic fitness).
+\end{itemize}
+
+\subsubsection{Perfect Bayesian Equilibrium in Signaling Games}
+
+A \textbf{Perfect Bayesian Equilibrium (PBE)} of a signaling game consists of:
+\begin{itemize}
+    \item A \textbf{strategy} $m^*(\theta)$ for the Sender: an action for each type.
+    \item A \textbf{strategy} $a^*(m)$ for the Receiver: an action for each message.
+    \item A \textbf{belief system} $\mu(\theta \mid m)$: the Receiver's posterior belief about the Sender's type after observing message $m$.
+\end{itemize}
+
+Satisfying:
+\begin{itemize}
+    \item \textbf{Sequential rationality:} Each player's strategy is optimal given the other's strategy and the beliefs.
+    \item \textbf{Belief consistency:} Beliefs $\mu(\theta \mid m)$ are derived from the Sender's strategy using Bayes' rule wherever possible:
+    \[
+    \mu(\theta \mid m) = \frac{p(\theta) \cdot \mathbf{1}[m^*(\theta) = m]}{\sum_{\theta'} p(\theta') \cdot \mathbf{1}[m^*(\theta') = m]} \quad \text{when denominator} > 0
+    \]
+    Off the equilibrium path (messages never sent in equilibrium), beliefs are unrestricted. This freedom generates multiple PBE and motivates further refinements.
+\end{itemize}
+
+\subsubsection{Separating Equilibrium}
+
+In a \textbf{separating equilibrium}, different types send different messages: $m^*(\theta) \neq m^*(\theta')$ for $\theta \neq \theta'$.
+
+\begin{itemize}
+    \item The Receiver can perfectly infer the Sender's type from the message.
+    \item On the equilibrium path: $\mu(\theta \mid m^*(\theta)) = 1$.
+    \item For a separating equilibrium to exist, there must be a reason for types to separate — typically, \textbf{the cost of sending a given message differs across types}, making mimicry unprofitable.
+\end{itemize}
+
+\subsubsection{Pooling Equilibrium}
+
+In a \textbf{pooling equilibrium}, all types send the same message: $m^*(\theta) = m^*$ for all $\theta$.
+
+\begin{itemize}
+    \item The Receiver learns nothing from the message; posterior beliefs equal prior beliefs: $\mu(\theta \mid m^*) = p(\theta)$.
+    \item For a pooling equilibrium to exist, no type must have an incentive to deviate to a different message given the Receiver's response.
+    \item Off-path beliefs (after messages not sent in equilibrium) can be set to sustain the pooling outcome.
+\end{itemize}
+
+\subsubsection{Spence's Job Market Signaling Model}
+
+\textbf{Setup:}
+\begin{itemize}
+    \item A worker has type $\theta \in \{H, L\}$ (high or low ability) with probabilities $p$ and $1-p$.
+    \item Only the worker knows their type.
+    \item The worker chooses education level $e \geq 0$. Education does not increase productivity; it only serves as a signal.
+    \item Cost of education: $c(H, e) = e$, $c(L, e) = 2e$. High types have lower costs: $c_H < c_L$ (\textbf{Single Crossing Condition}).
+    \item Productivity: $\theta_H = 2$, $\theta_L = 1$.
+    \item Firms observe $e$ and offer wages equal to expected productivity: $w(e) = \mathbb{E}[\theta \mid e]$.
+    \item Worker's utility: $w - c(\theta, e)$.
+\end{itemize}
+
+\textbf{Separating equilibrium:} High types choose $e^*$; low types choose $e = 0$.
+
+\begin{itemize}
+    \item Firms' beliefs: $\mu(H \mid e \geq e^*) = 1$, $\mu(L \mid e < e^*) = 1$.
+    \item Wages: $w(e \geq e^*) = 2$, $w(e < e^*) = 1$.
+    \item \textbf{Low type's incentive constraint:} No incentive to mimic high type. Low type gets $1 - 0 = 1$ by choosing $e=0$, and $2 - 2e^*$ by mimicking. No incentive iff $1 \geq 2 - 2e^*$, i.e., $e^* \geq \frac{1}{2}$.
+    \item \textbf{High type's incentive constraint:} No incentive to deviate to $e=0$. High type gets $2 - e^*$ from $e^*$ and $1$ from $e=0$. Incentive to separate iff $2 - e^* \geq 1$, i.e., $e^* \leq 1$.
+    \item \textbf{Separating equilibria exist for:} $e^* \in [\frac{1}{2}, 1]$.
+\end{itemize}
+
+\textbf{Key insight:} Education in equilibrium is \textit{socially wasteful} — it does not increase productivity, and its entire social cost is the resources spent on schooling. Yet the Single Crossing Condition ensures that only high-ability workers find it worthwhile to acquire education. Education functions as a credible signal precisely because it is costly and differentially costly across types.
+
+\textbf{Pooling equilibrium:} Both types choose the same $e^* = 0$ (for example). Wage: $w = p \cdot 2 + (1-p) \cdot 1 = 1 + p$. For this to be an equilibrium, the high type must not want to deviate to some $e' > 0$. Given off-path belief $\mu(L \mid e') = 1$ (worst-case belief), wage after deviation is $1$. High type does not deviate iff $1 + p - 0 \geq 1 - e'$ (satisfied for any $e' > 0$). So the pooling equilibrium can be sustained.
+
+\subsection{Forward Induction}
+
+\subsubsection{The Logic of Forward Induction}
+
+\textbf{Backward induction} reasons from the end of the game toward the beginning: what will happen later constrains choices now. \textbf{Forward induction} works in the other direction: observed early behavior constrains inferences about future intentions.
+
+The core idea: if a player takes an action that is only rational if they intend to play in a certain way later, opponents should infer that intention.
+
+\textbf{Application:} If a player deviates from the equilibrium path, what does this deviation signal? A player would only deviate if they expected the deviation to be profitable — given equilibrium reasoning about how opponents will respond. This logic can rule out equilibria sustained by implausible off-path beliefs.
+
+\subsubsection{The Intuitive Criterion (Cho and Kreps, 1987)}
+
+The most influential formalization of forward induction for signaling games. Suppose $(\sigma^*, \mu^*)$ is a PBE and consider a type-$\theta$ Sender observing an off-path message $m'$.
+
+\textbf{Step 1:} Identify which types would never benefit from deviating to $m'$ regardless of what the Receiver does:
+\[
+\mathcal{D}(m') = \left\{\theta : \max_{a \in A} u_S(\theta, m', a) < u_S^*(\theta)\right\}
+\]
+where $u_S^*(\theta)$ is type $\theta$'s equilibrium payoff. Types in $\mathcal{D}(m')$ would not deviate to $m'$ even in the best case; they are \textbf{dominated in the signaling game}.
+
+\textbf{Step 2:} The Receiver should place zero probability on types in $\mathcal{D}(m')$ after observing $m'$. If $\mathcal{D}(m') = \Theta \setminus \{\theta'\}$ for some type $\theta'$, then the Receiver should believe $m'$ was sent by type $\theta'$.
+
+\textbf{Intuitive Criterion:} A PBE fails the Intuitive Criterion if there exists an off-path message $m'$ and a type $\theta'$ such that:
+\begin{enumerate}
+    \item Type $\theta'$ is the only type that could rationally deviate to $m'$ (all other types are in $\mathcal{D}(m')$).
+    \item Given the Receiver correctly infers type $\theta'$ and best-responds, type $\theta'$ strictly prefers $m'$ to their equilibrium payoff.
+\end{enumerate}
+
+The Intuitive Criterion eliminates pooling equilibria that are sustained by unreasonably pessimistic off-path beliefs. In the Spence model, it selects the \textbf{least-cost separating equilibrium} ($e^* = \frac{1}{2}$): the unique separating equilibrium that eliminates all pooling equilibria.
+
+\subsection{Complete Equilibrium and Proper Equilibrium}
+
+\subsubsection{Trembling-Hand Perfect Equilibrium}
+
+\textbf{Motivation:} A Nash Equilibrium can require players to make choices that are optimal only because certain nodes are never reached. But what if players might make small mistakes (``tremble'')? An equilibrium supported by irrational off-path behavior would collapse if all nodes were occasionally reached.
+
+\textbf{Definition (Selten, 1975).} A strategy profile $\sigma^*$ is a \textbf{trembling-hand perfect equilibrium (THPE)} of the normal form if there exists a sequence of completely mixed strategy profiles $\{\sigma^k\}_{k=1}^\infty$ (where every strategy is played with positive probability) converging to $\sigma^*$, such that $\sigma_i^*$ is a best response to every $\sigma_{-i}^k$.
+
+Intuitively: $\sigma^*$ is robust to the possibility that any strategy might be played with small probability. Players behave optimally even against slight perturbations.
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Every THPE is a NE.
+    \item Every finite game has at least one THPE.
+    \item THPE \textit{eliminates NE that depend on weakly dominated strategies}: if $\sigma_i^*$ is weakly dominated, it cannot be part of a THPE.
+    \item In the normal form: THPE is equivalent to surviving iterated deletion of weakly dominated strategies in many cases.
+\end{itemize}
+
+\subsubsection{Proper Equilibrium}
+
+\textbf{Definition (Myerson, 1978).} A strategy profile $\sigma^*$ is a \textbf{proper equilibrium} if there exists a sequence of $\epsilon_k \to 0$ and completely mixed strategy profiles $\sigma^k \to \sigma^*$ such that for all players $i$, if $s_i$ is a strictly worse response than $s_i'$ against $\sigma_{-i}^k$:
+\[
+\sigma_i^k(s_i) \leq \epsilon_k \cdot \sigma_i^k(s_i')
+\]
+
+Proper equilibrium is \textbf{stronger than trembling-hand perfection}: it imposes that more costly mistakes are made with strictly smaller probabilities than less costly ones. This ``properness'' condition further restricts which strategy profiles can be equilibria.
+
+\textbf{Relationship hierarchy:}
+\[
+\text{Proper} \implies \text{Trembling-hand Perfect} \implies \text{Nash}
+\]
+
+\newpage
+%=================================================
+\section{Repeated Games}
+%=================================================
+
+\subsection{Motivation: Why Repetition Changes Everything}
+
+In a one-shot game, players have no ability to reward or punish each other based on past behavior. But in many real-world settings, the same players interact repeatedly — businesses compete in markets year after year, countries engage in ongoing diplomatic relations, colleagues work together for years.
+
+\textbf{The key insight of repeated game theory:} Repetition makes cooperation possible even when the one-shot game has a unique, inefficient Nash Equilibrium. Players can sustain mutually beneficial outcomes by using \textit{history-dependent strategies}: reward good behavior and punish defection.
+
+\subsection{Repeated Games: Formal Setup}
+
+\subsubsection{Stage Game and Repeated Game}
+
+Let $G = (N, \{S_i\}, \{u_i\})$ be a finite simultaneous game — the \textbf{stage game}. In the repeated game $G^\infty$ (or $G^T$), the stage game is played repeatedly:
+
+\begin{itemize}
+    \item In each period $t \in \{1, 2, 3, \ldots\}$, players simultaneously choose actions from the stage game strategy sets.
+    \item At the end of each period, all players observe the actions taken (public monitoring).
+    \item The game repeats, with the new period beginning.
+\end{itemize}
+
+\textbf{History:} A \textit{history} up to period $t$ is $h^t = (s^1, s^2, \ldots, s^{t-1}) \in S^{t-1}$. The set of all period-$t$ histories is $H^t = S^{t-1}$. Let $H = \bigcup_{t=1}^\infty H^t$ be the set of all possible histories.
+
+\textbf{Strategy:} A (behavior) strategy for player $i$ in the repeated game is a function $\sigma_i : H \to \Delta(S_i)$ mapping each history to a (possibly mixed) action in the stage game.
+
+\subsubsection{Payoffs in the Repeated Game}
+
+\textbf{Discounted payoffs:} With discount factor $\delta \in (0,1)$:
+\[
+V_i(\sigma) = (1-\delta) \sum_{t=1}^\infty \delta^{t-1} \mathbb{E}\left[u_i(s^t)\right]
+\]
+The $(1-\delta)$ normalization ensures $V_i$ is on the same scale as stage game payoffs: if player $i$ receives payoff $x$ in every period, $V_i = x$.
+
+\textbf{Interpretation of $\delta$:}
+\begin{itemize}
+    \item Standard time discounting: $\delta = \frac{1}{1+r}$ where $r$ is the interest rate.
+    \item Probability of continuation: if the game ends after each period with probability $1-\delta$, the expected payoff equals the discounted formula above.
+    \item Higher $\delta$ means players are more patient or interaction is more stable.
+\end{itemize}
+
+\textbf{Feasible and individually rational payoffs:}
+\begin{itemize}
+    \item \textbf{Feasible set} $\mathcal{F}$: the convex hull of all payoff vectors achievable in the stage game (including by randomizing over pure strategy profiles).
+    \item \textbf{Minimax payoff} for player $i$: $\underline{v}_i = \min_{s_{-i}} \max_{s_i} u_i(s_i, s_{-i})$. This is the lowest payoff opponents can hold player $i$ to, regardless of player $i$'s actions.
+    \item A payoff vector is \textbf{individually rational} if $v_i \geq \underline{v}_i$ for all $i$.
+\end{itemize}
+
+\subsection{Strategies and Equilibria in Infinitely Repeated Games}
+
+\subsubsection{Grim Trigger}
+
+The \textbf{Grim Trigger} strategy (also called \textit{Nash Reversion} or \textit{Grim Strategy}):
+\begin{itemize}
+    \item In period 1: play the cooperative action $c$.
+    \item In period $t > 1$: play $c$ if the history shows everyone played $c$ in every past period. Otherwise, play the stage game NE action $d$ forever.
+\end{itemize}
+
+``Grim'' because the punishment is the most severe possible: permanent reversion to the static NE.
+
+\textbf{Sustainability of cooperation under Grim Trigger:}
+
+With stage game Prisoner's Dilemma payoffs: cooperate $(c,c)$, defect together $(d,d)$, one-sided defection $(h, l)$, with $h > c > d > l$.
+
+If both players use Grim Trigger, player $i$'s payoff from \textit{cooperating} is:
+\[
+V_i^{\text{cooperate}} = c \quad (\text{normalized discounted value})
+\]
+
+If player $i$ deviates in period 1 and the other cooperates:
+\[
+V_i^{\text{deviate}} = (1-\delta) h + \delta \cdot d = (1-\delta)h + \delta d
+\]
+
+Cooperation is sustained iff:
+\[
+c \geq (1-\delta)h + \delta d \implies \delta \geq \frac{h - c}{h - d}
+\]
+
+This threshold $\bar{\delta} = \frac{h-c}{h-d}$ represents the minimum discount factor needed to sustain cooperation.
+
+\subsubsection{Tit-for-Tat}
+
+The \textbf{Tit-for-Tat} strategy:
+\begin{itemize}
+    \item In period 1: cooperate.
+    \item In period $t$: mimic the opponent's action from period $t-1$.
+\end{itemize}
+
+Tit-for-Tat is \textit{nice} (starts cooperating), \textit{retaliatory} (punishes defection immediately), \textit{forgiving} (returns to cooperation as soon as the opponent cooperates), and \textit{simple}. It won Robert Axelrod's famous computer tournaments of repeated Prisoner's Dilemma strategies.
+
+\textbf{However:} Tit-for-Tat does not constitute a subgame perfect equilibrium in the infinite Prisoner's Dilemma. After a deviation, the threat to punish for only one period may not be credible depending on parameters. Grim Trigger is easier to analyze rigorously.
+
+\subsection{The Folk Theorem}
+
+\subsubsection{Statement}
+
+The \textbf{Folk Theorem} is the central result in repeated game theory. It says that patient players can sustain almost any outcome:
+
+\textbf{Theorem (Friedman, 1971 — Folk Theorem for NE).} Let $G$ be a finite stage game with Nash Equilibrium payoffs $v^{NE}$. For any feasible payoff vector $v = (v_1, \ldots, v_n)$ with $v_i > v_i^{NE}$ for all $i$, there exists $\bar{\delta} < 1$ such that for all $\delta \geq \bar{\delta}$, the payoff vector $v$ is achieved as a Nash Equilibrium of the infinitely repeated game $G^\infty$.
+
+\textbf{Stronger version (Fudenberg-Maskin, 1986 — Folk Theorem for SPE).} Under a full-dimensionality condition, any individually rational feasible payoff vector can be supported as an SPE payoff of $G^\infty$ for sufficiently patient players.
+
+\subsubsection{Intuition}
+
+The Folk Theorem says: if players are sufficiently patient, the threat of future punishment can deter any single-period gain from deviation. The set of equilibrium outcomes in the infinitely repeated game is ``almost anything'' — specifically, anything in the feasible, individually rational region.
+
+\textbf{What makes punishment effective?}
+\begin{itemize}
+    \item The punishment must hurt the deviator.
+    \item The gain from deviation ($h - c$ in the Prisoner's Dilemma) must be outweighed by the future loss from punishment ($c - d$ discounted over future periods).
+    \item With $\delta \to 1$, future losses become almost as important as immediate gains, and punishment becomes effective.
+\end{itemize}
+
+\subsubsection{Limitations}
+
+\begin{itemize}
+    \item The Folk Theorem assumes \textit{perfect monitoring}: all actions are publicly observed at the end of each period. With imperfect or private monitoring, sustaining cooperation is much harder.
+    \item The Folk Theorem is a multiplicity result: it says many outcomes are \textit{possible}, not which one will \textit{actually} arise. Equilibrium selection is a separate problem.
+    \item The requirement $\delta \geq \bar{\delta}$ depends on the game: some outcomes require very high patience to sustain.
+\end{itemize}
+
+\subsection{Finitely Repeated Games}
+
+\subsubsection{The Unraveling Argument}
+
+In a \textbf{finitely repeated game} $G^T$ (the stage game played exactly $T$ times):
+
+\textbf{Theorem.} If the stage game $G$ has a unique Nash Equilibrium $s^*$, then the unique SPE of $G^T$ is to play $s^*$ in every period, for any finite $T$.
+
+\textbf{Proof by backward induction:}
+\begin{itemize}
+    \item \textbf{Period $T$:} This is the last period. No future interaction exists to reward or punish. Both players play the stage game NE $s^*$.
+    \item \textbf{Period $T-1$:} Players know period $T$ will result in $(s^*, u^*)$ regardless of what happens in $T-1$. So cooperation in $T-1$ cannot be rewarded in $T$. Players play $s^*$ in period $T-1$.
+    \item \textbf{By induction:} The NE is played in every period.
+\end{itemize}
+
+\textbf{The end-game problem:} Cooperation unravels backward from the last period. Even though the players would collectively benefit from cooperating in all $T$ periods, no individual can profitably threaten punishment in the last period.
+
+\subsubsection{Escape from Unraveling: Multiple Stage Game Equilibria}
+
+If the stage game has \textit{multiple} Nash Equilibria, the unraveling argument fails. A good equilibrium in future periods can be used to reward current cooperation, and a bad equilibrium can punish deviation.
+
+\textbf{Example:} Suppose the stage game has two NE: a good one with payoffs $(3,3)$ and a bad one with payoffs $(1,1)$. The cooperative target payoff is $(4,4)$ but is not a NE.
+
+\begin{itemize}
+    \item Strategy: cooperate in period 1 (aiming for $(4,4)$); play the good NE in period 2 if cooperation succeeded, otherwise play the bad NE.
+    \item Cooperation in period 1 is rewarded with a high-payoff NE in period 2; deviation is punished with the low-payoff NE.
+    \item Condition: benefit of cooperation in period 1 + value of good NE in period 2 $\geq$ benefit from deviating in period 1 + value of bad NE in period 2.
+    \item This can be satisfied for sufficient differences between the two stage-game NE.
+\end{itemize}
+
+\subsection{Applications of Repeated Game Theory}
+
+\subsubsection{Oligopoly Collusion}
+
+Two firms competing in prices (Bertrand). The one-shot NE is $P = c$ (zero profits). With infinite repetition and Grim Trigger:
+
+\begin{itemize}
+    \item Firms collude at monopoly price $P^m$, sharing monopoly profit $\pi^m$.
+    \item Deviation payoff: the deviating firm captures the whole market briefly by undercutting.
+    \item In the symmetric duopoly, cooperation is sustainable when $\delta \geq \frac{1}{2}$.
+    \item \textbf{Industry implications:} Collusion is more likely in industries with (a) few firms, (b) transparent pricing, (c) stable demand, and (d) frequent interaction.
+    \item Antitrust regulators watch for facilitating practices (price-matching guarantees, most-favored-nation clauses) that effectively raise $\delta$ or lower the deviation gain.
+\end{itemize}
+
+\subsubsection{Reputation and Trust}
+
+A firm that will interact with customers repeatedly has an incentive to maintain quality even without legal enforcement:
+
+\begin{itemize}
+    \item One-shot: the firm would supply low quality (lower cost, same price).
+    \item With repetition: the firm's \textit{reputation} for quality is an asset. Cheating today forfeits future sales. If the stream of future profits from maintaining reputation exceeds the one-time gain from shirking, quality is sustained.
+    \item This argument explains why established firms (with valuable reputations) typically deliver higher quality than fly-by-night operators.
+\end{itemize}
+
+\subsubsection{The Kreps-Wilson Reputation Model}
+
+In the finitely repeated entry deterrence game, backward induction predicts the incumbent \textit{never} fights — so entry always occurs. But empirically, incumbent firms often fight early entrants aggressively.
+
+Kreps and Wilson (1982) showed: if there is even a \textit{small} probability that the incumbent is a ``tough type'' who enjoys fighting, then the rational incumbent mimics the tough type to build a reputation. Early entries are fought even at short-run cost, because the reputation effect discourages future entrants and is worth the investment.
+
+This explains aggressive incumbent behavior as equilibrium reputation-building, even in finitely repeated games.
+
+\subsection{Bargaining}
+
+\subsubsection{The Nash Bargaining Solution}
+
+Two players negotiate to divide a surplus. If they fail to agree, they receive the \textbf{disagreement payoffs} $d = (d_1, d_2)$. Let $\mathcal{F}$ be the feasible set of utility pairs.
+
+\textbf{Nash Bargaining Solution:} The unique solution satisfying four axioms (Pareto optimality, symmetry, scale invariance, independence of irrelevant alternatives):
+\[
+(u_1^*, u_2^*) = \arg\max_{(u_1, u_2) \in \mathcal{F},\; u_i \geq d_i} (u_1 - d_1)(u_2 - d_2)
+\]
+
+This maximizes the product of utility gains over disagreement. 
+
+\textbf{Example:} Players divide \$1. $d = (0,0)$, $\mathcal{F} = \{(u_1, u_2) : u_1 + u_2 \leq 1, u_i \geq 0\}$.
+
+\[
+\max_{u_1 + u_2 = 1} u_1 u_2 = \max_{u_1} u_1(1 - u_1) \implies u_1^* = u_2^* = \frac{1}{2}
+\]
+
+The Nash Bargaining Solution splits the surplus equally in the symmetric case.
+
+\subsubsection{Rubinstein's Alternating-Offers Model}
+
+A game-theoretic foundation for bargaining, with an explicit dynamic structure:
+
+\begin{itemize}
+    \item \textbf{Period 1:} Player 1 proposes split $(x, 1-x)$. Player 2 accepts (game ends) or rejects (proceed to period 2).
+    \item \textbf{Period 2:} Player 2 proposes split $(1-y, y)$. Player 1 accepts or rejects.
+    \item \textbf{Continue:} Roles alternate. Discount factors: $\delta_1, \delta_2 \in (0,1)$.
+\end{itemize}
+
+\textbf{Finding the SPE by backward induction (two-period):}
+
+In period 2, Player 2 is the proposer. Player 1 accepts any offer $\geq 0$ (since the game ends). Player 2 offers $(0, 1)$, which Player 1 accepts (indifferent at $0$).
+
+In period 1, Player 2 will accept in period 1 rather than wait until period 2 when they get $1$. Player 2's value of waiting is $\delta_2 \cdot 1 = \delta_2$. So Player 2 accepts any offer $\geq \delta_2$ in period 1. Player 1 offers exactly $\delta_2$ to Player 2, keeping $1 - \delta_2$ for themselves.
+
+\textbf{Infinite horizon SPE (Rubinstein, 1982):}
+
+The unique SPE has Player 1 proposing and this offer being immediately accepted:
+\[
+x_1^* = \frac{1 - \delta_2}{1 - \delta_1 \delta_2}, \qquad x_2^* = \frac{\delta_2(1-\delta_1)}{1 - \delta_1 \delta_2}
+\]
+
+\textbf{Key properties:}
+\begin{itemize}
+    \item \textbf{Immediate agreement:} No delay occurs in equilibrium (delay is costly for both).
+    \item \textbf{First-mover advantage:} $x_1^* > x_2^*$ when $\delta_1 = \delta_2 = \delta$, since the proposer makes a take-it-or-leave-it offer that just makes the other player indifferent.
+    \item \textbf{Equal split in the limit:} As $\delta_1 = \delta_2 = \delta \to 1$, $x_1^* \to \frac{1}{2}$. Patient players split equally.
+    \item \textbf{Foundation for Nash Bargaining:} With symmetric discounting, the Rubinstein outcome converges to the Nash Bargaining Solution as patience increases.
+\end{itemize}
+
+\newpage
+%=================================================
+\section{Summary: How to Find Equilibria}
+%=================================================
+
+This chapter provides a complete, step-by-step guide to identifying and computing all types of equilibria covered in this course. For each equilibrium concept, we state the definition precisely, give the solution algorithm, and work through illustrative examples.
+
+%-----------------------------------------------
+\subsection{Pure Strategy Nash Equilibrium}
+%-----------------------------------------------
+
+\subsubsection{Definition}
+
+A strategy profile $s^* = (s_1^*, \ldots, s_n^*)$ is a \textbf{Pure Strategy Nash Equilibrium} if for every player $i$ and every $s_i \in S_i$:
+\[
+u_i(s_i^*, s_{-i}^*) \geq u_i(s_i, s_{-i}^*)
+\]
+No player can gain by unilaterally changing their strategy.
+
+\subsubsection{Algorithm}
+
+\begin{enumerate}
+    \item Write the payoff matrix (for two-player finite games).
+    \item \textbf{Underline Player 1's best responses:} For each column $j$ (strategy of Player 2), underline the entry in the column that maximizes Player 1's payoff. If tied, underline all tied cells.
+    \item \textbf{Underline Player 2's best responses:} For each row $i$ (strategy of Player 1), underline the entry in the row that maximizes Player 2's payoff.
+    \item \textbf{Identify Nash Equilibria:} Any cell in which \textit{both} entries are underlined is a pure strategy NE.
+\end{enumerate}
+
+\subsubsection{Full Example}
+
+\[
+\begin{array}{c|ccc}
+ & L & C & R \\
+\hline
+U & (3,\underline{2}) & (\underline{5},1) & (1,\underline{4}) \\
+M & (\underline{4},1) & (2,\underline{3}) & (\underline{4},2) \\
+D & (2,\underline{2}) & (3,2) & (2,3) \\
+\end{array}
+\]
+
+Underline Player 1's best responses (column by column):
+\begin{itemize}
+    \item Column $L$: $\max(3,4,2) = 4$ — underline $M$.
+    \item Column $C$: $\max(5,2,3) = 5$ — underline $U$.
+    \item Column $R$: $\max(1,4,2) = 4$ — underline $M$.
+\end{itemize}
+
+Underline Player 2's best responses (row by row):
+\begin{itemize}
+    \item Row $U$: $\max(2,1,4) = 4$ — underline $R$.
+    \item Row $M$: $\max(1,3,2) = 3$ — underline $C$.
+    \item Row $D$: $\max(2,2,3) = 3$ — underline $R$.
+\end{itemize}
+
+No cell has both entries underlined. \textbf{No pure strategy NE.}
+
+\subsubsection{When to Use}
+
+Always check for pure strategy NE first, as it is the easiest computation. If no pure NE exists, proceed to mixed strategies.
+
+%-----------------------------------------------
+\subsection{Dominant Strategy Equilibrium and IEDS}
+%-----------------------------------------------
+
+\subsubsection{Step-by-Step}
+
+\begin{enumerate}
+    \item \textbf{Check each strategy for each player.} Strategy $s_i$ strictly dominates $s_i'$ if $u_i(s_i, s_{-i}) > u_i(s_i', s_{-i})$ for \textit{every} $s_{-i}$.
+    \item \textbf{Check for domination by mixed strategies.} Compute expected payoffs of mixtures and compare.
+    \item \textbf{Eliminate dominated strategies} and repeat with the reduced game.
+    \item \textbf{Continue} until no dominated strategies remain.
+    \item If a unique strategy profile survives, it is the unique NE.
+\end{enumerate}
+
+\subsubsection{Dominance Verification Formula}
+
+Strategy $s_i$ strictly dominates $s_i'$ if and only if:
+\[
+\min_{s_{-i} \in S_{-i}} \left[u_i(s_i, s_{-i}) - u_i(s_i', s_{-i})\right] > 0
+\]
+
+\subsubsection{Mixed Strategy Domination}
+
+Strategy $s_i'$ is dominated by the mixture $\sigma_i = \sum_k \lambda_k s_i^k$ (with $\lambda_k \geq 0$, $\sum_k \lambda_k = 1$) if:
+\[
+\sum_k \lambda_k u_i(s_i^k, s_{-i}) > u_i(s_i', s_{-i}) \quad \forall\, s_{-i}
+\]
+
+%-----------------------------------------------
+\subsection{Mixed Strategy Nash Equilibrium}
+%-----------------------------------------------
+
+\subsubsection{Algorithm for $2 \times 2$ Games}
+
+\textbf{Setup:} Players have strategies $\{A, B\}$ and $\{L, R\}$.
+
+\[
+\begin{array}{c|cc}
+ & L & R \\
+\hline
+A & (a_1, b_1) & (a_2, b_2) \\
+B & (a_3, b_3) & (a_4, b_4) \\
+\end{array}
+\]
+
+Let Player 1 play $A$ with probability $p$, Player 2 play $L$ with probability $q$.
+
+\textbf{Step 1 — Find $q$ to make Player 1 indifferent:}
+\[
+U_1(A) = U_1(B): \quad q a_1 + (1-q) a_2 = q a_3 + (1-q) a_4
+\]
+\[
+q(a_1 - a_3) + (1-q)(a_2 - a_4) = 0 \implies q^* = \frac{a_4 - a_2}{(a_1 - a_3) - (a_2 - a_4)}
+\]
+
+\textbf{Step 2 — Find $p$ to make Player 2 indifferent:}
+\[
+U_2(L) = U_2(R): \quad p b_1 + (1-p) b_3 = p b_2 + (1-p) b_4
+\]
+\[
+p^* = \frac{b_4 - b_3}{(b_1 - b_2) - (b_3 - b_4)}
+\]
+
+\textbf{Step 3 — Verify:} Both $p^* \in [0,1]$ and $q^* \in [0,1]$.
+
+\textbf{Step 4 — Compute expected payoffs:}
+\[
+U_1^* = p^* q^* a_1 + p^*(1-q^*) a_2 + (1-p^*)q^* a_3 + (1-p^*)(1-q^*)a_4
+\]
+
+\subsubsection{Algorithm for Larger Games}
+
+\begin{enumerate}
+    \item Guess the \textbf{support} (which pure strategies are in the mix).
+    \item \textbf{Set up indifference conditions:} Each supported strategy gives equal expected payoff.
+    \item \textbf{Solve} the system of linear equations for the mixing probabilities.
+    \item \textbf{Check validity:} All probabilities in $[0,1]$, and strategies outside the support give weakly lower expected payoff.
+    \item Repeat for all candidate supports. Each valid solution is a mixed NE.
+\end{enumerate}
+
+\subsubsection{Complete Example: $3 \times 2$ Game}
+
+\[
+\begin{array}{c|cc}
+ & L & R \\
+\hline
+T & (3,2) & (0,3) \\
+M & (1,1) & (2,0) \\
+B & (0,2) & (3,1) \\
+\end{array}
+\]
+
+\textbf{Step 1:} Check for pure NE using underline method. No cell has both underlined — no pure NE.
+
+\textbf{Step 2:} Try support $\{T, B\}$ for Player 1, $\{L, R\}$ for Player 2.
+
+Player 1 indifferent between $T$ and $B$: $U_1(T) = U_1(B)$
+\[
+3q + 0(1-q) = 0 \cdot q + 3(1-q) \implies 3q = 3-3q \implies q^* = \frac{1}{2}
+\]
+
+Player 2 indifferent between $L$ and $R$ (with Player 1 mixing $T$ with prob $p$, $B$ with prob $1-p$):
+\[
+2p + 2(1-p) = 3p + 1(1-p) \implies 2 = 2p + 1 \implies p^* = \frac{1}{2}
+\]
+
+Check: Is $M$ worse for Player 1 than $T$ or $B$ when $q^* = \frac{1}{2}$?
+\[
+U_1(M) = 1 \cdot \frac{1}{2} + 2 \cdot \frac{1}{2} = \frac{3}{2}, \quad U_1(T) = 3 \cdot \frac{1}{2} = \frac{3}{2}
+\]
+$M$ gives the same expected payoff — so $M$ is also in the indifference set. This means there is a larger family of mixed NE. The unique NE with support $\{T,B\}$ fails if $M$ is equally good.
+
+Redo with support $\{T, M, B\}$ (Player 1 mixes all three): need two indifference equations for Player 2.
+
+\textbf{Lesson:} Always check whether strategies outside the guessed support are also indifferent; if so, the support must be expanded.
+
+%-----------------------------------------------
+\subsection{Subgame Perfect Equilibrium}
+%-----------------------------------------------
+
+\subsubsection{Definition}
+
+A strategy profile is an \textbf{SPE} if it induces a Nash Equilibrium in every subgame, including the whole game and all proper subgames.
+
+\subsubsection{Algorithm: Backward Induction}
+
+\begin{enumerate}
+    \item \textbf{Draw or identify the game tree.}
+    \item \textbf{Find the terminal decision nodes} (nodes where the immediate successors are all terminal).
+    \item \textbf{Assign optimal actions} at each such node (break ties arbitrarily or note multiplicity).
+    \item \textbf{Replace the subtree} with the resulting payoff vector.
+    \item \textbf{Move one level up} and repeat until the root is reached.
+    \item \textbf{Record all assigned actions:} these form the SPE strategy profile.
+\end{enumerate}
+
+\subsubsection{Algorithm: One-Stage Deviation Principle}
+
+To verify that a given strategy profile $\sigma^*$ is an SPE:
+
+For each player $i$ and each information set $h$ of player $i$:
+\begin{enumerate}
+    \item Consider the modified strategy where player $i$ plays some $a_i \neq \sigma_i^*(h)$ at $h$ and follows $\sigma^*$ everywhere else.
+    \item Compute the payoff of this deviation.
+    \item If no deviation at any $h$ increases player $i$'s payoff: $\sigma^*$ is an SPE.
+\end{enumerate}
+
+\subsubsection{Full Example: Three-Stage Negotiation}
+
+A buyer (B) makes an offer $p$ to a seller (S). The seller accepts or rejects. If rejected, the seller makes a counteroffer $p'$. The buyer accepts or rejects. If rejected again, both get $0$.
+
+Discount factors: $\delta_B = \delta_S = 0.8$.
+
+\textbf{Stage 3 (Buyer's acceptance decision):} Buyer accepts any offer $p'$ such that $1 - p' \geq 0$, i.e., $p' \leq 1$.
+
+\textbf{Stage 2 (Seller's counteroffer):} Seller offers the maximum $p'$ the buyer will accept: $p'^* = 1$. Seller gets $p'^* = 1$; buyer gets $0$. But discounted from stage 2 onwards, payoffs are as of stage 2.
+
+Wait — accounting for time: if the counteroffer in stage 2 yields payoffs $(0, 1)$ for (buyer, seller) \textit{in that period}, the value at stage 1 to the seller of going to stage 2 is $\delta_S \cdot 1 = 0.8$.
+
+\textbf{Stage 1 (Buyer's offer):} Seller accepts in stage 1 if $p \geq \delta_S \cdot 1 = 0.8$. Buyer minimizes $p$, so offers $p^* = 0.8$.
+
+\textbf{SPE:} Buyer offers $0.8$; seller accepts. Buyer gets $1 - 0.8 = 0.2$; seller gets $0.8$.
+
+%-----------------------------------------------
+\subsection{Bayesian Nash Equilibrium}
+%-----------------------------------------------
+
+\subsubsection{Algorithm}
+
+\begin{enumerate}
+    \item \textbf{Identify each player's type space} $\Theta_i$ and the prior distribution $p(\theta)$.
+    \item \textbf{Write down each type's strategy:} $s_i(\theta_i)$ — an action for each type.
+    \item \textbf{For each type $\theta_i$ of player $i$:} Form the expected payoff, integrating over opponent types using the prior (or posterior, if there is a signal).
+    \[
+    \max_{a_i} \; \mathbb{E}_{\theta_{-i}}\left[u_i(a_i, s_{-i}^*(\theta_{-i}), \theta_i, \theta_{-i}) \mid \theta_i\right]
+    \]
+    \item \textbf{Solve the system} of best-response conditions across all types and players simultaneously.
+    \item \textbf{Verify:} Each type's strategy is indeed a best response given all other types' strategies.
+\end{enumerate}
+
+\subsubsection{Example: Public Good Contribution}
+
+Two players, each has a private valuation $v_i \in \{H, L\}$ with equal probability, independently drawn. A public good is provided if at least one contributes. Contributing costs $c = 1$; the good gives value $H = 3$ or $L = 1$.
+
+BNE: each type contributes with some probability. In symmetric BNE, each player of type $\theta$ contributes with probability $q_\theta$.
+
+Player of type $H$ contributes iff:
+\[
+3 - 1 \geq 3 \cdot \Pr(\text{other doesn't contribute}) \cdot 0 + 3 \cdot \Pr(\text{other contributes}) \cdot 0
+\]
+(Simplified: contribute iff value exceeds cost given the probability the other does not contribute. Full computation omitted for brevity.)
+
+%-----------------------------------------------
+\subsection{Perfect Bayesian Equilibrium}
+%-----------------------------------------------
+
+\subsubsection{Algorithm for Signaling Games}
+
+\begin{enumerate}
+    \item \textbf{Guess the type of equilibrium:} separating, pooling, or semi-separating.
+    \item \textbf{Specify Sender strategies:} $m^*(\theta)$ for each type $\theta$.
+    \item \textbf{Derive on-path beliefs} using Bayes' rule:
+    \[
+    \mu(\theta \mid m) = \frac{p(\theta) \cdot \mathbf{1}[m^*(\theta) = m]}{\sum_{\theta'} p(\theta') \cdot \mathbf{1}[m^*(\theta') = m]}
+    \]
+    \item \textbf{Assign off-path beliefs} freely (any belief over types).
+    \item \textbf{Compute Receiver's best response:} $a^*(m) = \arg\max_a \sum_\theta \mu(\theta \mid m) u_R(\theta, m, a)$.
+    \item \textbf{Check Sender's incentive compatibility:} for each type $\theta$, $m^*(\theta)$ is a best response:
+    \[
+    u_S(\theta, m^*(\theta), a^*(m^*(\theta))) \geq u_S(\theta, m', a^*(m')) \quad \forall\, m'
+    \]
+    \item \textbf{Apply Intuitive Criterion if required:} check that off-path beliefs are not contradicted by forward induction.
+\end{enumerate}
+
+\subsubsection{Checklist: Separating Equilibrium}
+
+\begin{itemize}
+    \item Each type sends a distinct message: $m^*(\theta) \neq m^*(\theta')$ for $\theta \neq \theta'$.
+    \item Receiver's on-path beliefs are degenerate (perfect inference).
+    \item Each type prefers their own message to any other: \textbf{incentive compatibility} holds.
+    \item Specifically for two types: check that each type prefers their own message over the other type's message.
+\end{itemize}
+
+\subsubsection{Checklist: Pooling Equilibrium}
+
+\begin{itemize}
+    \item All types send the same message $m^*$.
+    \item Receiver's belief at $m^*$ equals the prior: $\mu(\theta \mid m^*) = p(\theta)$.
+    \item No type wants to deviate to any off-path message $m'$, given the off-path beliefs $\mu(\cdot \mid m')$.
+    \item Off-path beliefs can be set to disfavor deviation (worst-case beliefs for the deviator).
+    \item Apply Intuitive Criterion: if some type could not possibly benefit from deviating to $m'$, set belief at $m'$ to exclude that type.
+\end{itemize}
+
+%-----------------------------------------------
+\subsection{Repeated Game Equilibria}
+%-----------------------------------------------
+
+\subsubsection{Checking Sustainability Under Grim Trigger}
+
+To verify that cooperative action $c$ is sustained as an SPE of the infinitely repeated game under Grim Trigger:
+
+\begin{enumerate}
+    \item \textbf{Identify:} Cooperation payoff $\pi^c$, best deviation payoff $\pi^d$ (deviation today, then both play NE forever), and NE punishment payoff $\pi^{NE}$.
+    \item \textbf{Cooperation payoff} (normalized discounted value):
+    \[
+    V^c = \pi^c
+    \]
+    \item \textbf{Deviation payoff:}
+    \[
+    V^d = (1-\delta)\pi^d + \delta \pi^{NE}
+    \]
+    \item \textbf{Sustainability condition:} $V^c \geq V^d$:
+    \[
+    \pi^c \geq (1-\delta)\pi^d + \delta \pi^{NE} \implies \delta \geq \frac{\pi^d - \pi^c}{\pi^d - \pi^{NE}}
+    \]
+    \item \textbf{Also check:} The punishment phase is credible — playing NE forever is itself an SPE of the continuation game (it is, since stage game NE is trivially a repeated game NE).
+\end{enumerate}
+
+\subsubsection{General Trigger Strategy: Arbitrary Punishment}
+
+For more general strategies (e.g., punish for $T$ periods then revert to cooperation):
+
+\begin{itemize}
+    \item \textbf{Cooperation value:} $V^c = \pi^c$.
+    \item \textbf{Deviation value:} $V^d = (1-\delta)\pi^d + (1-\delta)\delta \pi^p \sum_{t=0}^{T-1} \delta^t + \delta^{T+1} \pi^c$, where $\pi^p$ is the punishment period payoff.
+    \item Set $V^c \geq V^d$ and solve for the required $\delta$.
+    \item Note: Grim Trigger (punishment forever) requires the \textit{lowest} $\bar\delta$ — it is the most effective deterrent.
+\end{itemize}
+
+%-----------------------------------------------
+\subsection{Summary Table of Equilibrium Concepts}
+%-----------------------------------------------
+
+\[
+\begin{array}{l|l|l|l}
+\textbf{Concept} & \textbf{Game Type} & \textbf{Key Condition} & \textbf{How to Find} \\
+\hline
+\text{Dominant Strategy} & \text{Any} & s_i^* \text{ dominates all others} & \text{Check pairwise domination} \\
+\text{Pure NE} & \text{Normal form} & \text{Mutual best responses} & \text{Underline method} \\
+\text{Mixed NE} & \text{Normal form} & \text{Indifference in support} & \text{Indifference equations} \\
+\text{SPE} & \text{Extensive form} & \text{NE in every subgame} & \text{Backward induction} \\
+\text{BNE} & \text{Incomplete info} & \text{Best resp. for each type} & \text{Type-by-type opt.} \\
+\text{PBE} & \text{Dynamic + types} & \text{Seq. rat. + Bayes beliefs} & \text{Guess, derive, verify} \\
+\text{THPE} & \text{Normal form} & \text{Robust to trembles} & \text{Perturbation limits} \\
+\text{Repeated NE} & \text{Repeated game} & \text{Deviation unprofitable} & \delta \geq \bar\delta \text{ condition} \\
+\end{array}
+\]
+
+\subsubsection{Which Concept to Apply When}
+
+\begin{itemize}
+    \item \textbf{Simultaneous, complete information:} Find all pure and mixed NE. Check if any involve dominated strategies; if so, consider THPE.
+    \item \textbf{Sequential, complete information, perfect information:} Use backward induction to find SPE. Identify non-credible threats that appear as NE but not SPE.
+    \item \textbf{Sequential, incomplete information:} Use PBE. Guess type of equilibrium (separating/pooling), derive Bayes-consistent beliefs, verify incentive compatibility. Apply Intuitive Criterion to refine.
+    \item \textbf{Repeated game:} Check sustainability using the one-shot deviation principle. Derive the critical discount factor. Apply Folk Theorem reasoning for the set of sustainable outcomes.
+    \item \textbf{Auction/mechanism design:} Use BNE. Set up type-contingent strategies, form expected payoff conditions for each type, and solve.
+\end{itemize}
+
+\end{document}
