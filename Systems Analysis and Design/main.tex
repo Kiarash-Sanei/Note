@@ -1,0 +1,2584 @@
+\documentclass[hidelinks]{article}
+
+% ----------------------------- Page Layout -----------------------------
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+
+% ----------------------------- Colors ----------------------------------
+\usepackage[dvipsnames,table]{xcolor} % "table" loads colortbl for colored rules
+
+% ----------------------------- Math ------------------------------------
+\usepackage{amsmath,amssymb,mathrsfs}
+
+% ----------------------------- Lists -----------------------------------
+\usepackage{enumitem}
+
+% ----------------------------- Section Styling -------------------------
+\usepackage{titlesec}
+
+% ----------------------------- Code listings ---------------------------
+\usepackage{listings}
+
+% ----------------------------- Tables ----------------------------------
+\usepackage{array}
+
+% ----------------------------- Hyperlinks ------------------------------
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+
+% --------------------------------------------------
+% Color Palette
+% --------------------------------------------------
+\definecolor{carminered}{rgb}{1.0,0.0,0.22}
+\definecolor{capri}{rgb}{0.0,0.75,1.0}
+\definecolor{brightlavender}{rgb}{0.75,0.58,0.89}
+\definecolor{codebg}{rgb}{0.10,0.10,0.13}
+\definecolor{codecomment}{rgb}{0.46,0.66,0.46}
+\definecolor{codestr}{rgb}{0.96,0.62,0.42}
+
+% --------------------------------------------------
+% Dark Theme
+% --------------------------------------------------
+\pagecolor{black}
+\color{white}
+\arrayrulecolor{white} % make table rules visible on black
+
+% --------------------------------------------------
+% Section / Part Style
+% --------------------------------------------------
+\titleformat{\part}
+  {\bfseries\huge\color{carminered}\filcenter}
+  {\thepart}
+  {0.6em}
+  {}
+\titleformat{\section}
+  {\bfseries\Large\color{brightlavender}}
+  {\thesection}
+  {0.5em}
+  {}
+\titleformat{\subsection}
+  {\bfseries\color{Thistle}}
+  {\thesubsection}
+  {0.5em}
+  {}
+\setcounter{tocdepth}{2}
+
+% --------------------------------------------------
+% Bullet Style
+% --------------------------------------------------
+\setlist[itemize,1]{label=$\bullet$}
+\setlist[itemize,2]{label=$\circ$}
+\setlist[itemize,3]{label=$\bullet$}
+\setlist[itemize,4]{label=$\circ$}
+
+% --------------------------------------------------
+% Code listing style (dark)
+% --------------------------------------------------
+\lstdefinestyle{dark}{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small\color{white},
+  keywordstyle=\color{brightlavender}\bfseries,
+  commentstyle=\color{codecomment}\itshape,
+  stringstyle=\color{codestr},
+  numberstyle=\tiny\color{gray},
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=single,
+  rulecolor=\color{gray},
+  tabsize=2,
+  captionpos=b,
+  xleftmargin=6pt,
+  framexleftmargin=4pt
+}
+\lstset{style=dark}
+
+% --------------------------------------------------
+% Title Style
+% --------------------------------------------------
+\title{\color{carminered}\textbf{System Analysis and Design}}
+\author{\color{Thistle}Kiarash Sanei}
+\date{\color{SkyBlue}July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{Large}
+\tableofcontents
+\end{Large}
+\newpage
+
+% =====================================================================
+\part{Foundations}
+% =====================================================================
+
+\section{Course Overview \& Tools}
+\begin{itemize}
+  \item \textbf{The ``area computer'' analogy.} To do one job well (compute areas) you must
+        master a toolkit (integration): models, processes, and patterns. This course is the
+        toolkit for building information systems.
+  \item \textbf{What the course covers:} general practices (project management, feasibility
+        study), methodologies (Scrum, continuous delivery), modeling (diagrams and modeling
+        languages), analysis practices (requirements, process, and data analysis), and design
+        practices (software architecture, design patterns, data model, UI/UX).
+  \item \textbf{Grading:} Exercises 5\,pt, Project 5\,+\,1\,pt, Midterm 5\,pt, Final 5\,pt.
+\end{itemize}
+
+\section{System Analysis \& Design Fundamentals}
+
+\subsection{Why Projects Fail}
+\begin{itemize}
+  \item Between 2011--2015 only about 29\% of software projects were fully successful;
+        roughly half were ``challenged''; failure rates hovered between 17\% and 22\%.
+  \item Common failure causes: unrealistic goals, inaccurate resource estimates, and poorly
+        defined requirements.
+  \item Top three success factors: \emph{user involvement}, \emph{executive support},
+        and \emph{clear requirements}. Lack of user input and incomplete requirements are
+        the leading causes of challenged projects.
+  \item Major software failures are often compared to avoidable airplane crashes caused by
+        inexperience and poor maintenance. Success needs a balance of techniques,
+        methodologies, and tools.
+\end{itemize}
+
+\subsection{System \& Information-System Concepts}
+\begin{itemize}
+  \item A \textbf{system} is a group of interrelated components working together to achieve a
+        specific result.
+  \item \textbf{Information system types:} Transaction Processing (TPS), Management Information,
+        Decision Support (DSS), Expert Systems, Communication \& Collaboration (CCS),
+        Office Automation (OAS).
+  \item \textbf{TPS} records daily business transactions and feeds data to other systems.
+  \item \textbf{DSS} analyses data to support complex decision-making.
+  \item \textbf{Expert System} captures and applies specialised human knowledge to give expert-like advice.
+  \item \textbf{CCS} facilitates teamwork and information exchange among stakeholders.
+  \item \textbf{OAS} improves office-worker productivity by automating clerical tasks.
+\end{itemize}
+
+\subsection{Enterprise Applications}
+\begin{itemize}
+  \item \textbf{ERP} (Enterprise Resource Planning): integrates business processes into one
+        unified system; centralises data and reduces unmanaged risk.
+  \item \textbf{SCM} (Supply Chain Management): manages information flow between a business, its
+        suppliers, and partners; optimises logistics and delivery.
+  \item \textbf{CRM} (Customer Relationship Management): captures and responds to customer data;
+        directly counters ``lack of user involvement.''
+  \item \textbf{EAI} (Enterprise Application Integration): tools and methods to connect disparate
+        systems (e.g.\ TPS and DSS) so they work together seamlessly.
+\end{itemize}
+
+\subsection{Stakeholders \& Development-Process Roles}
+\begin{itemize}
+  \item A \textbf{stakeholder} is anyone with an interest in an existing or proposed system.
+  \item \textbf{System owners} provide funding and act as executive advocates.
+  \item \textbf{System users} are the ``customers'' who use the software daily to process and
+        exchange data.
+  \item \textbf{Systems analysts} study organisational problems and propose how people, data,
+        processes, and IT can best improve the business.
+  \item \textbf{System designers} translate business requirements and constraints into a
+        technical solution (databases, inputs, outputs, screens, networks).
+  \item \textbf{System builders} construct the components from the design specifications.
+  \item \textbf{Project managers (PM)} plan, monitor, and control schedule, budget,
+        deliverables, and customer satisfaction.
+  \item \textbf{External Service Provider (ESP)} sells expertise to other businesses and may act
+        as analyst, designer, or builder.
+\end{itemize}
+
+\subsection{System Analyst Skills}
+\begin{itemize}
+  \item \textbf{Problem-solving:} addresses real problems, improves situations, follows new directives.
+  \item \textbf{Technical:} working knowledge of IT and programming.
+  \item \textbf{Soft skills:} communication, flexibility, ethics.
+  \item \textbf{Business knowledge:} to propose effective solutions.
+\end{itemize}
+
+\section{The Software Development Process}
+
+\subsection{Methodology Fundamentals}
+\begin{itemize}
+  \item A \textbf{software development methodology (SDM)} is a formalised set of activities,
+        methods, best practices, deliverables, and automated tools used to build and improve
+        information systems.
+  \item Benefits of a consistent process: lets management shift resources between projects,
+        produces consistent documentation, promotes quality, and reduces lifetime maintenance
+        costs; reduces risk and maintains competitiveness.
+\end{itemize}
+
+\subsection{Capability Maturity Model (CMM)}
+\begin{itemize}
+  \item \textbf{Level 1 --- Initial:} no prescribed process; unpredictable, poorly controlled.
+  \item \textbf{Level 2 --- Repeatable:} project-management practices track cost, schedule, functionality.
+  \item \textbf{Level 3 --- Defined:} a standard methodology is adopted for all projects.
+  \item \textbf{Levels 4 \& 5 --- Managed \& Optimizing:} quality goals are set; processes are
+        continuously monitored and improved from data.
+\end{itemize}
+
+\subsection{System Life Cycle \& High-Level Activities}
+\begin{itemize}
+  \item Two stages: \emph{systems development} and \emph{operation \& maintenance}.
+  \item \textbf{Planning \& Initiation:} system request, feasibility analysis, work plan --- \emph{why}.
+  \item \textbf{Analysis:} gather requirements, build system proposal --- \emph{what}.
+  \item \textbf{Design:} design strategy, architecture, database specs --- \emph{how}.
+  \item \textbf{Construction \& Implementation:} build, test, deliver, train users, document.
+\end{itemize}
+
+\subsection{Structured Design Methods}
+\begin{itemize}
+  \item Traditional, linear/partitioned, phase-by-phase. Best when requirements are well defined.
+  \item \textbf{Waterfall:} strictly sequential; poor for unclear requirements or short schedules.
+\end{itemize}
+
+\begin{lstlisting}[language=,caption={Waterfall --- strictly sequential phases}]
+Planning --> Analysis --> Design --> Implementation
+   (each phase must complete before the next begins)
+\end{lstlisting}
+
+\begin{itemize}
+  \item \textbf{Parallel development:} a shared analysis and general design phase, then the project
+        splits into independent subprojects that each run their own design and implementation
+        concurrently; reduces overall delivery time.
+\end{itemize}
+
+\begin{lstlisting}[language=,caption={Parallel Development --- split then reunite}]
+Planning --> Analysis --> General Design
+                               |
+              +----------------+----------------+
+              |                |                |
+              v                v                v
+         Sub-Design A    Sub-Design B    Sub-Design C
+              |                |                |
+              v                v                v
+           Impl. A          Impl. B          Impl. C
+              +----------------+----------------+
+                               |
+                               v
+                          Integration
+\end{lstlisting}
+
+\begin{itemize}
+  \item \textbf{V-model:} each development phase on the left leg of the V is paired with a
+        corresponding validation/testing phase on the right leg; coding sits at the bottom; testing
+        phases are defined \emph{before} coding begins.
+\end{itemize}
+
+\begin{lstlisting}[language=,caption={V-model --- development paired with testing}]
+Requirements Analysis ---------> Acceptance Testing
+         \                              ^
+          v                            |
+    System Design -----------> System Testing
+              \                       ^
+               v                      |
+         Arch. Design ------> Integration Testing
+                   \                 ^
+                    v                |
+              Detailed Design --> Unit Testing
+                          \         ^
+                           v       /
+                          Coding / Implementation
+      (left leg: definition)   (right leg: verification)
+\end{lstlisting}
+
+\subsection{Rapid Application Development (RAD)}
+\begin{itemize}
+  \item Uses prototyping/phased development; runs analysis, design, and implementation
+        concurrently to deliver versions quickly. Excellent for unclear requirements / short schedules.
+  \item \textbf{Phased development:} sequential versions; concurrent A/D/I per version; excellent
+        schedule visibility.
+  \item \textbf{System prototyping:} a prototype refined by user feedback becomes the final system;
+        poor for complex/highly reliable systems.
+  \item \textbf{Throwaway prototyping:} prototype only to clarify requirements, then discard and
+        build properly; best for unfamiliar technology and complex design; excellent reliability.
+\end{itemize}
+
+\subsection{Agile Methods}
+\begin{itemize}
+  \item Short cycles, adaptable to change, simplicity, continuous feedback. Excellent when
+        requirements are very unclear.
+  \item Family includes \textbf{Scrum}, \textbf{eXtreme Programming (XP)}, and DSDM.
+\end{itemize}
+
+\subsection{Methodology Selection (summary table)}
+See the cheat sheet (Section~\ref{sec:cheat-methodology}) for the full ``Pick Your Poison'' comparison.
+
+\subsection{Key Deliverables \& Cross-Life-Cycle Activities}
+\begin{itemize}
+  \item Planning $\Rightarrow$ \textbf{Project Plan}; Analysis $\Rightarrow$ \textbf{System Proposal};
+        Design $\Rightarrow$ \textbf{System Specification}.
+  \item Cross-life-cycle activities (fact-finding, documentation) overlap several phases.
+  \item Fact-finding uses interviews and meetings; ongoing support/maintenance handles errors
+        and new requirements after production.
+\end{itemize}
+
+\section{System Analysis}
+
+\subsection{What System Analysis Does}
+\begin{itemize}
+  \item A structured problem-solving technique: decompose a system into components to understand
+        how they work together; focus on \emph{what} the system does, independent of technology.
+  \item Studies both weaknesses and potential gains in the current system; output is the blueprint
+        for design and construction.
+  \item Work is captured in a \textbf{repository} to keep documentation consistent.
+  \item Key activities: scope definition, problem analysis, requirements analysis, logical design,
+        decision analysis.
+\end{itemize}
+
+\subsection{Model-Driven Analysis}
+\begin{itemize}
+  \item Build visual models of current reality or a proposed vision.
+  \item \textbf{Structured analysis:} data flow through processes (Data Flow Diagrams).
+  \item \textbf{Information engineering:} data structure (Entity-Relationship Diagrams).
+  \item \textbf{Object-oriented analysis:} data + behaviour as objects (UML).
+\end{itemize}
+
+\subsection{Requirements Analysis}
+\begin{itemize}
+  \item \textbf{Functional requirements (FRs):} inputs, processes, outputs, stored data, business rules.
+  \item \textbf{Non-functional requirements (NFRs):} performance, security, usability, deadlines,
+        constraints.
+  \item \textbf{Use cases} model business scenarios for which the system gives a defined response.
+  \item \textbf{Timeboxing} prioritises mandatory requirements for early versions, deferring
+        desirable features.
+\end{itemize}
+
+\subsection{Requirements Discovery Methods}
+\begin{itemize}
+  \item Fact-finding: interviews, observation, questionnaires, document sampling, research.
+  \item \textbf{Joint Requirements Planning (JRP):} facilitated workshops with owners, users, analysts.
+  \item \textbf{Discovery prototyping:} users react to a working-but-incomplete system.
+  \item \textbf{Rapid architected analysis:} reverse-engineer existing systems into formal models.
+\end{itemize}
+
+\subsection{Problem Analysis}
+\begin{itemize}
+  \item Understand the problem domain before proposing solutions.
+  \item Use cause-and-effect analysis to trace symptoms to root causes.
+  \item A \textbf{context diagram} models how the system interacts with external entities and
+        defines its boundary.
+  \item \textbf{Objectives} = measurable success targets; \textbf{constraints} = limits on solutions.
+\end{itemize}
+
+\subsection{Feasibility Analysis}
+\begin{itemize}
+  \item \textbf{Operational:} does the solution meet business requirements?
+  \item \textbf{Technical:} is the technology/expertise available?
+  \item \textbf{Economic:} costs vs.\ tangible and intangible benefits.
+  \item \textbf{Schedule:} are deadlines realistic?
+  \item \textbf{Legal/Cultural:} regulatory compliance and organisational fit.
+\end{itemize}
+
+\subsection{Economic Evaluation Techniques}
+\begin{itemize}
+  \item \textbf{Payback analysis:} time for accumulated benefits to recover costs.
+  \item \textbf{Return on Investment (ROI):} lifetime profitability (net benefits / total costs).
+  \item \textbf{Net Present Value (NPV):} discounted costs vs.\ benefits over the system lifetime.
+  \item \textbf{Time value of money:} future cash is worth less than present cash; discounting
+        converts future amounts to present value.
+\end{itemize}
+
+\noindent{\color{capri}
+\[ \text{Present Value: } PV = \frac{FV}{(1+i)^{n}}
+   \qquad\qquad \text{Discount factor} = \frac{1}{(1+i)^{n}} \]
+\[ \text{ROI} = \frac{\text{Total benefits} - \text{Total costs}}{\text{Total costs}}\times 100\% \]
+\[ \text{NPV} = \sum_{t=0}^{n}\frac{B_t - C_t}{(1+i)^{t}} \qquad\text{(accept the project if } \text{NPV} > 0\text{)} \]
+}
+
+\subsection{Comparing \& Choosing Alternatives}
+\begin{itemize}
+  \item \textbf{Candidate Systems Matrix:} documents similarities/differences between alternative
+        solutions (stakeholder impact, data, processes, communications, technology architecture).
+  \item \textbf{Feasibility Analysis Matrix:} ranks alternatives using weighted criteria
+        (operational, technical, economic, schedule, cultural, legal); weighted scores support
+        objective selection.
+\end{itemize}
+
+\subsection{System Proposal}
+\begin{itemize}
+  \item Presents the recommended solution to owners/stakeholders: problem background,
+        requirements summary, feasibility results, alternative comparison, costs, benefits, schedule.
+  \item Delivered as a written report (factual or administrative/results-oriented format), an oral
+        presentation, or both; objective is approval to proceed.
+\end{itemize}
+
+\subsection{Creeping Commitment \& Risk Reduction}
+\begin{itemize}
+  \item \textbf{Creeping commitment:} feasibility is re-evaluated continuously; decisions are
+        refined as information arrives, preventing premature commitment to weak solutions.
+  \item Analysis reduces technical, operational, and economic uncertainty; modeling turns
+        ambiguity into structured representations; iterative validation supports informed,
+        evidence-based decisions.
+  \item Success factors: clear scope (no creep), root-cause problem analysis, active stakeholder
+        involvement, objective feasibility evaluation, well-structured documentation/repositories.
+\end{itemize}
+
+\section{Planning \& Project Management}
+
+\subsection{Why Plan?}
+\begin{itemize}
+  \item Gives direction, defines goals and scope, organises tasks/timelines/responsibilities,
+        improves use of time/budget/resources, surfaces risks early, and raises the chance of success.
+\end{itemize}
+
+\subsection{Project Management Tools}
+\begin{itemize}
+  \item \textbf{Work Breakdown Structure (WBS):} hierarchical decomposition into smaller tasks;
+        tracks duration, progress, and dependencies; built incrementally and iteratively.
+  \item \textbf{Task dependencies:} which activities must finish before others begin.
+  \item \textbf{Gantt chart:} horizontal bar chart of tasks vs.\ timeline; monitors schedule.
+  \item \textbf{Network diagram / PERT / CPM:} visualise task relationships and find the
+        \emph{critical path}.
+\end{itemize}
+
+\subsection{Effort Estimation}
+\begin{itemize}
+  \item Estimation assigns projected time/effort to tasks; trades off functionality, time, and cost.
+  \item Best estimates come from past, similar projects.
+  \item \textbf{Use-case points:} based on technical complexity and environmental factors.
+  \item \textbf{Story points:} relative effort, common in agile.
+\end{itemize}
+
+\subsection{Work Plan \& WBS}
+\begin{itemize}
+  \item A \textbf{work plan} is a dynamic, sequential list of all tasks, updated regularly.
+  \item Derive tasks from a similar past project or directly from the chosen methodology.
+  \item WBS standardises task organisation and helps teams learn from past successes/mistakes.
+\end{itemize}
+
+\subsection{Scope Management}
+\begin{itemize}
+  \item Defines and controls what is in the project; keeps it focused and aligned with goals.
+  \item \textbf{Scope creep:} new requirements added after start; disrupts timeline and cost.
+  \item \textbf{Techniques:} identify all requirements early, allow only necessary changes,
+        analyse change impact, defer changes as future enhancements, use time boxing.
+\end{itemize}
+
+\subsection{Staffing}
+\begin{itemize}
+  \item Match people's abilities to project needs; determine headcount; motivate the team;
+        distribute tasks; minimise conflict.
+  \item \textbf{Deliverable: staffing plan} --- number/types of people, reporting structure,
+        roles/responsibilities, plus the \textbf{project charter} (objectives and rules).
+\end{itemize}
+
+\noindent{\color{capri}
+\[ \text{Number of people} = \frac{\text{person-months}}{\text{time to complete (months)}}
+   \qquad\quad \text{Lines of communication} = \frac{n(n-1)}{2} \]
+The second formula is why communication overhead grows roughly quadratically as the team grows ---
+hence sub-teams and a reporting structure for large projects.
+}
+
+\subsection{Motivation \& Conflict}
+\begin{itemize}
+  \item Motivation has the greatest influence on performance; money alone is a weak motivator.
+  \item Techniques: 20\% time for personal projects, peer-to-peer recognition, team ownership
+        (``we'' not ``I''), interest-driven task choice, equitable compensation, autonomy, trust.
+  \item Reduce conflict via cohesiveness, clear roles, charter-defined work/communication rules,
+        clear plans/procedures, and anticipating competing priorities early.
+\end{itemize}
+
+\subsection{Environment, Infrastructure \& Documentation}
+\begin{itemize}
+  \item Choose the right (CASE) tools to boost productivity and centralise information;
+        apply standards consistently; support a centralised repository; enforce workflows.
+  \item Document thoroughly and continuously into an organised project binder; use a standard
+        process (e.g.\ Unified Process) for templates; never postpone documentation to the end.
+\end{itemize}
+
+\subsection{Release Planning}
+\begin{itemize}
+  \item \textbf{Inputs:} product vision, high-level backlog, roadmap, team velocity.
+  \item Review constraints (scope, target date, budget); identify minimum releasable features;
+        groom and map backlog items to sprints; produce a release plan (features, timeline, cost,
+        sprint mapping).
+  \item \textbf{Fixed-date planning:} sprint count from the calendar; estimate velocity as a
+        slower--faster \emph{range}; slower\,$\times$\,sprints $=$ ``will-have'' line;
+        faster\,$\times$\,sprints $=$ ``might-have'' line.
+  \item \textbf{Fixed-date burnup chart:} categorise into will-have / might-have / won't-have;
+        prioritise must-haves before the fixed ship date; track cumulative progress.
+  \item \textbf{Fixed-scope burndown chart:} remaining story points vs.\ schedule, compared with
+        high/low/average velocity, to gauge the chance of completing fixed scope.
+  \item \textbf{Fixed-scope burnup chart:} completed points rising toward a fixed target scope.
+\end{itemize}
+
+\subsection{Project-Management Software}
+\begin{itemize}
+  \item Support planning/scheduling/tracking; central platform for tasks, docs, communication;
+        improve visibility into progress/timelines/resources; surface risks/delays/dependencies early.
+\end{itemize}
+
+% =====================================================================
+\part{Agile \& Scrum}
+% =====================================================================
+
+\section{Agile Fundamentals}
+
+\subsection{History}
+\begin{itemize}
+  \item Agile emerged around 1995 as a reaction to rigid processes; early critics saw it as
+        ``controlled code-and-fix,'' which applied to only a small group.
+  \item Builds on design/coding/testing practices that improve flexibility and productivity;
+        keeps explicit but lightweight processes.
+  \item Major methods: DSDM, Scrum, XP, ASD, Crystal family, Feature-Driven Development (FDD), AUP.
+\end{itemize}
+
+\subsection{The Agile Manifesto}
+We value the items on the left more, while still valuing those on the right:
+\begin{itemize}
+  \item \textbf{Individuals and interactions} over processes and tools
+  \item \textbf{Working software} over comprehensive documentation
+  \item \textbf{Customer collaboration} over contract negotiation
+  \item \textbf{Responding to change} over following a plan
+\end{itemize}
+
+\subsection{The Twelve Principles (condensed)}
+\begin{itemize}
+  \item Satisfy the customer through early and continuous delivery of valuable software.
+  \item Welcome changing requirements, even late, for competitive advantage.
+  \item Deliver working software frequently (weeks, not months).
+  \item Business people and developers work together daily.
+  \item Build around motivated individuals; give them environment, support, and trust.
+  \item Face-to-face conversation is the most efficient communication.
+  \item Working software is the primary measure of progress.
+  \item Promote sustainable development at a constant pace.
+  \item Continuous attention to technical excellence and good design.
+  \item Simplicity --- maximising the work \emph{not} done --- is essential.
+  \item Best architectures/requirements/designs emerge from self-organising teams.
+  \item Regularly reflect and tune behaviour to become more effective.
+\end{itemize}
+
+\subsection{Benefits, Challenges, and Agile vs.\ Traditional}
+\begin{itemize}
+  \item \textbf{Benefits:} adaptability via short cycles, faster usable increments, better
+        collaboration, early issue detection, higher customer satisfaction.
+  \item \textbf{Challenges:} shifting from traditional management, weak customer engagement,
+        poor estimation, scaling difficulty, superficial ``cargo-cult'' adoption.
+  \item \textbf{Agile vs.\ traditional:} iterative vs.\ sequential, evolving vs.\ fixed
+        requirements, collaboration vs.\ heavy documentation, continuous adaptation vs.\ upfront
+        planning, incremental value vs.\ big-bang delivery.
+  \item \emph{When is Agile wise?} When requirements are unclear/volatile, feedback is available,
+        the team is co-located/empowered, and early partial value is useful. It is a weaker fit for
+        fixed-scope, safety-critical, or heavily regulated big-design-up-front work.
+\end{itemize}
+
+\subsection{Agile Metrics}
+\begin{itemize}
+  \item \textbf{Velocity:} work completed per iteration.
+  \item \textbf{Burndown chart:} remaining work over time.
+  \item \textbf{Cycle time:} start-to-finish duration of a task.
+  \item \textbf{Defect rate:} product-quality signal.
+  \item \textbf{Customer feedback:} qualitative value signal.
+\end{itemize}
+
+\section{Scrum}
+
+\subsection{Background}
+\begin{itemize}
+  \item ``Scrum'' (1986) described fast, flexible product development at Japanese firms (Honda,
+        Canon). Sutherland \& Schwaber introduced the software variant in 1995. The name comes from
+        rugby --- emphasising teamwork.
+\end{itemize}
+
+\subsection{Roles}
+\begin{itemize}
+  \item \textbf{Scrum Master:} ensures the team follows Scrum rules; facilitator and leader, not a
+        project manager; has no authority over the team; explains practices internally and to
+        external stakeholders.
+  \item \textbf{Product Owner (PO):} maximises product value; knows the business/customer; sole
+        owner of the product backlog; ensures user stories meet the Definition of Ready; holds the
+        product vision.
+  \item \textbf{Developer Team:} cross-functional (define, develop, test, deploy, maintain,
+        communicate); typically 5--9 people; self-organising.
+\end{itemize}
+
+\subsection{Artifacts}
+\begin{itemize}
+  \item \textbf{Product Backlog:} continuously evolving, ordered list of requirements; the single
+        source of truth for product modifications.
+  \item \textbf{Sprint Backlog:} backlog items selected for the sprint plus the tasks to deliver
+        them (develop, build, review, test); the team's internal prediction for the next increment.
+  \item \textbf{Potentially Shippable Product Increment:} delivered each sprint; can ship to
+        production immediately because it has no outstanding tasks.
+\end{itemize}
+
+\subsection{States: Definition of Ready vs.\ Definition of Done}
+\begin{itemize}
+  \item \textbf{Definition of Ready (DoR):} rules a user story must meet before the team accepts
+        it; ensures clarity up front and minimises mid-sprint discussion.
+  \item \textbf{Definition of Done (DoD):} criteria for ``potentially shippable'' (coded, unit +
+        coverage tested, functionally/performance/UAT tested, reviewed, documented). Only work
+        meeting the DoD is delivered.
+\end{itemize}
+
+\subsection{Events}
+\begin{itemize}
+  \item \textbf{The Sprint:} fixed timebox (often 1--2 weeks); shorter sprints mean shorter
+        refinement/poker/retrospective sessions.
+  \item \textbf{Daily Stand-up ($\le$15 min):} each member answers (1) what did I accomplish?
+        (2) what will I do next? (3) what is blocking me? It is inspection/synchronisation/adaptive
+        planning --- \emph{not} a problem-solving or traditional status meeting.
+  \item \textbf{Planning Poker:} quantify effort for new work; the whole team agrees a size; a
+        ``common view'' forms and sizing reliability (burn rate) improves over time.
+  \item \textbf{Sprint Review (product demo):} demo to team, PO, and business/customer; gather and
+        inject feedback for the next sprint.
+  \item \textbf{Team Retrospective:} after each sprint, evaluate what went well/badly to improve
+        the way of working.
+  \item \textbf{Backlog Refinement:} anticipate/define stories for the next sprint; usually
+        mid-sprint; lets the PO improve stories before the next sprint.
+\end{itemize}
+
+\subsection{Social Objects}
+\begin{itemize}
+  \item \textbf{Scrum Board} (e.g.\ Kanban): activities move left-to-right across columns.
+  \item \textbf{Burn-Down Chart:} planned points are ``burned'' as features complete; target is 0
+        remaining at sprint end; outlines the burn rate so the team can steer progress.
+  \item \textbf{Impediment Board:} external blockers (e.g.\ ``not enough desks,'' ``network down'');
+        the Scrum Master ensures they are handled.
+\end{itemize}
+
+\subsection{Scrum Flow}
+\begin{itemize}
+  \item PO + team define the sprint goal; Planning Poker sizes the work; stories meeting the DoR
+        enter the sprint backlog.
+  \item The sprint runs uninterrupted; the PO may \emph{not} change stories mid-sprint.
+  \item At the end: demo to the customer, run the retrospective, refine the backlog (can also be
+        mid-sprint), and the PO adds updated stories back to the product backlog.
+\end{itemize}
+
+\subsection{Benefits}
+\begin{itemize}
+  \item Delighted customers (value early and often), improved ROI, reduced cost (less waste),
+        fast results (time-boxed sprints), and confidence via transparency/inspection/adaptation.
+  \item \textbf{Visibility} reduces misunderstanding and rework; \textbf{risk} drops because it
+        becomes clear early whether the team is building the right product; \textbf{business value}
+        is generated each sprint by shipping early instead of letting work get ``stuck.''
+\end{itemize}
+
+\section{Requirements in Scrum (User Stories)}
+
+\subsection{Requirements: Sequential vs.\ Scrum}
+\begin{itemize}
+  \item \textbf{Sequential:} requirements are fixed, fully detailed up front, standalone, and
+        followed strictly --- assuming early stability reduces uncertainty.
+  \item \textbf{Scrum:} details emerge through ongoing conversation, expanded just enough to start;
+        stored as flexible \textbf{Product Backlog Items (PBIs)} that evolve as the team learns.
+\end{itemize}
+
+\subsection{User Stories and the 3 Cs}
+\begin{itemize}
+  \item User stories express business value clearly for business and technical readers; ideal for
+        features but not for everything (e.g.\ defects are better as plain descriptions).
+  \item \textbf{Card:} the brief written form (index card / sticky note).
+  \item \textbf{Conversation:} ongoing discussion that uncovers detail and shared understanding.
+  \item \textbf{Confirmation:} acceptance criteria / conditions of satisfaction (often on the
+        card's back); used to build and test the story and to verify correctness.
+\end{itemize}
+
+The standard card template and an example, plus a Gherkin-style way to write the
+\emph{Confirmation} (acceptance criteria) --- this is what ``conditions of satisfaction'' look like in practice.
+\begin{lstlisting}[language=,caption={User-story card + acceptance criteria (added)}]
+As a [role], I want [goal], so that [benefit].
+
+Example
+  As a registered shopper, I want to save items to a wishlist,
+  so that I can purchase them later.
+
+Acceptance criteria (Gherkin: Given / When / Then)
+  Given I am logged in and viewing a product
+  When I click "Add to wishlist"
+  Then the item appears in my wishlist
+  And the wishlist count increases by one
+\end{lstlisting}
+
+\subsection{Levels of Detail}
+\begin{itemize}
+  \item \textbf{Epic:} largest story; months long; spans a release or more; never enters a sprint;
+        a placeholder for big work.
+  \item \textbf{Theme:} medium; weeks long; a significant functional area; still too large for one sprint.
+  \item \textbf{Sprintable (implementable) story:} smallest; days long; fits one sprint; enough
+        detail to build; describes the \emph{what} from the user's view.
+  \item \textbf{Task:} below stories; hours long; one or two developers; describes the \emph{how}.
+\end{itemize}
+
+\subsection{INVEST --- Evaluating Stories}
+\begin{itemize}
+  \item \textbf{Independent:} loosely coupled; minimise (not necessarily eliminate) dependencies.
+  \item \textbf{Negotiable:} captures essence and intent; leaves implementation open for discussion.
+  \item \textbf{Valuable:} delivers value to a customer and/or user; PO approves purely technical work.
+  \item \textbf{Estimatable:} if not, it is too large or ambiguous; may need a spike.
+  \item \textbf{Sized appropriately (Small):} fits the sprint it is planned for.
+  \item \textbf{Testable:} pass/fail against acceptance criteria.
+  \item \emph{Ready for a sprint?} When it satisfies INVEST \emph{and} the team's DoR: small enough
+        to finish in the sprint, clear and negotiated, estimated, and testable with explicit criteria.
+\end{itemize}
+
+\subsection{Non-Functional Requirements \& Knowledge-Acquisition Stories}
+\begin{itemize}
+  \item NFRs are system-wide constraints (e.g.\ ``web browser support'') that affect almost all
+        PBIs; fold as many as possible into the DoD so every feature is validated against them.
+  \item \textbf{Knowledge-acquisition stories} (prototypes, PoCs, experiments, spikes) gain
+        information; their value must justify their cost --- otherwise prefer a fail-fast approach.
+\end{itemize}
+
+\subsection{Gathering \& Mapping Stories}
+\begin{itemize}
+  \item \textbf{User-story-writing workshops:} PO, Scrum Master, team, stakeholders brainstorm
+        stories top-down (epics $\to$ smaller) or bottom-up (sprintable stories for the next release).
+  \item \textbf{Story mapping:} decompose a high-level activity into a left-to-right workflow;
+        epics at the top, themes as the task sequence, sprintable stories arranged vertically by
+        priority; gives context across releases.
+\end{itemize}
+
+\subsection{PBI Types}
+\begin{itemize}
+  \item \textbf{Feature:} new user-facing capability (user-story format).
+  \item \textbf{Change:} adjusts/improves existing functionality.
+  \item \textbf{Defect:} a gap between expected and actual behaviour; prioritised by severity/impact.
+  \item \textbf{Technical improvement:} refactoring/infrastructure; not user-visible; needs PO approval.
+  \item \textbf{Knowledge acquisition:} spikes/PoCs to reduce uncertainty.
+\end{itemize}
+
+\subsection{Grooming and the DEEP Model}
+\begin{itemize}
+  \item Backlog grooming/refinement is continuous: the PO and team clarify, split, estimate, and
+        reorder PBIs so items are ready for upcoming sprints.
+  \item \textbf{DEEP:} \emph{Detailed appropriately} (near-term items small/detailed and on top),
+        \emph{Emergent} (never frozen), \emph{Estimated} (effort attached; rough T-shirt sizes for
+        large items), \emph{Prioritized} (ordered by value/urgency).
+  \item \textbf{Who/when:} PO leads and decides; the team spends up to $\sim$10\% of sprint time;
+        initial grooming at release planning, ongoing in workshops, after dailies, and during reviews.
+\end{itemize}
+
+\subsection{DoR \& Release-Flow Management}
+\begin{itemize}
+  \item The \textbf{DoR} is a checklist a PBI must satisfy before sprint selection; a strong DoR
+        raises the chance of meeting the sprint goal.
+  \item Partition the backlog with two lines into \textbf{must-have}, \textbf{nice-to-have}, and
+        \textbf{won't-have} for a release; must-haves are essential and built first.
+  \item \textbf{Pipeline management:} keep $\sim$2--3 sprints of ready stories; too little grooming
+        starves the pipeline, too much creates waste through unnecessary detail and rework.
+\end{itemize}
+
+\section{Sprints in Scrum}
+
+\subsection{Estimation, Units \& Velocity}
+\begin{itemize}
+  \item Estimate total feature size, measure team velocity, then
+        \textbf{duration $=$ size / velocity}, which drives cost.
+  \item The development team (who do the work) produce the estimates; the PO clarifies; the Scrum
+        Master facilitates. Keep estimates separate from commitments; favour accuracy over precision;
+        prefer relative sizing.
+  \item \textbf{Units:} \emph{story points} (relative magnitude/complexity/effort) or
+        \emph{ideal days} (effort-days; keep distinct from elapsed time).
+\end{itemize}
+
+\noindent{\color{capri}\[ \text{Sprints needed} \approx \frac{\text{total backlog size (points)}}{\text{average velocity (points/sprint)}} \]}
+
+\subsection{Planning Poker}
+\begin{itemize}
+  \item Consensus-based discussion that uncovers assumptions and builds shared understanding;
+        groups comparable items into bins on a chosen scale (more granularity at the low end).
+  \item Industry-standard scales: Fibonacci-like \texttt{1, 2, 3, 5, 8, 13, 20, 40, 100}, or
+        powers of two.
+  \item Process: PO presents the PBI; team clarifies; each member reveals a private estimate
+        simultaneously (avoiding anchoring); discuss outliers and re-vote until consensus.
+\end{itemize}
+
+\subsection{Velocity --- Use \& Misuse}
+\begin{itemize}
+  \item Velocity $=$ size of PBIs completed in a sprint (output volume, not value). Used for release
+        forecasting, sprint capacity, and process-health diagnosis.
+  \item Express as a \emph{range}; expect it to rise with focused improvement, then plateau; team
+        changes cause a temporary dip.
+  \item \textbf{Don't:} rely on chronic overtime, judge individuals by velocity, or incentivise
+        point inflation. \textbf{Do:} prefer sustainable practices and recognise that misuse breeds
+        harmful culture.
+\end{itemize}
+
+\subsection{Sprint Planning}
+\begin{itemize}
+  \item Held at sprint start ($\sim$4--8\,h). PO presents goal + prioritised items; the team
+        forecasts what it can deliver; the Scrum Master facilitates and challenges the commitment
+        for realism.
+  \item \textbf{Inputs:} groomed product backlog, team velocity, constraints, team capabilities,
+        initial sprint goal.
+  \item \textbf{Outputs:} a validated sprint goal and a sprint backlog (the commitment). Break PBIs
+        into tasks of $\le$8\,h.
+  \item \textbf{Approach I (1-part):} capacity $\to$ refine goal $\to$ select PBIs $\to$ iterate to capacity.
+  \item \textbf{Approach II (2-part):} Part 1 forecast PBIs by points; Part 2 break into tasks +
+        estimate hours, verify hours vs.\ capacity, adjust, finalise commitment.
+\end{itemize}
+
+\subsection{Determining Capacity}
+\begin{itemize}
+  \item Subtract ceremonies, non-sprint commitments, planned time off, and a risk buffer from total
+        availability; measure in points or effort-hours; forecast by adjusting historical velocity.
+\end{itemize}
+
+\subsection{Sprint Execution \& Flow}
+\begin{itemize}
+  \item The team self-organises; the Scrum Master coaches and removes impediments; the PO stays
+        available for feedback and acceptance.
+  \item Minimal up-front task planning (just critical dependencies); avoid heavyweight Gantt charts;
+        plan opportunistically and adapt.
+  \item \textbf{Flow:} manage work collectively (not individual utilisation); \emph{swarm} to finish
+        items before starting new ones; adopt a ``Musketeer'' (all-for-one) attitude; build T-shaped
+        skills; avoid mini-waterfalls that leave partially done work.
+  \item Use information radiators (task board, burndown/burnup); move tasks
+        \texttt{to-do} $\to$ \texttt{in-progress} $\to$ \texttt{done}.
+\end{itemize}
+
+\subsection{Burndown \& Burnup Charts}
+\begin{itemize}
+  \item \textbf{Sprint burndown:} plot remaining task-hours daily (hours on $y$, time on $x$);
+        slope shows progress; trend-line intersection at sprint end $=$ on schedule; early $=$ can
+        pull in work; late $=$ over-committed/slow $\Rightarrow$ intervene.
+  \item \textbf{Sprint burnup:} plot \emph{completed} work (prefer story points) toward the sprint
+        goal; emphasises delivered value.
+\end{itemize}
+
+\subsection{Sprint Review}
+\begin{itemize}
+  \item Informal, high-value inspect-and-adapt of the increment, at sprint end before the retro;
+        only fully completed work is shown.
+  \item Participants: Scrum team, internal stakeholders, other teams (sales/support), and external
+        customers/users. Roles: Scrum Master facilitates, PO presents, developers demo (rotated).
+  \item Activities: \textbf{Demonstrate} (a tool for conversation, use automated test results if
+        non-visual), \textbf{Discuss} (defer deep problem-solving), \textbf{Adapt} (validate
+        product-market fit; reprioritise/add/remove backlog items; update scope/schedule/budget).
+  \item \emph{Not} a formal sign-off (acceptance happens during execution); turn perceived-incomplete
+        items into new PBIs.
+\end{itemize}
+
+\subsection{Sprint Retrospective}
+\begin{itemize}
+  \item The team inspects its own process/practices/tools/communication. Core questions:
+        what to \emph{continue}, \emph{stop}, and \emph{start}.
+  \item Participants: developers (diverse perspectives), Scrum Master (facilitates), PO (helps
+        optimise flow, attendance depends on team comfort); outsiders by invitation only --- protect
+        psychological safety.
+  \item Flow: set the atmosphere (systems not individuals; blame-free), share context (objective
+        data + Event Timeline + Emotions Seismograph), identify insights (silent grouping, root
+        causes), determine actions (clear owners, add improvement tasks to the next sprint backlog),
+        close (recap, appreciate, brief meta-retro).
+  \item \textbf{Follow-through:} put improvement tasks in the backlog \emph{before} new features,
+        reduce capacity to account for the effort, and avoid separate improvement plans that get
+        marginalised. \emph{Improvement is not guaranteed right after a retro --- it requires the
+        actions to actually be executed and reinforced over subsequent sprints.}
+\end{itemize}
+
+\section{eXtreme Programming (XP)}
+
+\subsection{Overview, Values, Principles}
+\begin{itemize}
+  \item XP (1996, Kent Beck); first book 1999, revised 2004; framed as an \emph{engineering
+        discipline} but with a clear, structured process.
+  \item \textbf{Values:} communication, simplicity, feedback, courage.
+  \item \textbf{Principles:} rapid feedback, assume simplicity, incremental change, embrace change,
+        quality work.
+\end{itemize}
+
+\subsection{The XP Process (phases)}
+\begin{itemize}
+  \item \textbf{Exploration:} refine stories/priorities; pick next-iteration stories; collaborate
+        with the customer; identify risks; keep planning lightweight.
+  \item \textbf{Planning:} split stories into tasks; integrate feedback; write acceptance tests
+        first; create the iteration plan; estimate and commit.
+  \item \textbf{Iterations to Release:} continuous review; pair programming + collective code;
+        small frequent releases; testing + analysis; final integrated release.
+  \item \textbf{Productionizing:} system-wide verification \& validation of the first release;
+        deploy; rollback readiness; smoke testing + monitoring.
+  \item \textbf{Maintenance:} implement remaining requirements; bug fixes; iterate phases 2--4 per
+        cycle; integrate production feedback; refactor.
+  \item \textbf{Death:} close the project; post-mortem; document lessons; archive; celebrate.
+  \item \textbf{Development ``engine''} $=$ phases 2--4; each run produces a new release.
+\end{itemize}
+
+\subsection{The 12 XP Practices}
+\begin{itemize}
+  \item Planning Game; Small Releases; Metaphor; Simple Design;
+  \item Testing (tests before code); Refactoring; Pair Programming; Collective Ownership;
+  \item Continuous Integration; 40-Hour Week (sustainable pace); On-Site Customer; Coding Standards.
+\end{itemize}
+
+\subsection{System Metaphor \& Team}
+\begin{itemize}
+  \item A \textbf{Spike} (small prototype) explores architecture and helps define the
+        \textbf{Metaphor} --- a simple analogy giving overall architecture without over-constraining.
+  \item \textbf{Core team:} Developer/Programmer, Customer, Manager/Tracker, Coach.
+  \item \textbf{Optional:} Analyst, Testers, Resource Manager.
+\end{itemize}
+
+% =====================================================================
+\part{Modeling}
+% =====================================================================
+
+\section{Requirements \& Process Modeling}
+
+\subsection{Requirements Discovery}
+\begin{itemize}
+  \item Identifying/extracting system problems and solution requirements from users.
+  \item A \textbf{system requirement} describes what the system must do or a property it must have
+        (a.k.a.\ business requirement).
+  \item \textbf{Functional:} specific behaviours --- create/update/calculate/validate; inputs,
+        outputs, triggers; business rules; verified by functional test cases.
+  \item \textbf{Non-functional:} qualities --- performance (response time, throughput,
+        scalability, availability), security (authn/authz, confidentiality, integrity, auditing),
+        operational/business constraints (cost, maintainability, usability, compliance, reliability);
+        verified by metrics, SLAs, security assessments.
+\end{itemize}
+
+\subsection{Consequences of Flawed Requirements}
+\begin{itemize}
+  \item Higher cost, delayed delivery, user dissatisfaction/rejection, escalated maintenance,
+        unreliability/downtime, damaged IT reputation.
+\end{itemize}
+
+\subsection{Requirements Documents \& Management}
+\begin{itemize}
+  \item \textbf{Requirements Definition Document:} formal communication of requirements; acts as a
+        contract; a.k.a.\ Requirements Specification / Functional Specifications.
+  \item \textbf{Requirements management:} ongoing handling of changes; up to 50\%+ of requirements
+        may change before deployment.
+\end{itemize}
+
+\subsection{Fact-Finding Methods}
+\begin{itemize}
+  \item Document/form/database sampling; research and site visits; observation of the work
+        environment; questionnaires; interviews; prototyping; Joint Requirements Planning (JRP).
+\end{itemize}
+
+\subsection{Use-Case Modeling}
+\begin{itemize}
+  \item User-centred; captures requirements from the perspective of user interactions; specified
+        in stakeholder-understandable form; supports verification/validation.
+  \item \textbf{Use case:} a behaviourally related sequence of steps for one business task
+        (automated + manual).
+  \item \textbf{Use-case diagram:} actors, use cases, and relationships; shows system boundary and
+        who interacts how.
+  \item \textbf{Use-case narrative:} detailed textual description --- inputs, outputs, step-by-step
+        activities.
+  \item \emph{Benefits:} elicits correct requirements, shared vocabulary with users, scope clarity,
+        basis for estimation/testing.
+\end{itemize}
+
+\subsection{Use-Case Symbols, Actors \& Relationships}
+\begin{itemize}
+  \item \textbf{Use case:} horizontal ellipse. \textbf{Actor:} human, organisation, system,
+        device, or \emph{time} (temporal events).
+  \item \textbf{Four actor types:} primary business actor (chief beneficiary), primary system actor
+        (initiates the event), external server actor (responds to a request), external receiver
+        actor (receives value but isn't primary).
+  \item \textbf{Association:} solid line; arrowhead $\to$ use case means the actor initiated it;
+        no arrowhead $=$ receiver; may be uni- or bidirectional.
+  \item \textbf{Extends ($\langle\langle$extends$\rangle\rangle$):} optional steps extracted to
+        simplify a base use case; arrow from extension $\to$ base.
+  \item \textbf{Uses/Includes ($\langle\langle$uses$\rangle\rangle$):} common steps factored into an
+        abstract use case invoked by others; arrow from base $\to$ abstract.
+  \item \textbf{Depends On ($\langle\langle$depends on$\rangle\rangle$):} which use cases must occur
+        first; sets development sequence.
+  \item \textbf{Inheritance:} shared actor behaviour generalised to an abstract actor that others
+        inherit from.
+\end{itemize}
+
+\subsection{Process of Requirements Use-Case Modeling}
+\begin{itemize}
+  \item Step 1: identify business actors. Step 2: identify business use cases. Step 3: construct
+        the use-case model diagram (associations, uses, extends, depends-on). Step 4: document
+        use-case narratives (triggers, steps, outcomes; normal + alternative flows).
+  \item Goal: a user-perspective model of \emph{what} is required (no implementation detail) that
+        supports estimation/scheduling.
+\end{itemize}
+
+A use-case diagram and a narrative can be written textually (PlantUML), which is handy for
+versioning models in git alongside code.
+\begin{lstlisting}[language=,caption={Use-case model as PlantUML (added)}]
+@startuml
+left to right direction
+actor Customer
+actor "Kitchen Staff" as Kitchen
+
+rectangle "Los Pollos Hermanos Ordering System" {
+  Customer --> (Place Order)
+  (Place Order) ..> (Apply Promo) : <<extends>>
+  (Place Order) ..> (Validate Payment) : <<uses>>
+  (Place Order) --> Kitchen
+}
+@enduml
+\end{lstlisting}
+
+\begin{lstlisting}[language=,caption={Use-case narrative skeleton (added)}]
+Use Case:        Place Order
+Primary Actor:   Customer
+Trigger:         Customer selects items and confirms
+Preconditions:   Menu is available; customer is identified
+Main Flow:
+  1. Customer selects menu items
+  2. System calculates total (and applies promo if eligible)
+  3. Customer submits payment
+  4. System validates payment and creates the order
+  5. System notifies kitchen staff
+Postconditions:  Order is queued; receipt is issued
+Alternate Flow:  3a. Payment fails -> system prompts retry / cancel
+\end{lstlisting}
+
+\subsection{Modeling Categories}
+\begin{itemize}
+  \item \textbf{Process model:} logic of business processes/operations; tools include Data Flow
+        Diagrams (DFDs) and Business Process Models (BPMs).
+  \item \textbf{Data model:} logical data structure --- entities, attributes, relationships;
+        Entity-Relationship Diagram (ERD); supports normalisation/integrity and DB design.
+  \item \textbf{Object model:} objects encapsulating data + behaviour; class/sequence/collaboration
+        diagrams; bridges OO analysis to implementation.
+\end{itemize}
+
+\section{UML Behavioral Diagrams}
+
+\subsection{What UML Is}
+\begin{itemize}
+  \item Unified Modeling Language --- a standardised visual language for system structure and
+        behaviour, used in analysis, design, and documentation.
+  \item Open standard from the Object Management Group (OMG), also known for CORBA; introduced 1997;
+        unified competing OO methods. UML standardises \emph{modeling}, not a development process.
+  \item In Agile it is used selectively (often whiteboard sketches) when it adds value; with
+        waterfall, models become formal documents passed between phases.
+\end{itemize}
+
+\subsection{UML in Analysis, Design \& Documentation}
+\begin{itemize}
+  \item \textbf{Analysis:} use case, conceptual class, activity, state diagrams.
+  \item \textbf{Design:} class, sequence, package, state, deployment diagrams.
+  \item \textbf{Documentation:} simpler diagrams that explain structure/behaviour of a finished
+        system to aid maintenance.
+  \item \textbf{Categories:} \emph{structural} (class, package, deployment) vs.\ \emph{behavioral}
+        (use case, sequence, activity, state).
+\end{itemize}
+
+\subsection{Use Case Diagram}
+Models interactions between external actors and the system; defines the system boundary;
+relationships include include, extend, and generalization.
+
+\subsection{State Machine Diagram}
+\begin{itemize}
+  \item Shows an object's states over its life cycle; \textbf{transitions} (triggered by
+        events/conditions) move between states; a \textbf{guard} must hold for a transition; an
+        \textbf{action} executes during a transition.
+  \item \textbf{Special states:} initial, final, composite (with substates), entry/exit actions.
+  \item \textbf{Superstates} group related substates (transitions can target the superstate;
+        substates inherit common transitions) --- reduces repetition.
+  \item \textbf{Concurrent states:} parallel regions operate simultaneously; events may trigger
+        transitions in each region independently.
+  \item Best for event-driven/reactive, state-dependent behaviour.
+\end{itemize}
+
+\subsection{Activity Diagram}
+\begin{itemize}
+  \item Models workflow: activities (tasks), control flows (order), decision nodes (branching),
+        initial/final nodes, objects \& object flows (data).
+  \item \textbf{Action decomposition} breaks a complex activity into smaller actions;
+        \textbf{signals} are asynchronous messages that can start/influence activities.
+  \item \textbf{Partitions (swimlanes)} assign activities to actors/roles/components.
+  \item Use for use-case behaviour, business processes (human + system), decisions, parallelism.
+\end{itemize}
+
+\subsection{Sequence Diagram}
+\begin{itemize}
+  \item Shows object interactions over time: lifelines (participants), messages (arrows),
+        activation bars (operation duration); vertical axis $=$ time.
+  \item Models object creation (message begins a new lifeline) and deletion (termination marker).
+  \item \textbf{Loops} repeat message sets; \textbf{alt} fragments express conditional paths.
+  \item Derived from important use-case scenarios; useful in analysis and design.
+\end{itemize}
+
+A sequence diagram is also concise as PlantUML, with a loop and an alt fragment shown.
+\begin{lstlisting}[language=,caption={Sequence diagram as PlantUML (added)}]
+@startuml
+actor User
+participant UI
+participant API
+participant DB
+
+User -> UI : submit login
+UI -> API : POST /login
+loop until valid or 3 tries
+  API -> DB : find user
+  alt credentials valid
+    DB --> API : user record
+    API --> UI : 200 + token
+  else invalid
+    DB --> API : not found
+    API --> UI : 401
+  end
+end
+@enduml
+\end{lstlisting}
+
+\subsection{Other Behavioral Diagrams \& BPMN}
+\begin{itemize}
+  \item \textbf{Communication} (interactions emphasising relationships), \textbf{interaction
+        overview} (activity + interaction), and \textbf{timing} diagrams (state/condition over time).
+  \item \textbf{BPMN} (Business Process Model and Notation): graphical standard for business
+        processes --- events, activities, gateways (decisions), sequence flows, pools \& lanes
+        (participants/responsibilities). Complements UML by focusing on business rather than
+        software structure; bridges technical and business stakeholders.
+\end{itemize}
+
+
+\section{UML Structural Diagrams}
+
+\subsection{Class Diagrams}
+\begin{itemize}
+  \item The most common UML structural diagram; models the static structure of a system by
+        showing classes, attributes, and methods.
+  \item Depicts relationships: inheritance, association, dependency.
+  \item Serves as a blueprint for OO design and code generation; used from analysis through implementation.
+  \item \textbf{Elements:} classes (rectangles divided into name/attributes/operations); attributes have
+        visibility (\texttt{+} public, \texttt{-} private, \texttt{\#} protected); multiplicity labels
+        (1, 0..*, 1..*); abstract classes and interfaces shown in italics or with \texttt{<{}<interface>{}>}.
+  \item \textbf{When to use:} requirements analysis (domain concepts), detailed design (before coding),
+        documentation, code generation, communication of hierarchies and patterns.
+\end{itemize}
+
+\subsection{Class Diagram Relationships}
+\begin{itemize}
+  \item \textbf{Association:} structural relationship (solid line), with multiplicity and optional role
+        names (e.g.\ ``employer''/``employee'') and navigation arrows (uni- or bidirectional).
+  \item \textbf{Operations:} listed in the third compartment; format:
+        \texttt{visibility name(params): returnType}; abstract operations in italics.
+  \item \textbf{Generalization (inheritance):} hollow triangle arrow pointing from child to parent;
+        child inherits all members and can add/override; represents an ``is-a'' relationship.
+  \item \textbf{Dependency:} dashed arrow from dependent to provider; local variable use, method
+        parameter, static call; weaker than association; stereotypes: \texttt{<{}<use>{}>},
+        \texttt{<{}<create>{}>}, \texttt{<{}<call>{}>}.
+  \item \textbf{Abstract class vs.\ interface:} abstract classes can have concrete methods and
+        cannot be instantiated; interfaces define a pure contract (all methods abstract); a class can
+        implement multiple interfaces but inherits from only one abstract class.
+\end{itemize}
+
+\begin{lstlisting}[language=,caption={Class diagram fragment as PlantUML}]
+@startuml
+abstract class Vehicle {
+  +speed: int
+  +{abstract} move(): void
+}
+class Car {
+  +fuelType: string
+  +move(): void
+}
+Vehicle <|-- Car          ' generalization (hollow triangle)
+Car "1" -- "0..*" Wheel  ' association with multiplicity
+@enduml
+\end{lstlisting}
+
+\subsection{Component Diagrams}
+\begin{itemize}
+  \item Models the high-level organisation of software components: modular, replaceable parts that
+        encapsulate behaviour and implement interfaces.
+  \item Shows how components wire together through provided and required interfaces; focuses on
+        dependencies and interactions, not internal details.
+  \item \textbf{Elements:} components (\texttt{<{}<component>{}>} stereotype); provided interfaces
+        (lollipop: circle on a line); required interfaces (socket: half-circle); assembly connector
+        (ball-and-socket); dependency (dashed arrow).
+  \item \textbf{When to use:} high-level architecture partitioning, deployment/configuration of
+        third-party or legacy components, communicating structure to multiple teams, planning
+        integration testing.
+\end{itemize}
+
+\subsection{Composite Structure Diagrams}
+\begin{itemize}
+  \item Shows the \emph{internal} structure of a classifier (class or component): how parts
+        collaborate and connect internally.
+  \item Unlike class diagrams, focuses on \emph{runtime} configuration of interconnected instances
+        (the ``white-box'' view).
+  \item \textbf{Elements:} parts (rectangles within the main box), ports (small squares on boundary
+        managing incoming/outgoing requests), connectors (communication paths), interfaces (lollipop/
+        socket on ports), collaborations (dotted ellipses showing interaction patterns).
+  \item \textbf{When to use:} modelling internal wiring of complex components, specifying design
+        patterns (MVC, Observer), documenting product-line assemblies with predefined connections.
+\end{itemize}
+
+\subsection{Deployment Diagrams}
+\begin{itemize}
+  \item Models the physical distribution of software artifacts across hardware nodes; shows what runs
+        where in a deployed system.
+  \item Essential for understanding system topology, redundancy, and network communication.
+  \item \textbf{Elements:} nodes (3D boxes --- \texttt{<{}<device>{}>} for physical hardware,
+        \texttt{<{}<execution environment>{}>} for software platform like OS or web server);
+        artifacts (actual files: .jar, .dll, .exe) shown inside nodes; communication paths (solid
+        lines between nodes indicating network connections).
+  \item \textbf{When to use:} planning hardware allocation, documenting multi-tier architectures,
+        identifying single points of failure, planning redundancy, deploying to cloud/Kubernetes,
+        performance analysis.
+\end{itemize}
+
+% =====================================================================
+\part{Software Design}
+% =====================================================================
+\section{Introduction to System Design}
+
+\subsection{What System Design Is}
+\begin{itemize}
+  \item System design focuses on the implementation of requirements identified during analysis.
+  \item The primary goal is to create a technical blueprint that guides the actual development process.
+  \item Design activities define data storage strategies and physical system architecture.
+  \item User interface components and input/output mechanisms are established at this stage.
+  \item Analysis and design are iterative processes that require frequent refinement and cross-functional feedback.
+\end{itemize}
+
+\subsection{From Analysis Models to Design Models}
+\begin{itemize}
+  \item \textbf{Verify \& validate:} cross-reference activity diagrams with use-case descriptions;
+        apply use-case realisation to trace functional requirements through the design; balance
+        functional, structural, and behavioural model dimensions.
+  \item \textbf{Evolve:} expand on analysis models to incorporate non-functional requirements
+        (performance, processing distribution, environmental constraints, UI, database configurations).
+  \item Primary design objectives: maintainability, cost-effectiveness, efficiency, and reliability.
+  \item Implementation techniques: factoring, partitioning, collaborations, and architectural layering.
+\end{itemize}
+
+\subsection{Design Strategy Decision}
+\begin{itemize}
+  \item Options: custom in-house development, purchasing packaged software, or outsourcing.
+  \item Evaluation: identify tools/skills needed internally, or locate suitable packages; build
+        alternative matrices of pros/cons.
+  \item Feasibility must incorporate technical, economic, and organisational dimensions.
+  \item Requests for Proposals (RFP) or Information (RFI) secure vendor cost and time estimates.
+\end{itemize}
+
+\subsection{Software Architecture}
+\begin{itemize}
+  \item The high-level structure of a system and the discipline of creating such structures.
+  \item Defines fundamental components, their responsibilities, and the relationships and interactions
+        between them.
+  \item Addresses non-functional requirements: scalability, security, performance, reliability.
+  \item Acts as a bridge between business requirements and technical implementation.
+  \item Decisions made at this level are \emph{difficult and costly to change later} --- the most
+        critical phase of the design lifecycle.
+  \item Common architectural patterns: layered, client-server, microservices, event-driven.
+\end{itemize}
+
+\subsection{Architecture Characteristics}
+High-level qualities that shape system behaviour and trade-offs.
+\begin{itemize}
+  \item \textbf{Availability \& Reliability:} uptime percentage; correct outputs under stated conditions;
+        achieved via redundancy, monitoring, failure mitigation (health checks, retries, circuit breakers).
+  \item \textbf{Testability \& Scalability:} testability uses dependency injection, mocks, contract testing,
+        observability hooks; scalability handles increased load by adding resources (horizontal vs.\
+        vertical; stateless designs aid scaling).
+  \item \textbf{Security \& Agility:} CIA triad (confidentiality, integrity, availability); threat modelling,
+        authn/authz, least privilege, encryption (at rest and in transit); agility enables quick pivots via
+        Agile practices, CI/CD, and modular architecture --- DevSecOps makes security \emph{enable}
+        agility, not block it.
+  \item \textbf{Fault Tolerance \& Elasticity:} fault tolerance keeps the system operating despite failures
+        (redundancy, replication, graceful degradation, failover); elasticity auto-scales resources based
+        on real-time demand --- essential in cloud environments.
+  \item \textbf{Recoverability \& Performance:} recoverability restores service after failure (RTO/RPO,
+        backups, disaster recovery, point-in-time recovery); performance covers responsiveness,
+        throughput, latency, resource usage (caching, indexing, async processing, CDNs); fast recovery
+        (low RTO) often requires performance investments such as hot standbys.
+  \item \textbf{Deployability \& Learnability:} deployability covers ease and safety of releasing changes
+        (CI/CD, blue/green and canary deployments, feature flags); learnability measures how quickly
+        new developers/operators can understand and use the system (clear docs, consistent APIs, good
+        logging/monitoring); high deployability supports rapid learning via fast feedback cycles.
+\end{itemize}
+
+\subsection{Trade-offs, Technical Debt, and Continuous Improvement}
+\begin{itemize}
+  \item Every architectural decision creates trade-offs between competing quality attributes (e.g.\ more
+        security $\Rightarrow$ more latency).
+  \item Architects prioritise requirements based on stakeholder needs and business objectives; document
+        the rationale behind structural choices.
+  \item \textbf{Architectural drift} occurs when the actual implementation deviates from the planned
+        design; manage via technical debt tracking and periodic architecture reviews.
+  \item Continuous monitoring of system metrics informs future architectural updates.
+\end{itemize}
+
+\subsection{Architecture vs.\ Design}
+\begin{itemize}
+  \item \textbf{Architecture} defines the system's high-level structure: major components/subsystems,
+        their responsibilities, interfaces, and interactions; driven mainly by \emph{non-functional}
+        requirements and constraints; system-wide.
+  \item \textbf{Design} defines the detailed solution inside those components: classes, methods,
+        algorithms, data structures, UI details, and database schema; driven mainly by
+        \emph{functional} requirements; component/module-level.
+  \item Architecture sets constraints and guidelines; design works within those boundaries.
+  \item \textbf{Architecture outputs:} architectural style/pattern, component diagram, deployment
+        diagram, technology stack, integration approach, data ownership boundaries.
+  \item \textbf{Design outputs:} class diagrams, sequence diagrams, DB tables, UI wireframes,
+        validation rules, error handling logic.
+  \item Example: Architecture chooses a web app with a REST API \& MySQL; design specifies the
+        classes, logic, queries, and UI flows.
+\end{itemize}
+
+\subsection{Subsystems, Interfaces, and Packages}
+\begin{itemize}
+  \item \textbf{Subsystems} are the primary decomposition mechanism; the goal is to maximise
+        independence between them, reducing coupling and enabling parallel and independent
+        deployment. Partitions represent closely collaborating class groups; stronger coupling indicates
+        they belong in the same partition.
+  \item \textbf{Interfaces} hide subsystem implementation details, exposing only what is needed;
+        the \emph{Facade} pattern provides a simple interface to a complex subsystem; layering
+        organises subsystems into cohesive layers (presentation, business logic, utility) with
+        dependencies flowing only downward.
+  \item \textbf{Package diagrams} group similar/related components (use cases, class diagrams);
+        show packages and their relationships (aggregation, association, dependency); changes to
+        packages with dependencies must be handled carefully.
+  \item \textbf{Deployment diagrams} model the physical deployment of artifacts onto nodes:
+        artifacts $=$ real-world things (source files, executables); nodes $=$ hardware or execution
+        environments. Two node types: \texttt{<{}<device>{}>} (physical hardware, e.g.\ a PC or
+        server) and \texttt{<{}<execution environment>{}>} (software platform, e.g.\ Apache).
+\end{itemize}
+
+\subsection{The Design: Classes, Units, Modules, UI}
+\begin{itemize}
+  \item \textbf{Design classes} refine analysis classes with specific attributes, methods, and
+        implementation details.
+  \item \textbf{Units} are the smallest testable pieces of code (individual methods or functions).
+  \item \textbf{Modules} group related design classes and units into cohesive, loosely coupled blocks.
+  \item The \textbf{user interface} sits as a separate layer, mediating between users and the underlying
+        domain logic; well-structured design keeps UI concerns separate from business logic.
+\end{itemize}
+
+\section{Architectural Patterns}
+
+\subsection{MVC (Model-View-Controller)}
+\begin{itemize}
+  \item \textbf{Model:} data, business logic, rules (no UI logic). \textbf{View:} presentation.
+        \textbf{Controller:} turns input into commands for Model/View.
+  \item \emph{Passive model} knows nothing of Views/Controllers; \emph{active model} notifies
+        Views via the Observer pattern.
+  \item \textbf{Use when} UI and business logic must be separated, multiple views show the same
+        data, or logic must be testable apart from the UI (Rails, Django, Spring MVC, ASP.NET MVC,
+        UIKit, Android).
+  \item \textbf{Watch for} the ``fat controller,'' tight View--Controller coupling; variants MVP
+        and MVVM. Not ideal for real-time tight View/Model sync.
+\end{itemize}
+
+\begin{lstlisting}[language=Python,caption={Minimal MVC (added)}]
+class Model:                       # data + logic
+    def __init__(self): self.count = 0
+    def increment(self): self.count += 1
+
+class View:                        # presentation only
+    def render(self, count): print(f"Count = {count}")
+
+class Controller:                  # input -> model -> view
+    def __init__(self, m, v): self.m, self.v = m, v
+    def on_click(self):
+        self.m.increment()
+        self.v.render(self.m.count)
+\end{lstlisting}
+
+\subsection{MVVM (Model-View-ViewModel)}
+\begin{itemize}
+  \item \textbf{ViewModel} sits between View and Model, exposing observable properties and commands
+        the View \emph{binds} to; the View has no logic.
+  \item Relies on \textbf{two-way data binding} and the command pattern; popularised by WPF, now in
+        Angular, Vue, SwiftUI, Jetpack Compose.
+  \item \textbf{Use when} the framework supports declarative UI/binding and you want minimal
+        code-behind and testable UI logic.
+  \item \textbf{Watch for} silent binding failures, performance with large datasets, bloated
+        ViewModels, and a steeper learning curve.
+\end{itemize}
+
+\subsection{Layered (n-tier) Architecture}
+\begin{itemize}
+  \item Horizontal layers, each a single responsibility; dependencies flow \emph{downward}.
+  \item Typical four layers: \textbf{Presentation} (UI/APIs), \textbf{Business} (logic/validation/
+        workflows), \textbf{Persistence} (data access/ORM), \textbf{Database} (SQL/NoSQL/files).
+  \item \textbf{Use when} you need clear separation, parallel team work, or swappable layers; good
+        starting point before microservices (Spring Boot, ASP.NET Core, FastAPI).
+  \item \textbf{Watch for} the ``sinkhole'' anti-pattern (pass-through layers with no logic), added
+        complexity/latency, layer-skipping, and changes rippling across layers.
+\end{itemize}
+
+\subsection{Clean Architecture}
+\begin{itemize}
+  \item Concentric circles; the \textbf{dependency rule} points inward toward business logic; outer
+        circles depend on inner, never the reverse (Robert C.~Martin; evolves Hexagonal/Onion).
+  \item Layers inside-out: \textbf{Entities} (enterprise rules) $\to$ \textbf{Use Cases}
+        (application rules) $\to$ \textbf{Interface Adapters} (controllers/presenters/gateways)
+        $\to$ \textbf{Frameworks \& Drivers}. Inner layers define interfaces, outer layers implement
+        them (\emph{dependency inversion}).
+  \item \textbf{Use when} business logic must outlive frameworks, decisions on DB/UI must be
+        deferred, and testability/maintainability are paramount.
+  \item \textbf{Watch for} boilerplate/indirection, overkill on small projects, and dogmatic
+        over-abstraction.
+\end{itemize}
+
+\subsection{Microkernel (Plugin) Architecture}
+\begin{itemize}
+  \item A minimal stable \textbf{core} plus independent, hot-swappable \textbf{plugins}; a
+        \textbf{plugin registry} tracks capabilities; a \textbf{contract/API} defines core--plugin
+        communication.
+  \item \textbf{Use when} features/third-party extensions are added often, experimental features
+        must be isolated, or different customers need different feature sets (Eclipse, Chrome,
+        payment gateways, antivirus).
+  \item \textbf{Watch for} getting the core size right, plugin versioning/conflicts, communication
+        overhead, sandboxing/security, and combinatorial testing.
+\end{itemize}
+
+\subsection{Microservices}
+\begin{itemize}
+  \item Decompose into small independent services around business capabilities; each runs in its
+        own process and communicates over the network (REST/gRPC/messaging) and owns its database.
+  \item Supporting pieces: API gateway, service discovery, infrastructure automation (containers,
+        orchestration, CI/CD).
+  \item \textbf{Use when} large teams need independent deploys, services scale differently, or a
+        monolith has outgrown itself.
+  \item \textbf{Watch for} distributed-system complexity (latency, partial failure, eventual
+        consistency), distributed data/transactions, and operational overhead. \emph{Start with a
+        monolith; split when necessary.}
+\end{itemize}
+
+\section{Design Patterns (Gang of Four)}
+\begin{itemize}
+  \item Recurring problems get recurring, reusable solutions; documented patterns cut design time
+        and ease understanding/maintenance/extension.
+  \item Three categories: \textbf{Creational} (object creation), \textbf{Structural} (composing
+        classes/objects), \textbf{Behavioral} (communication \& responsibility).
+\end{itemize}
+
+% ------------------------- Creational -------------------------
+\subsection{Creational Patterns}
+
+\subsubsection*{Abstract Factory}
+Creates \emph{families} of related objects through abstract products; clients stay independent of
+concrete classes. Use for themes/platforms/variants; downside: adding a new product \emph{type} is hard.
+\begin{lstlisting}[language=Python,caption={Abstract Factory (added)}]
+from abc import ABC, abstractmethod
+class Button(ABC):
+    @abstractmethod
+    def paint(self): ...
+class WinButton(Button):
+    def paint(self): return "Windows button"
+class MacButton(Button):
+    def paint(self): return "macOS button"
+
+class GUIFactory(ABC):
+    @abstractmethod
+    def create_button(self) -> Button: ...
+class WinFactory(GUIFactory):
+    def create_button(self): return WinButton()
+class MacFactory(GUIFactory):
+    def create_button(self): return MacButton()
+
+def build_ui(factory: GUIFactory):     # client uses abstractions only
+    return factory.create_button().paint()
+\end{lstlisting}
+
+\subsubsection*{Builder}
+Constructs a complex object step by step, separating construction from representation; the same
+process can yield different results. Use for many optional parts; avoids ``telescoping'' constructors.
+\begin{lstlisting}[language=Python,caption={Builder (added)}]
+class Pizza:
+    def __init__(self): self.toppings = []
+class PizzaBuilder:
+    def __init__(self): self.pizza = Pizza()
+    def add(self, t): self.pizza.toppings.append(t); return self  # fluent
+    def build(self): return self.pizza
+
+pizza = PizzaBuilder().add("cheese").add("mushroom").build()
+\end{lstlisting}
+
+\subsubsection*{Factory Method}
+Defines an interface for creating an object but lets subclasses decide the class to instantiate.
+Use when a class can't anticipate the type it must create; supports the Open--Closed Principle.
+\begin{lstlisting}[language=Python,caption={Factory Method (added)}]
+from abc import ABC, abstractmethod
+class Logistics(ABC):
+    @abstractmethod
+    def create_transport(self): ...     # the factory method
+    def plan(self): return self.create_transport().deliver()
+class RoadLogistics(Logistics):
+    def create_transport(self): return Truck()
+class Truck:
+    def deliver(self): return "deliver by truck"
+\end{lstlisting}
+
+\subsubsection*{Prototype}
+Creates new objects by \emph{cloning} an existing one, preserving complex state, without depending
+on concrete classes. Use when creation is expensive; mind deep vs.\ shallow copy and cycles.
+\begin{lstlisting}[language=Python,caption={Prototype (added)}]
+import copy
+class Document:
+    def __init__(self, content): self.content = content
+    def clone(self): return copy.deepcopy(self)   # deep copy avoids shared state
+template = Document(["header", "body"])
+report = template.clone(); report.content.append("footer")
+\end{lstlisting}
+
+\subsubsection*{Singleton}
+Ensures one instance with a global access point. Use for shared config/logging. Downsides: global
+state, harder testing, possible SRP violation, concurrency hazards.
+\begin{lstlisting}[language=Python,caption={Singleton, thread-safe (added)}]
+import threading
+class Config:
+    _instance, _lock = None, threading.Lock()
+    def __new__(cls):
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = super().__new__(cls)
+        return cls._instance
+\end{lstlisting}
+
+% ------------------------- Structural -------------------------
+\subsection{Structural Patterns}
+
+\subsubsection*{Adapter}
+Wraps an incompatible interface to match what the client expects, reusing existing code unchanged.
+Use for legacy/third-party integration.
+\begin{lstlisting}[language=Python,caption={Adapter (added)}]
+class OldPrinter:                       # adaptee (incompatible)
+    def print_text(self, s): return f"OLD:{s}"
+class Printer:                          # target interface
+    def output(self, s): ...
+class PrinterAdapter(Printer):
+    def __init__(self, old): self.old = old
+    def output(self, s): return self.old.print_text(s)  # translate
+\end{lstlisting}
+
+\subsubsection*{Bridge}
+Separates an abstraction from its implementation so both vary independently (composition over
+inheritance); avoids class explosion across two dimensions of variation.
+
+\subsubsection*{Composite}
+Treats individual objects and groups uniformly via a common interface; models part--whole trees
+(file systems, menus). Mind interfaces that don't fit all node types.
+\begin{lstlisting}[language=Python,caption={Composite (added)}]
+class Node:
+    def size(self): ...
+class File(Node):
+    def __init__(self, n): self.n = n
+    def size(self): return self.n
+class Folder(Node):
+    def __init__(self): self.children = []
+    def size(self): return sum(c.size() for c in self.children)  # recursive
+\end{lstlisting}
+
+\subsubsection*{Decorator}
+Adds responsibilities dynamically by wrapping an object that shares its interface; a flexible
+alternative to subclassing. Order of decorators matters.
+\begin{lstlisting}[language=Python,caption={Decorator (added)}]
+class Coffee:
+    def cost(self): return 2.0
+class MilkDecorator:
+    def __init__(self, c): self.c = c
+    def cost(self): return self.c.cost() + 0.5
+drink = MilkDecorator(MilkDecorator(Coffee()))   # stackable -> 3.0
+\end{lstlisting}
+
+\subsubsection*{Facade}
+Provides a simple interface over a complex subsystem; reduces coupling and exposes only what
+clients need. The subsystem stays accessible for advanced use.
+\begin{lstlisting}[language=Python,caption={Facade (added)}]
+class Facade:
+    def __init__(self, a, b, c): self.a, self.b, self.c = a, b, c
+    def start(self):                # one call hides subsystem orchestration
+        self.a.init(); self.b.load(); return self.c.run()
+\end{lstlisting}
+
+\subsubsection*{Flyweight}
+Minimises memory by sharing \emph{intrinsic} state and passing \emph{extrinsic} state externally;
+a factory reuses instances. Use for huge numbers of similar objects.
+
+\subsubsection*{Proxy}
+A placeholder controlling access to a real object with the same interface; enables lazy creation,
+access control, caching, logging, or remoting.
+\begin{lstlisting}[language=Python,caption={Proxy, lazy loading (added)}]
+class Image:
+    def __init__(self, path): self.path = path; self._load()
+    def _load(self): print("loading", self.path)
+    def draw(self): return self.path
+class ImageProxy:
+    def __init__(self, path): self.path, self._img = path, None
+    def draw(self):
+        if self._img is None: self._img = Image(self.path)  # on demand
+        return self._img.draw()
+\end{lstlisting}
+
+% ------------------------- Behavioral -------------------------
+\subsection{Behavioral Patterns}
+
+\subsubsection*{Chain of Responsibility}
+Passes a request along a chain of handlers until one handles it; sender stays decoupled from
+receivers. Use for approval flows, event handling, middleware. Risk: a request may go unhandled.
+\begin{lstlisting}[language=Python,caption={Chain of Responsibility (added)}]
+class Handler:
+    def __init__(self, nxt=None): self.nxt = nxt
+    def handle(self, lvl):
+        if self.nxt: return self.nxt.handle(lvl)
+class Manager(Handler):
+    def handle(self, lvl):
+        return "approved" if lvl <= 1 else super().handle(lvl)
+class Director(Handler):
+    def handle(self, lvl):
+        return "approved" if lvl <= 3 else "rejected"
+chain = Manager(Director())
+\end{lstlisting}
+
+\subsubsection*{Command}
+Encapsulates a request as an object so it can be stored, queued, logged, or undone; decouples
+invoker from receiver. Use for menus/buttons, queues, undo/redo.
+\begin{lstlisting}[language=Python,caption={Command with undo (added)}]
+class AddText:
+    def __init__(self, doc, text): self.doc, self.text = doc, text
+    def execute(self): self.doc.append(self.text)
+    def undo(self): self.doc.pop()
+history = []
+def run(cmd): cmd.execute(); history.append(cmd)
+def undo(): history.pop().undo()
+\end{lstlisting}
+
+\subsubsection*{Interpreter}
+Represents a small language's grammar as classes that interpret expressions (terminal +
+non-terminal) with a shared context. Good for simple DSLs/rule engines; class count grows fast.
+
+\subsubsection*{Iterator}
+Traverses a collection sequentially without exposing its internals; supports multiple/independent
+traversals. Use to hide structure and standardise iteration.
+\begin{lstlisting}[language=Python,caption={Iterator (added)}]
+class Tree:
+    def __init__(self, items): self.items = items
+    def __iter__(self):            # Python's iterator protocol
+        for x in self.items: yield x
+for node in Tree([1, 2, 3]): print(node)
+\end{lstlisting}
+
+\subsubsection*{Mediator}
+Centralises communication between objects so they don't reference each other directly; reduces
+coupling. Use for complex UIs. Risk: the mediator becoming a ``god object.''
+
+\subsubsection*{Memento}
+Captures and restores an object's internal state without breaking encapsulation; Originator creates
+mementos, a Caretaker stores them. Use for undo/checkpoints; mind memory cost.
+\begin{lstlisting}[language=Python,caption={Memento (added)}]
+class Editor:
+    def __init__(self): self.text = ""
+    def save(self): return self.text          # memento (snapshot)
+    def restore(self, m): self.text = m
+caretaker = []
+e = Editor(); e.text = "v1"; caretaker.append(e.save())
+e.text = "v2"; e.restore(caretaker.pop())      # back to "v1"
+\end{lstlisting}
+
+\subsubsection*{Observer}
+Defines a one-to-many dependency: when the subject changes, all observers are notified
+automatically. Use for events/publish--subscribe and reactive UIs; watch for update storms and
+leaks from unmanaged subscriptions.
+\begin{lstlisting}[language=Python,caption={Observer (added)}]
+class Subject:
+    def __init__(self): self._obs = []
+    def subscribe(self, o): self._obs.append(o)
+    def notify(self, data):
+        for o in self._obs: o.update(data)
+class Display:
+    def update(self, data): print("updated:", data)
+\end{lstlisting}
+
+\subsubsection*{State}
+Lets an object change behaviour when its state changes by delegating to state objects; replaces
+large conditionals. Use for finite state machines/lifecycles.
+\begin{lstlisting}[language=Python,caption={State (added)}]
+class Draft:
+    def publish(self, doc): doc.state = Published()
+class Published:
+    def publish(self, doc): print("already published")
+class Document:
+    def __init__(self): self.state = Draft()
+    def publish(self): self.state.publish(self)
+\end{lstlisting}
+
+\subsubsection*{Strategy}
+Encapsulates interchangeable algorithms behind a common interface, selectable at runtime;
+composition over inheritance; supports Open--Closed.
+\begin{lstlisting}[language=Python,caption={Strategy (added)}]
+class Context:
+    def __init__(self, strategy): self.strategy = strategy
+    def run(self, data): return self.strategy(data)   # plug in any algorithm
+quick = Context(sorted)
+reverse = Context(lambda d: sorted(d, reverse=True))
+\end{lstlisting}
+
+\subsubsection*{Template Method}
+Fixes an algorithm skeleton in a base class while subclasses customise specific steps (and optional
+hooks). Reuses common workflow; relies on inheritance.
+\begin{lstlisting}[language=Python,caption={Template Method (added)}]
+from abc import ABC, abstractmethod
+class Report(ABC):
+    def generate(self):            # the template method (fixed sequence)
+        self.header(); self.body(); self.footer()
+    def header(self): print("=== Report ===")
+    @abstractmethod
+    def body(self): ...            # subclasses fill the variable step
+    def footer(self): print("--- end ---")
+\end{lstlisting}
+
+\subsubsection*{Visitor}
+Separates operations from the objects they act on; add new operations without changing element
+classes (double dispatch). Use when the object structure is stable but operations change often;
+adding a new element type forces changes to every visitor.
+
+
+\section{System Design: An Incremental Approach}
+
+\subsection{Client, Server, and DNS}
+\begin{itemize}
+  \item \textbf{Client} requests services/resources; \textbf{server} listens and provides them.
+        Separation of concerns: clients handle presentation and user interaction; servers manage
+        data, logic, and persistence. Each tier can scale, evolve, and be secured independently.
+  \item \textbf{DNS} maps domain names to IP addresses; decouples human-readable names from
+        physical server locations; enables load distribution (returning different IPs per region),
+        redundancy (one name $\to$ multiple IPs), and service mobility (change IP without changing
+        how users reach you).
+\end{itemize}
+
+\subsection{Databases}
+\begin{itemize}
+  \item Stores, retrieves, and manages data persistently; typically a separate node for independent
+        scaling.
+  \item \textbf{SQL (relational):} table-based, strict schema, ACID transactions, complex joins
+        (PostgreSQL, MySQL). Choose when you need predictable, structured data.
+  \item \textbf{NoSQL (non-relational):} document/graph/key-value/column, schema-flexible,
+        horizontal scaling, high write throughput, unstructured data (MongoDB, Cassandra). Choose
+        for logs, sessions, catalogs, or write-heavy workloads.
+  \item Many system designs use both: SQL for transactions/user accounts, NoSQL for logs/sessions.
+\end{itemize}
+
+\subsection{Scaling}
+\begin{itemize}
+  \item \textbf{Vertical scaling (scale up):} add more CPU/RAM/storage to one server. Simpler but
+        has hardware limits and high unit cost.
+  \item \textbf{Horizontal scaling (scale out):} add more servers. Near-infinite scaling and better
+        fault tolerance, but adds complexity. SQL typically scales vertically; NoSQL is designed for
+        horizontal scaling.
+  \item \textbf{Load balancers} distribute incoming traffic across multiple servers, preventing any
+        single server from being overwhelmed, hiding failures, and routing around unhealthy instances.
+        Common algorithms: round robin, least connections, IP hash, weighted. Sit between clients and
+        servers.
+  \item \textbf{Database replication} copies data from a master to one or more slaves; master handles
+        writes; slaves handle reads; a slave can be promoted to master on failure (high availability).
+\end{itemize}
+
+\subsection{Caching and CDN}
+\begin{itemize}
+  \item \textbf{Cache:} temporarily stores frequently accessed data for faster retrieval (memory instead
+        of disk/DB); reduces latency and load on downstream services.
+        Strategies: read-through, write-through, write-around, write-back.
+        Examples: Redis, Memcached, browser cache, CDN cache.
+  \item \textbf{Cache considerations:} cache what is frequently read and rarely changed (user sessions,
+        product catalogs); set a TTL; handle invalidation carefully (stale data $=$ consistency issues);
+        watch for cache stampede (many simultaneous misses) and plan for warm-up.
+  \item \textbf{CDN:} distributed network of servers delivering content based on geographic location;
+        caches static assets (images, CSS, JS, video) at edge nodes worldwide; reduces latency by
+        serving from the nearest server; offloads traffic and bandwidth from the origin; advanced CDNs
+        also accelerate dynamic content and API caching.
+\end{itemize}
+
+\subsection{Stateful vs.\ Stateless Architecture}
+\begin{itemize}
+  \item \textbf{Stateful:} session data on the server that handled the request; requires sticky sessions
+        (same server per user); complicates load balancing, failover, and scaling.
+  \item \textbf{Stateless:} no session data on the server; each request carries all needed information;
+        any server can handle any request; load balancing is trivial; scaling is easy (just add/remove
+        servers); session data is stored externally (DB, Redis, or client-side token like JWT).
+\end{itemize}
+
+\subsection{GeoDNS and Message Queues}
+\begin{itemize}
+  \item \textbf{GeoDNS:} returns different IP addresses based on the requester's geographic location;
+        directs users to the nearest/most appropriate region; enables content localisation and routing
+        around regional outages. Works alongside CDNs and load balancers.
+  \item \textbf{Message queues:} temporary storage buffers for asynchronous communication between
+        services; producers send without waiting; consumers pull at their own pace; decouples services,
+        improves fault tolerance, handles traffic spikes.
+        Examples: RabbitMQ, Apache Kafka, Amazon SQS, Redis Pub/Sub.
+  \item \textbf{Use cases:} async processing (sending emails), traffic spike absorption, parallel
+        distribution of work across workers, reliable delivery with retries and dead-letter queues.
+\end{itemize}
+
+\subsection{Observability and Supporting Infrastructure}
+\begin{itemize}
+  \item \textbf{Logging:} records discrete events (errors, requests, state) for debugging and audit trails.
+  \item \textbf{Metrics:} numerical measurements (latency, throughput, error rate) for monitoring and
+        alerting.
+  \item \textbf{Automations:} trigger actions based on logs/metrics (auto-scaling, restart failed
+        services); reduce manual intervention and enable self-healing.
+  \item Common stack: ELK (Elasticsearch, Logstash, Kibana) for logs; Prometheus + Grafana for metrics.
+  \item \textbf{API gateway:} single entry point for all client requests; handles routing, authentication,
+        rate limiting, logging, and response aggregation; can aggregate responses from multiple services.
+        NGINX is a widely used high-performance API gateway and reverse proxy.
+  \item \textbf{Object storage:} stores data as objects (data + metadata + unique ID) rather than files or
+        blocks; ideal for unstructured data (images, videos, backups, logs); scales horizontally to
+        petabytes with built-in redundancy. MinIO is a popular S3-compatible implementation.
+\end{itemize}
+
+% -------------------------------------------------------------------
+\section{UI/UX Design}
+
+\subsection{UI vs.\ UX}
+\begin{itemize}
+  \item \textbf{UI (User Interface):} the visual elements users interact with --- buttons, icons, colours,
+        typography, layouts. About how something \emph{looks}.
+  \item \textbf{UX (User Experience):} the overall feeling and ease of use when interacting with a product.
+        About how something \emph{works and feels}.
+  \item Good UI makes the product attractive; good UX makes it usable and efficient.
+  \item UX includes research, user flows, wireframing, prototyping, and usability testing
+        \emph{before} any visual design begins.
+\end{itemize}
+
+\subsection{What Makes Good UX?}
+\begin{itemize}
+  \item Good UX is \emph{invisible} --- users accomplish goals without noticing the interface.
+  \item \textbf{Clarity:} users immediately understand what to do and where to go.
+  \item \textbf{Efficiency:} common tasks take minimal time and effort.
+  \item \textbf{Consistency:} similar actions work similarly across the product.
+  \item \textbf{Feedback:} every user action receives a clear response (visual, audible, or haptic).
+\end{itemize}
+
+\subsection{The UX Design Process}
+\begin{itemize}
+  \item UX Design creates products delivering meaningful and relevant experiences by understanding
+        user needs, behaviours, and pain points through research; covering the full journey from
+        first discovery to long-term use (information architecture, interaction design, usability
+        testing, iteration).
+  \item Process phases: \textbf{Requirements} (user needs, business goals, constraints) $\to$
+        \textbf{Design} (wireframes, prototypes, user flows) $\to$ \textbf{Verification} (testing
+        with real users) $\to$ \textbf{Implementation} (developer handoff and collaboration) $\to$
+        \textbf{Maintenance} (feedback, usage data, iteration).
+  \item \textbf{Sketch} (quick low-fi, ideas) $\to$ \textbf{Design} (high-fi, colours/typography/
+        spacing) $\to$ \textbf{Prototype} (interactive, clickable, simulates real flows). Each stage
+        increases fidelity and catches issues earlier.
+  \item \textbf{Wireframes vs.\ sketches:} sketches are hand-drawn, divergent (many ideas);
+        wireframes are digital, structured, convergent (refine one idea); wireframes use grayscale
+        and placeholders to avoid visual-design distraction.
+\end{itemize}
+
+\subsection{Laws of UX}
+Evidence-based principles from psychology and human behaviour that support design decisions.
+\begin{itemize}
+  \item \textbf{Aesthetic-Usability Effect:} attractive design is perceived as more usable; creates a
+        positive halo but can mask minor usability issues; aesthetics complement, not replace, real
+        usability.
+  \item \textbf{Choice Overload:} too many options overwhelm users and reduce decision quality;
+        satisfaction decreases as option count increases (paradox of choice); limit options to what is
+        necessary.
+  \item \textbf{Chunking:} breaking information into smaller, meaningful groups improves comprehension
+        and reduces cognitive load; effective chunk size is 3--5 items; use visual separation (spacing,
+        borders).
+  \item \textbf{Doherty Threshold:} system response under 400\,ms keeps users in flow; delays $>$1\,s
+        interrupt thought; use loading indicators for unavoidable delays.
+  \item \textbf{Fitt's Law:} time to acquire a target depends on distance and target size; larger/closer
+        targets are faster; edge targets are effectively infinite in size; place important actions
+        (Save, Submit) near the cursor.
+  \item \textbf{Flow:} complete immersion in a task (clear goals, immediate feedback, balanced
+        challenge); interruptions (popups, slow loads) break flow; flow leads to high satisfaction and
+        repeat usage.
+  \item \textbf{Jakob's Law:} users prefer your site to work like sites they already know; familiar
+        patterns reduce learning curve; innovate in functionality, not in basic interaction patterns.
+  \item \textbf{Law of Proximity:} objects near each other are perceived as related; proximity overrides
+        colour and shape for grouping; white space is a powerful grouping tool.
+  \item \textbf{Law of Similarity:} similar elements (colour, shape, size) are perceived as related;
+        consistent styling signals functional relationships; different action types need distinct styling.
+\end{itemize}
+
+\subsection{Tools, Systems, and Collaboration}
+\begin{itemize}
+  \item \textbf{UI Designer vs.\ UX Designer:} UX (how it works and feels --- research, flows,
+        wireframes, testing) comes first; UI (how it looks --- colours, typography, visual hierarchy)
+        comes second; both roles collaborate closely.
+  \item \textbf{Design system:} a collection of reusable components, patterns, and standards (UI
+        components, design tokens, usage guidelines); ensures consistency across products/teams/
+        platforms; speeds up development by eliminating repeated decisions. Examples: Google
+        Material Design, IBM Carbon, Atlassian Design System, Shopify Polaris.
+  \item \textbf{UI kits:} pre-designed interface elements (buttons, inputs, cards, modals, icons,
+        nav bars); often the visual implementation of a design system's components; examples: Figma
+        UI kits, Bootstrap, Ant Design, Chakra UI, Tailwind UI.
+  \item \textbf{Figma:} cloud-based, real-time collaborative design tool; supports wireframing,
+        high-fi mockups, interactive prototypes, and developer handoff; key features: auto layout,
+        components, variants, plugins, version history; the current industry standard.
+\end{itemize}
+
+% =====================================================================
+\part{Engineering Practices \emph{(Course Extras)}}
+% =====================================================================
+
+\section{Introduction to DevOps}
+
+\subsection{What is DevOps?}
+\begin{itemize}
+  \item A cultural and technical movement that bridges development (Dev) and operations (Ops) teams.
+  \item Emphasises collaboration, automation, and shared responsibility throughout the software
+        lifecycle.
+  \item Goal: deliver software faster, more reliably, and with fewer errors.
+  \item Key practices: continuous integration, continuous delivery, infrastructure as code, monitoring,
+        and logging.
+  \item DevOps is \emph{not} a tool or a job title --- it is a mindset and a set of practices.
+\end{itemize}
+
+\subsection{The Problems Before DevOps}
+\begin{itemize}
+  \item Development and operations worked in separate silos with conflicting goals: Dev wanted to push
+        changes fast; Ops wanted stability.
+  \item Long release cycles with integration happening at the end caused ``integration hell.''
+  \item Deployments were manual, risky, and infrequent (weeks or months).
+  \item Bugs found late in the cycle were expensive and time-consuming to fix.
+\end{itemize}
+
+\subsection{How DevOps Works}
+\begin{itemize}
+  \item Breaks down silos by uniting development, operations, and QA; shared responsibility.
+  \item Automation replaces manual handoffs and repetitive tasks.
+  \item Feedback loops are shortened: issues caught earlier, fixed faster.
+  \item Outcome: faster delivery, higher quality, less friction.
+\end{itemize}
+
+\subsection{CI/CD}
+\begin{itemize}
+  \item \textbf{Continuous Integration (CI):} developers merge code into a shared repository multiple
+        times per day; requires automated builds and tests to catch integration issues immediately.
+  \item \textbf{Continuous Delivery (CD):} software is always in a deployable state after the CI
+        pipeline passes; automates the release process so any passing build can be deployed with
+        one click.
+  \item Together, CI/CD enables faster feedback, lower risk, and frequent reliable deployments.
+\end{itemize}
+
+\subsection{DevOps, Agile, and System Design}
+\begin{itemize}
+  \item Agile produces potentially shippable code; DevOps ensures it is \emph{actually} deployable
+        at the end of every sprint by automating the ``last mile'' from commit to production.
+  \item \textbf{Agile + DevOps} $=$ fast development AND fast, reliable deployment.
+  \item DevOps shapes system design: \textbf{design for deployability} (zero-downtime blue-green/
+        canary), \textbf{observability} (logs/metrics/traces built in from day one), \textbf{automation}
+        (infra provisioned as code), \textbf{failure} (graceful rollback), and \textbf{testability}
+        (each component independently testable).
+\end{itemize}
+
+\subsection{The CI/CD Pipeline}
+\begin{itemize}
+  \item \textbf{Source:} developer pushes code to version control (Git).
+  \item \textbf{Build:} compile, resolve dependencies, create artifacts.
+  \item \textbf{Test:} unit tests, integration tests, static analysis.
+  \item \textbf{Deploy to staging:} production-like environment for further validation.
+  \item \textbf{Release to production:} after approval --- automatically or manually.
+\end{itemize}
+
+\subsection{Environments, Tools, and Culture}
+\begin{itemize}
+  \item \textbf{Environments} are isolated system instances for different lifecycle stages:
+        development (local coding/testing), staging (pre-production validation), production (live users).
+  \item \textbf{Your DevOps tool stack:} version control (Git/GitHub/GitLab), CI/CD (Jenkins/
+        GitHub Actions/GitLab CI), containerisation and orchestration (Docker, Kubernetes), IaC
+        (Terraform, Ansible), monitoring (Prometheus, Grafana).
+  \item \textbf{Infrastructure as Code (IaC):} manage and provision infrastructure through
+        machine-readable definition files; servers, networks, databases, and load balancers defined
+        as code in version control; repeatable, testable, and versioned like application code.
+  \item \textbf{A pipeline alone does not mean DevOps:} true DevOps requires the culture --- shared
+        responsibility, collaboration, and continuous improvement; without the culture it is just
+        automation.
+\end{itemize}
+
+
+\section{Docker}
+
+\subsection{Why Containers}
+\begin{itemize}
+  \item Solves ``it works on my machine'': the app and \emph{all} its dependencies travel together
+        and run consistently everywhere; deployment is faster and more reliable.
+  \item \textbf{Containers vs.\ VMs:} VMs bundle a full guest OS; containers \emph{share the host
+        kernel}, so they are smaller, start faster, and pack more per host. VMs give stronger
+        isolation at higher overhead.
+\end{itemize}
+
+\subsection{Ecosystem \& Concepts}
+\begin{itemize}
+  \item Workflow: \textbf{Dockerfile $\to$ Image $\to$ Registry $\to$ Container}.
+  \item An \textbf{image} is a read-only template; a \textbf{container} is a running instance of an
+        image with its own processes/network/filesystem changes.
+  \item \textbf{Lifecycle:} \texttt{build} an image $\to$ \texttt{run} a container $\to$
+        stop/restart/pause $\to$ remove and recreate from the same image.
+  \item \textbf{Under the hood:} Linux \emph{namespaces} (isolation), \emph{cgroups} (resource
+        limits), layered images, and a background \emph{daemon}. On macOS/Windows, Docker Desktop
+        runs a Linux VM / WSL\,2 so the same Linux container runs everywhere.
+\end{itemize}
+
+\begin{lstlisting}[language=,caption={Single-stage Dockerfile (from the slides)}]
+FROM python:3.12-slim
+WORKDIR /app
+COPY . .
+RUN pip install -r requirements.txt
+CMD ["python", "app.py"]
+\end{lstlisting}
+
+\begin{lstlisting}[language=,caption={Multi-stage build keeps the final image small (added)}]
+# build stage: has compilers/build tools
+FROM golang:1.22 AS build
+WORKDIR /src
+COPY . .
+RUN go build -o /bin/app
+
+# final stage: only the artifact, smaller + smaller attack surface
+FROM gcr.io/distroless/static
+COPY --from=build /bin/app /app
+ENTRYPOINT ["/app"]
+\end{lstlisting}
+
+\subsection{Dockerfile Details}
+\begin{itemize}
+  \item \textbf{Layers:} each instruction is an immutable, cacheable layer; put frequently changing
+        steps near the end to maximise cache reuse.
+  \item \textbf{CMD vs.\ ENTRYPOINT:} \texttt{ENTRYPOINT} is the always-run executable;
+        \texttt{CMD} gives default args/command. \texttt{docker run} args override \texttt{CMD} but
+        are \emph{appended} to \texttt{ENTRYPOINT}. Common pattern: \texttt{ENTRYPOINT} $=$ app,
+        \texttt{CMD} $=$ default options. \emph{For a multi-directive startup, use an entrypoint
+        script:} \texttt{ENTRYPOINT ["./entrypoint.sh"]}.
+  \item \textbf{ADD vs.\ COPY:} prefer \texttt{COPY}; use \texttt{ADD} only for its extras
+        (auto-extract local archives, fetch URLs --- rarely recommended).
+  \item \textbf{EXPOSE vs.\ port mapping:} \texttt{EXPOSE} only documents a port;
+        \texttt{-p 8080:80} (host:container) actually publishes it.
+\end{itemize}
+
+\begin{lstlisting}[language=bash,caption={Common Docker commands (added)}]
+docker build -t myapp:1.0 .       # image from Dockerfile
+docker run -d -p 8080:80 myapp    # start container, publish port
+docker ps                         # running containers
+docker stop <id>                  # graceful stop
+docker images                     # local images
+\end{lstlisting}
+
+\subsection{Compose, Volumes, Networks}
+\begin{itemize}
+  \item \textbf{Docker Compose} declares multi-container apps in \texttt{compose.yaml};
+        \texttt{docker compose up} starts the whole stack and a dedicated network.
+  \item \textbf{Volumes} give persistent storage independent of a container's life; shareable
+        across containers; mount read-only with \texttt{:ro} when you only need to read.
+  \item \textbf{Networks:} \texttt{bridge} (default, same host), \texttt{host} (no isolation),
+        \texttt{none} (no networking), \texttt{overlay} (multi-host clusters), \texttt{macvlan}
+        (own MAC/IP). Containers on the same network reach each other by name.
+  \item \textbf{Registries:} public Docker Hub (repos + tags like \texttt{latest}/\texttt{v1.0});
+        private (Artifactory, Nexus) for access control, scanning, compliance.
+  \item \textbf{Swarm} is Docker's native orchestrator (replicas, load balancing, failover) but is
+        largely superseded by Kubernetes. \textbf{Podman} is a daemonless, rootless,
+        Docker-compatible alternative.
+\end{itemize}
+
+\begin{lstlisting}[language=,caption={compose.yaml: web + db with a volume and read-only mount (added)}]
+services:
+  web:
+    build: .
+    ports: ["8080:80"]
+    depends_on: [db]
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - dbdata:/var/lib/postgresql/data        # persistent
+      - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro  # read-only
+volumes:
+  dbdata:
+\end{lstlisting}
+
+\section{DevOps \& CI/CD Tools}
+
+\subsection{Pipelines}
+\begin{itemize}
+  \item CI/CD tools automate build/test/deploy, reduce human error, give fast feedback, and create
+        a shared, consistent workflow.
+  \item A \textbf{pipeline} is an automated sequence of stages (integrate $\to$ build $\to$ test
+        $\to$ security $\to$ deploy); each stage validates before the next; fail early.
+  \item \textbf{Designing a pipeline:} identify build/test/deploy stages, add quality gates
+        (unit tests, static analysis, security scans), order stages to fail fast, configure
+        dev/staging/prod deploys, then monitor and optimise.
+  \item \textbf{Infrastructure as Code (IaC):} provision via version-controlled config (Terraform,
+        Ansible) for repeatable, consistent environments.
+\end{itemize}
+
+\subsection{The Tools}
+\begin{itemize}
+  \item \textbf{Jenkins:} open-source automation server; huge plugin ecosystem; pipelines as code
+        in a \texttt{Jenkinsfile}.
+  \item \textbf{GitHub Actions:} CI/CD built into GitHub; workflows in
+        \texttt{.github/workflows/*.yml}; large action marketplace; no extra servers.
+  \item \textbf{GitLab CI/CD:} built-in; pipelines in \texttt{.gitlab-ci.yml}; jobs run on Runners.
+  \item \textbf{CircleCI:} cloud CI/CD; YAML config; parallelism and caching.
+  \item \textbf{Terraform} (HashiCorp): declarative IaC; multi-provider (AWS/Azure/GCP/Kubernetes);
+        shows an execution plan before applying.
+  \item \textbf{Artifact repositories} (Artifactory, Nexus, Docker Hub, GHCR): store versioned
+        build outputs so the \emph{same} build deploys to every environment.
+  \item \textbf{Kubernetes (K8s):} container orchestration --- scheduling, load balancing, service
+        discovery, rolling updates, self-healing, scaling.
+  \item \textbf{AI in CI/CD:} code generation/review, predicting build failures/anomalies, test
+        generation/prioritisation, and intelligent log/metric analysis for faster incident response.
+\end{itemize}
+
+\subsection{Real-World Flow}
+Push to GitHub triggers Actions $\to$ build + test + scan $\to$ Docker builds an image pushed to a
+registry $\to$ Terraform provisions/updates infra $\to$ deploy to production $\to$ monitor.
+
+\begin{lstlisting}[language=,caption={GitHub Actions workflow (added)}]
+name: ci
+on: [push]
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements.txt
+      - run: pytest --cov=app
+      - run: docker build -t ghcr.io/org/app:${{ github.sha }} .
+\end{lstlisting}
+
+\begin{lstlisting}[language=,caption={Declarative Jenkinsfile (added)}]
+pipeline {
+  agent any
+  stages {
+    stage('Build') { steps { sh 'make build' } }
+    stage('Test')  { steps { sh 'make test'  } }
+    stage('Deploy'){ when { branch 'main' }
+                     steps { sh 'make deploy' } }
+  }
+}
+\end{lstlisting}
+
+\section{Microservices in Practice}
+
+\subsection{From Monolith to Services}
+\begin{itemize}
+  \item Monolith pains: huge codebases, one failure can sink everything, must scale the whole
+        system, team conflicts, slow/risky deploys.
+  \item Cloud computing + pioneers (Netflix, Amazon) made small independent services practical:
+        each owns a business capability, communicates via lightweight APIs/messaging, and deploys
+        and scales independently.
+\end{itemize}
+
+\subsection{Designing Services with DDD}
+\begin{itemize}
+  \item Organise around business capabilities, not technical layers; clear single responsibility;
+        minimal cross-service dependencies; stable APIs; ``small enough to manage, large enough to
+        be meaningful.''
+  \item \textbf{Domain-Driven Design:} model around real domains; split into \textbf{bounded
+        contexts} (often one per microservice).
+  \item \textbf{Ubiquitous language:} one shared vocabulary across talk, docs, and code to prevent
+        misunderstanding.
+  \item \textbf{Teams} own a service's full lifecycle; autonomy enables faster delivery and free
+        technology choice.
+\end{itemize}
+
+\subsection{Communication}
+\begin{itemize}
+  \item Synchronous (REST, gRPC) or asynchronous (message brokers); keep services loosely coupled;
+        handle timeouts/retries/errors.
+  \item \textbf{gRPC:} high-performance RPC using Protocol Buffers; binary serialisation (faster
+        than JSON); multi-language code generation; great for low-latency calls.
+  \item \textbf{Service discovery:} register/find instances dynamically (Consul, Eureka, K8s DNS).
+  \item \textbf{API gateway:} single client entry point for auth, routing, rate limiting,
+        aggregation (Kong, NGINX, Spring Cloud Gateway).
+  \item \textbf{Workflows} span services via orchestration or choreography; design for failures,
+        retries, and consistency.
+\end{itemize}
+
+\begin{lstlisting}[language=,caption={gRPC service contract (.proto) (added)}]
+syntax = "proto3";
+service OrderService {
+  rpc PlaceOrder (OrderRequest) returns (OrderReply);
+}
+message OrderRequest { string item = 1; int32 qty = 2; }
+message OrderReply   { string order_id = 1; bool ok = 2; }
+\end{lstlisting}
+
+\subsection{Building, Releasing, Testing, Operating}
+\begin{itemize}
+  \item Independent deployable units behind well-defined, \emph{versioned} APIs; package with
+        containers and CI/CD.
+  \item \textbf{Release strategies:} blue-green and canary reduce risk; keep rollback/monitoring.
+  \item \textbf{Testing layers:} unit, integration, \emph{contract} (API compatibility between
+        services), end-to-end.
+  \item \textbf{Security:} authn/authz, TLS everywhere, secure storage/transit, least privilege,
+        regular security testing.
+  \item \textbf{Observability:} metrics (health/perf), centralised logging, distributed tracing
+        across services.
+  \item \textbf{Challenges:} operational/architectural complexity, unreliable network calls,
+        distributed data, hard debugging --- needs strong automation/DevOps.
+  \item \emph{Do you need them?} Often a monolith is more efficient for small projects; benefits
+        grow with system/team size. Decide by business need, not trend.
+\end{itemize}
+
+\section{More Software Development Methodologies}
+\begin{itemize}
+  \item \textbf{Disciplined Agile Delivery (DAD)} --- Ambler \& Lines, 2012: a process-\emph{decision}
+        framework covering the full delivery lifecycle, blending Scrum/XP/Kanban/Lean/Agile
+        Modeling, with flexibility plus governance. Phases: \emph{Inception}, \emph{Construction},
+        \emph{Transition}.
+  \item \textbf{Dynamic Systems Development Method (DSDM):} agile delivery with strong governance;
+        early/frequent business value; active user involvement. Roles: Business Sponsor, Business
+        Visionary, Technical Coordinator, Team Leader, Solution Developers/Testers. Phases:
+        Feasibility $\to$ Foundations $\to$ Evolutionary Development $\to$ Deployment $\to$
+        Post-Project.
+  \item \textbf{Rational Unified Process (RUP):} iterative (Rational/IBM); disciplined PM,
+        documentation, continuous risk reduction. Phases: Inception $\to$ Elaboration $\to$
+        Construction $\to$ Transition, each with multiple iterations.
+  \item \textbf{Lean Software Development:} Toyota-inspired; maximise customer value, eliminate
+        waste, decide from learning/feedback, deliver in small increments, improve continuously.
+  \item \textbf{There is no single ``correct'' methodology:} pick and adapt practices to goals,
+        constraints, and stakeholders; the best one consistently delivers value, quality, and
+        satisfaction.
+\end{itemize}
+
+\section{Software Documentation}
+\begin{itemize}
+  \item \textbf{Problem it solves:} early projects relied on individual knowledge; undocumented
+        decisions made systems hard to understand, maintain, and grow.
+  \item \textbf{What to document:} requirements/specs, architecture \& design decisions, code
+        organisation/key components, install/deploy/config, user guides \& maintenance.
+  \item \textbf{What \emph{not} to document:} obvious self-explanatory code, duplicated info,
+        temporary details, outdated/inaccurate info, excessive detail.
+  \item \textbf{Types:} user, developer, system, API, process documentation.
+  \item \textbf{Good docs} are clear, accurate, appropriately detailed, well organised, and kept
+        up to date.
+  \item \textbf{Best practices:} write for the audience; concise language; examples/diagrams; keep
+        in sync with the software; consistent organisation.
+  \item \textbf{Tools:} Markdown, Doxygen/Javadoc (generate from source), Sphinx, MkDocs, Swagger
+        (APIs), wikis, version control.
+  \item \textbf{Reading docs:} identify purpose/audience; scan the table of contents; focus on
+        task-relevant sections; study examples/diagrams; follow references.
+  \item \textbf{References vs.\ guides:} references give precise technical detail (functions,
+        classes, APIs); guides teach tasks step-by-step. Good documentation provides both.
+  \item \textbf{Key takeaway:} documentation is part of development, differs by stakeholder, must
+        stay accurate/current, reduces maintenance/risk, and evolves with the system.
+\end{itemize}
+
+\begin{lstlisting}[language=Python,caption={Docstring that Sphinx/IDEs can render (added)}]
+def transfer(amount: float, src: str, dst: str) -> bool:
+    """Move funds between accounts.
+
+    Args:
+        amount: positive amount to transfer.
+        src: source account id.
+        dst: destination account id.
+    Returns:
+        True if the transfer succeeded.
+    Raises:
+        ValueError: if amount <= 0.
+    """
+\end{lstlisting}
+
+\section{Software Testing}
+\begin{itemize}
+  \item Evaluating a system to detect defects; ensures requirements are met; improves quality,
+        reliability, and satisfaction; manual or automated; reduces post-deployment failure risk.
+  \item \textbf{Throughout the SDLC:} starts at requirements (catch issues early), developer
+        testing during implementation, dedicated validation phases, and continuous testing during
+        maintenance so changes don't introduce regressions.
+\end{itemize}
+
+\subsection{Methods \& Levels}
+\begin{itemize}
+  \item \textbf{Ad-hoc:} informal exploration, no scripted cases; best with strong domain knowledge.
+  \item \textbf{Manual:} act as an end user; great for usability/UX/visuals.
+  \item \textbf{Automated:} tools/scripts; ideal for repetitive tests and CI/CD; upfront cost,
+        long-term savings.
+  \item \textbf{Unit:} individual functions/classes in isolation; written by developers; JUnit,
+        NUnit, pytest.
+  \item \textbf{Integration:} interfaces and data exchange between modules.
+  \item \textbf{System:} the complete integrated app against all requirements, from a user view.
+  \item \textbf{Smoke:} quick check that critical functionality works after a build.
+  \item \textbf{Regression:} ensure changes haven't broken existing features; usually automated.
+\end{itemize}
+
+\subsection{Coverage, Edge Cases, Critical Paths}
+\begin{itemize}
+  \item \textbf{Coverage} (statements/branches/functions) shows what tests exercise; higher is
+        better but 100\% doesn't guarantee bug-free; use it to find untested areas.
+  \item \textbf{Edge cases:} boundary/min/max/unusual inputs --- rare but defect-prone.
+  \item \textbf{Critical paths:} the most-used, highest-impact workflows (auth, payments, data
+        persistence) --- test these first.
+\end{itemize}
+
+\subsection{Mocking \& Test Design}
+\begin{itemize}
+  \item \textbf{Mocking / test doubles} replace real dependencies (DB, APIs, filesystem) with
+        configurable simulations for isolated, fast, controllable tests.
+  \item \emph{Clean Architecture helps mocking} because the dependency rule and interfaces in the
+        inner layers let you substitute outer-layer implementations (DB/HTTP) with test doubles ---
+        the use cases depend on abstractions, not concrete tools.
+  \item \textbf{Design tests} from requirements; cover normal, edge, and invalid inputs; prioritise
+        critical workflows; keep tests independent/repeatable/readable; use coverage to find gaps.
+\end{itemize}
+
+\begin{lstlisting}[language=Python,caption={Unit test with a mock (pytest) (added)}]
+from unittest.mock import Mock
+
+def notify(user_id, gateway):
+    return gateway.send(user_id, "hi")
+
+def test_notify_calls_gateway():
+    gw = Mock()                       # test double
+    gw.send.return_value = True
+    assert notify(42, gw) is True
+    gw.send.assert_called_once_with(42, "hi")
+\end{lstlisting}
+
+\subsection{Higher-Level \& Specialised Testing}
+\begin{itemize}
+  \item \textbf{End-to-End (E2E):} complete user workflows in a production-like environment;
+        valuable but slow/expensive to maintain.
+  \item \textbf{In Continuous Delivery:} automated unit/integration/E2E run at multiple pipeline
+        stages; fast feedback; results gate promotion; enables frequent quality releases.
+  \item \textbf{Black-box vs.\ white-box:} behaviour from inputs/outputs vs.\ internal
+        logic/paths/coverage --- complementary.
+  \item \textbf{Shadow testing:} run a new system alongside production on real inputs (no user
+        impact) and compare outputs to find discrepancies before release.
+  \item \textbf{User Acceptance Testing (UAT):} business stakeholders validate real workflows; the
+        final gate before deployment.
+  \item \textbf{Performance testing:} behaviour under load --- response time, throughput, resource
+        use, bottlenecks. \textbf{Security testing:} vulnerabilities --- unauthorised access, data
+        leaks, injection. Together they ensure reliability and resilience.
+\end{itemize}
+
+
+% =====================================================================
+\part{Epilogue}
+% =====================================================================
+
+\section{The Epilogue: Looking Back \& Forward}
+
+\subsection{What This Course Covered}
+\begin{itemize}
+  \item Planning, Agile, Scrum, and requirements gathering.
+  \item Software architecture characteristics and patterns (MVC, Clean, Microservices).
+  \item UML: structural diagrams (Class, Object, Component, Deployment) and behavioural
+        diagrams (Use Case, Sequence, Activity, State).
+  \item System design: DNS, load balancers, caching, message queues, stateless architecture,
+        CDNs, and object storage.
+  \item UI/UX: laws of UX, wireframes, prototypes, design systems, and Figma.
+  \item DevOps: CI/CD, pipelines, infrastructure as code, Docker, Kubernetes.
+\end{itemize}
+
+\subsection{Career Paths}
+\begin{itemize}
+  \item \textbf{Product Owner:} defines requirements, manages the backlog, and prioritises features
+        for business value.
+  \item \textbf{Architecture Owner:} designs the high-level structure, chooses patterns, and ensures
+        technical quality.
+  \item \textbf{DevOps Engineer:} builds CI/CD pipelines, manages infrastructure, and automates
+        deployments.
+  \item \textbf{UI/UX Designer:} researches users, creates wireframes and prototypes, and crafts
+        intuitive interfaces.
+  \item \textbf{Software Engineer (SWE):} writes code, implements features, fixes bugs, and makes the
+        design real.
+\end{itemize}
+
+\subsection{AI and the Software Engineer}
+\begin{itemize}
+  \item AI will \emph{augment} SWEs, not replace them; it handles boilerplate, suggestions, and
+        simple tasks.
+  \item Complex system design, architecture decisions, and trade-off reasoning still require human
+        judgement.
+  \item Understanding business requirements and translating them into technical solutions is a human
+        skill; so is debugging subtle issues, performance tuning, and maintaining legacy systems.
+  \item SWEs who use AI become more productive; those who ignore it may fall behind.
+  \item Use AI for boilerplate, refactoring, explaining concepts, and reviewing designs --- then focus
+        your own energy on creativity, architecture, and problem-solving.
+\end{itemize}
+
+\subsection{Soft Skills and Mindset}
+\begin{itemize}
+  \item \textbf{Communication:} explaining technical decisions to non-technical stakeholders is a
+        superpower.
+  \item \textbf{Trade-offs:} every decision involves trade-offs; there is no perfect solution.
+  \item \textbf{Documentation:} future you and your teammates will thank you for clear, up-to-date
+        docs.
+  \item \textbf{Continuous learning:} technology changes fast; fundamentals (patterns, principles)
+        stay relevant.
+  \item \textbf{Fail fast, learn faster:} mistakes in design, code, or deployment are opportunities,
+        not failures.
+\end{itemize}
+
+\subsection{Practical Next Steps}
+\begin{itemize}
+  \item Build something small end-to-end: from requirements to UI to backend to deployment.
+  \item Contribute to open source to see how real systems are designed and reviewed.
+  \item Practice system design with friends or on a whiteboard.
+  \item Learn one tool deeply from each category (Git, Docker, Figma, etc.) instead of skimming all.
+  \item Find a mentor or community to review your designs and code.
+  \item You don't need to master everything at once --- start with what you use daily; every expert
+        was once a beginner who refused to give up.
+\end{itemize}
+
+% =====================================================================
+\part{Cheat Sheet}
+% =====================================================================
+A condensed, exam-oriented reference distilled from the whole course.
+
+\section{Methodology Selection ``Pick Your Poison''}
+\label{sec:cheat-methodology}
+\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{\color{capri}Usefulness for} & \textbf{Water-fall} & \textbf{Parallel} & \textbf{Phased} & \textbf{Proto-typing} & \textbf{Throwaway} & \textbf{XP} \\
+\hline
+Unclear user requirements & Poor & Poor & Good  & Great & Great & Great \\ \hline
+Unfamiliar technology     & Poor & Poor & Good  & Poor  & Great & Poor  \\ \hline
+Complex systems           & Good & Good & Good  & Poor  & Great & Poor  \\ \hline
+Reliable systems          & Good & Good & Good  & Poor  & Great & Good  \\ \hline
+Short time schedule       & Poor & Good & Great & Great & Good  & Great \\ \hline
+Schedule visibility       & Poor & Poor & Great & Great & Good  & Good  \\ \hline
+\end{tabular}
+
+\section{Roles, Requirements \& Quick Mnemonics}
+\begin{itemize}
+  \item \textbf{Dev-process roles:} owner (funds) $\cdot$ user (uses) $\cdot$ analyst (what) $\cdot$
+        designer (how) $\cdot$ builder (constructs) $\cdot$ PM (controls) $\cdot$ ESP (external).
+  \item \textbf{Scrum roles:} Product Owner (value, backlog) $\cdot$ Scrum Master (process,
+        impediments) $\cdot$ Dev Team (build, self-organise, 5--9).
+  \item \textbf{Scrum artifacts:} Product Backlog $\cdot$ Sprint Backlog $\cdot$ Increment.
+  \item \textbf{Scrum events:} Sprint $\cdot$ Sprint Planning $\cdot$ Daily Stand-up ($\le$15\,min)
+        $\cdot$ Review $\cdot$ Retrospective $\cdot$ Backlog Refinement.
+  \item \textbf{DoR} (ready before sprint) vs.\ \textbf{DoD} (done = shippable).
+  \item \textbf{3 Cs:} Card $\cdot$ Conversation $\cdot$ Confirmation.
+  \item \textbf{Story sizes:} Epic (months) $>$ Theme (weeks) $>$ Sprintable story (days) $>$ Task (hours).
+  \item \textbf{INVEST:} Independent, Negotiable, Valuable, Estimatable, Small, Testable.
+  \item \textbf{DEEP backlog:} Detailed appropriately, Emergent, Estimated, Prioritized.
+  \item \textbf{Retro questions:} continue / stop / start.
+  \item \textbf{Burndown} = remaining work down to 0; \textbf{Burnup} = completed work up to target.
+\end{itemize}
+
+\section{Feasibility \& Economics}
+\begin{itemize}
+  \item \textbf{Feasibility types:} Operational, Technical, Economic, Schedule, Legal, Cultural.
+  \item \textbf{Matrices:} Candidate Systems (compare) $\cdot$ Feasibility Analysis (rank, weighted).
+\end{itemize}
+\noindent{\color{capri}
+\[ PV=\frac{FV}{(1+i)^n}\quad
+   \text{ROI}=\frac{B-C}{C}\cdot 100\%\quad
+   \text{NPV}=\sum_{t=0}^{n}\frac{B_t-C_t}{(1+i)^t}\;(\text{accept if }>0) \]
+\[ \text{People}=\frac{\text{person-months}}{\text{months}}\quad
+   \text{Comm.\ lines}=\frac{n(n-1)}{2}\quad
+   \text{Sprints}=\frac{\text{size}}{\text{velocity}} \]
+}
+
+\section{UML \& Modeling}
+\begin{itemize}
+  \item \textbf{Structural diagrams:} class, package, deployment.
+  \item \textbf{Behavioral diagrams:} use case, sequence, activity, state machine.
+  \item \textbf{Use-case relations:} association $\cdot$ $\langle\langle$uses/includes$\rangle\rangle$
+        $\cdot$ $\langle\langle$extends$\rangle\rangle$ $\cdot$ $\langle\langle$depends on$\rangle\rangle$
+        $\cdot$ inheritance.
+  \item \textbf{State machine:} state, transition, event, guard, action, initial/final, composite,
+        superstate, concurrent regions.
+  \item \textbf{Process models:} DFD, BPM/BPMN (events, activities, gateways, sequence flows,
+        pools/lanes). \textbf{Data model:} ERD. \textbf{Object model:} class/sequence/collaboration.
+\end{itemize}
+
+\section{Pattern Catalogue}
+\renewcommand{\arraystretch}{1.25}
+\noindent\begin{tabular}{|l|l|}
+\hline
+\textbf{\color{capri}Category} & \textbf{\color{capri}Patterns} \\
+\hline
+Architectural & MVC, MVVM, Layered (n-tier), Clean, Microkernel, Microservices \\ \hline
+Creational    & Abstract Factory, Builder, Factory Method, Prototype, Singleton \\ \hline
+Structural    & Adapter, Bridge, Composite, Decorator, Facade, Flyweight, Proxy \\ \hline
+Behavioral    & Chain of Responsibility, Command, Interpreter, Iterator, Mediator, \\
+              & Memento, Observer, State, Strategy, Template Method, Visitor \\ \hline
+\end{tabular}
+
+\subsection*{One-line intents (most-tested)}
+\begin{itemize}
+  \item \textbf{Singleton} --- one instance, global access.
+  \item \textbf{Factory Method} --- subclass decides the concrete class.
+  \item \textbf{Abstract Factory} --- create whole families of related objects.
+  \item \textbf{Builder} --- step-by-step construction of complex objects.
+  \item \textbf{Adapter} --- make an incompatible interface fit.
+  \item \textbf{Decorator} --- add responsibilities by wrapping.
+  \item \textbf{Facade} --- one simple interface over a complex subsystem.
+  \item \textbf{Proxy} --- controlled/lazy access via the same interface.
+  \item \textbf{Composite} --- treat part and whole uniformly (trees).
+  \item \textbf{Observer} --- one-to-many auto-notification (events).
+  \item \textbf{Strategy} --- interchangeable algorithms chosen at runtime.
+  \item \textbf{Command} --- request as object (queue/log/undo).
+  \item \textbf{State} --- behaviour changes with state (FSM).
+  \item \textbf{Template Method} --- fixed skeleton, customisable steps.
+  \item \textbf{Chain of Responsibility} --- pass a request along handlers.
+\end{itemize}
+
+\section{DevOps, Docker \& Testing Quick Reference}
+\begin{itemize}
+  \item \textbf{Docker flow:} Dockerfile $\to$ Image $\to$ Registry $\to$ Container.
+  \item \textbf{Image} = read-only template; \textbf{Container} = running instance.
+  \item \textbf{CMD} = default args (overridable); \textbf{ENTRYPOINT} = always-run executable.
+  \item \textbf{COPY} preferred over \textbf{ADD}; \textbf{EXPOSE} documents, \texttt{-p} publishes.
+  \item \textbf{Networks:} bridge / host / none / overlay / macvlan.
+  \item \textbf{Pipeline stages:} integrate $\to$ build $\to$ test $\to$ security $\to$ deploy
+        (fail early).
+  \item \textbf{IaC:} Terraform, Ansible. \textbf{Orchestration:} Kubernetes.
+  \item \textbf{Test levels:} unit $\to$ integration $\to$ system $\to$ E2E; plus smoke, regression,
+        contract, shadow, UAT, performance, security.
+  \item \textbf{Black-box} (behaviour) vs.\ \textbf{white-box} (internal logic/coverage).
+  \item \textbf{Release strategies:} blue-green, canary.
+\end{itemize}
+
+\section{Microservices \& Architecture Decisions}
+\begin{itemize}
+  \item \textbf{DDD:} bounded contexts ($\approx$ one per service) + ubiquitous language.
+  \item \textbf{Comms:} REST/gRPC (sync) or message brokers (async); loose coupling;
+        retries/timeouts.
+  \item \textbf{Infra:} API gateway, service discovery, observability (metrics, logs, tracing).
+  \item \textbf{Rule of thumb:} start with a monolith; split to microservices when team/system size
+        and differing scaling needs justify the operational cost.
+\end{itemize}
+
+
+\section{System Design Quick Reference}
+\begin{itemize}
+  \item \textbf{Client--Server:} presentation/interaction (client) vs.\ data/logic/persistence (server).
+  \item \textbf{DNS:} domain names $\to$ IPs; enables load distribution, redundancy, service mobility.
+  \item \textbf{SQL vs.\ NoSQL:} SQL = ACID, structured, joins; NoSQL = flexible schema, horizontal
+        scaling, high write throughput.
+  \item \textbf{Scaling:} vertical (add power to one server, limited); horizontal (add servers, complex
+        but near-infinite). SQL scales vertically; NoSQL scales horizontally.
+  \item \textbf{Load balancer:} distributes traffic; hides failures. Algorithms: round robin, least
+        connections, IP hash.
+  \item \textbf{DB replication:} master (writes) $\to$ slaves (reads); slave promoted on master failure.
+  \item \textbf{Cache:} serve from memory; strategies: read-through, write-through, write-around,
+        write-back. Set TTL; handle invalidation. Watch for stampede.
+  \item \textbf{CDN:} edge servers geographically near users; caches static assets; reduces latency
+        and origin load.
+  \item \textbf{Stateless architecture:} no server-side session; any server can handle any request;
+        session in DB/Redis/JWT. Enables horizontal scaling.
+  \item \textbf{GeoDNS:} returns different IPs by user location; combines with CDNs/load balancers.
+  \item \textbf{Message queue:} async decoupling; producers write, consumers read at own pace.
+        Examples: RabbitMQ, Kafka, SQS.
+  \item \textbf{Observability stack:} ELK (logs), Prometheus + Grafana (metrics), distributed
+        tracing.
+  \item \textbf{API gateway:} single entry point; routing, auth, rate limiting, aggregation (NGINX).
+  \item \textbf{Object storage:} unstructured data (images, video, backups) as objects with metadata
+        and unique IDs; S3-compatible (MinIO).
+  \item \textbf{Arch characteristics:} Availability, Reliability, Testability, Scalability, Security,
+        Agility, Fault Tolerance, Elasticity, Recoverability, Performance, Deployability, Learnability.
+\end{itemize}
+
+\section{UI/UX Laws Quick Reference}
+\begin{itemize}
+  \item \textbf{Aesthetic-Usability Effect:} pretty $=$ perceived as more usable (but can mask flaws).
+  \item \textbf{Choice Overload:} fewer options = better decisions; limit and group choices.
+  \item \textbf{Chunking:} group related items in 3--5 chunks; use spacing/borders.
+  \item \textbf{Doherty Threshold:} $<$400\,ms response keeps users in flow.
+  \item \textbf{Fitt's Law:} bigger + closer targets are faster to reach; edges are effectively infinite.
+  \item \textbf{Flow:} clear goals + immediate feedback + balanced challenge = deep engagement.
+  \item \textbf{Jakob's Law:} follow familiar conventions; innovate in functionality, not in interaction patterns.
+  \item \textbf{Law of Proximity:} nearby = related; use white space deliberately.
+  \item \textbf{Law of Similarity:} similar look = similar function; distinguish primary vs.\ secondary actions.
+  \item \textbf{UX process:} Requirements $\to$ Design $\to$ Verification $\to$ Implementation $\to$ Maintenance.
+  \item \textbf{Fidelity:} Sketch (lo-fi, diverge) $\to$ Wireframe (structure) $\to$ Prototype (interactive test).
+\end{itemize}
+
+\section{DevOps Quick Reference}
+\begin{itemize}
+  \item \textbf{CI} = merge often + auto build/test. \textbf{CD} = always deployable + one-click release.
+  \item \textbf{Pipeline stages:} Source $\to$ Build $\to$ Test $\to$ Staging $\to$ Production.
+  \item \textbf{Environments:} Development (local) $\to$ Staging (production-like) $\to$ Production (live).
+  \item \textbf{IaC:} infra defined as version-controlled code (Terraform, Ansible, CloudFormation).
+  \item \textbf{Pipeline $\ne$ DevOps:} pipeline is a tool; DevOps is shared responsibility + culture.
+  \item \textbf{Design for DevOps:} deployability, observability, automation, failure recovery, testability.
+  \item \textbf{Agile + DevOps:} Agile = working software every sprint; DevOps = deployed every sprint.
+\end{itemize}
+
+\end{document}
