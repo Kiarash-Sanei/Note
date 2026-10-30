@@ -1,0 +1,1337 @@
+\documentclass[hidelinks]{article}
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{tkz-euclide}
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{mathrsfs}
+
+\usetikzlibrary{angles,calc, decorations.pathreplacing, shapes.geometric, arrows.meta, positioning}
+
+\definecolor{carminered}{rgb}{1.0, 0.0, 0.22}
+\definecolor{capri}{rgb}{0.0, 0.75, 1.0}
+\definecolor{brightlavender}{rgb}{0.75, 0.58, 0.89}
+
+\titleformat{\section}
+    {\bfseries\color{brightlavender}\Large}
+    {\thesection}
+    {0.5em}
+    {}
+
+\titleformat{\subsection}
+    {\color{Thistle}\bfseries}
+    {\thesubsection}
+    {0.5em}
+    {}
+
+\setlist[itemize,1]{label=$\bullet$}
+\setlist[itemize,2]{label=$\circ$}
+\setlist[itemize,3]{label=$\bullet$}
+\setlist[itemize,4]{label=$\circ$}
+
+\title{\color{carminered}\textbf{Linear Algebra}}
+\author{\color{Thistle}Kiarash Sanei}
+\date{\color{SkyBlue}May, 2026}
+
+\begin{document}
+\hypersetup{bookmarksnumbered=true}
+\pagecolor{black}
+\color{white}
+\maketitle
+
+\begin{Large}
+\tableofcontents
+\end{Large}
+\pagebreak
+
+% ============================================================
+\section{Vectors and Matrix Operations}
+% ============================================================
+
+\subsection{Vectors}
+\begin{itemize}
+    \item \textbf{Vector} $\rightarrow$ a 1-dimensional array of numbers — has both magnitude and direction.
+    \item \textbf{Linear Equation} $\rightarrow$ $Au = b$, where $N$ is the number of training data points and $M$ is the number of features.
+    \item \textbf{Categorical (Non-numerical) Data} $\rightarrow$ encoded via \textbf{one-hot} vectors:
+    \[
+        \text{red} = \begin{bmatrix}1\\0\\0\end{bmatrix},\quad
+        \text{green} = \begin{bmatrix}0\\1\\0\end{bmatrix},\quad
+        \text{blue} = \begin{bmatrix}0\\0\\1\end{bmatrix}.
+    \]
+    One-hot vectors are very sparse. Any two distinct one-hot vectors are orthogonal, so they are never similar to each other.
+    \item \textbf{Dot product and norm:}
+    \[
+        \|\vec{v}\|^2 = v^T v, \qquad \|\vec{v}\| \rightarrow \text{Euclidean length (norm of } v\text{)}.
+    \]
+    \item \textbf{Shadow (scalar projection)} $\rightarrow$ When $\|w\| = 1$, the scalar $v \cdot w = v^T w$ is the length of the orthogonal projection of $v$ onto $w$ (the ``shadow'' of $v$ on $w$).
+    In general: $\dfrac{v^T w}{\|w\|}$ is the scalar projection of $v$ onto $w$.
+\end{itemize}
+
+\subsection{Vector Operations}
+\begin{itemize}
+    \item Addition
+    \item Subtraction
+    \item Scalar multiplication
+    \item \textbf{Inner product} (dot product) — notations all mean the same thing for real vectors:
+    \[
+        a \cdot b \;=\; a^T b \;=\; b^T a \;=\; \langle a,\, b \rangle \;=\; \langle a \mid b \rangle \;=\; (a,\, b).
+    \]
+    Note: $a^T b = b^T a$ holds for real vectors; for complex vectors, $\langle a, b\rangle \neq \langle b, a\rangle$ in general.
+\end{itemize}
+
+\subsection{Matrix--Vector Multiplication}
+\begin{itemize}
+    \item $A_{m \times n} = \begin{bmatrix} a_{11} & \cdots & a_{1n} \\ \vdots & \ddots & \vdots \\ a_{m1} & \cdots & a_{mn} \end{bmatrix}$.
+    Denoting the $j$-th column as $a_j \in \mathbb{R}^m$:
+    \[A = \begin{bmatrix} a_1 & a_2 & \cdots & a_n \end{bmatrix}.\]
+
+    \item \textbf{Column perspective} — $Ax$ is a linear combination of the columns of $A$:
+    \[
+        Ax = x_1 a_1 + x_2 a_2 + \cdots + x_n a_n \in \mathbb{R}^m.
+    \]
+    Equivalently, the $i$-th entry of $Ax$ is $a_i^T x$ (dot product of the $i$-th \emph{row} of $A$ with $x$).
+
+    \item \textbf{Row perspective} — $x^T A$ (where $x\in\mathbb{R}^m$) is a linear combination of the \emph{rows} of $A$. Denoting the $i$-th row as $\tilde{a}_i^T \in \mathbb{R}^{1\times n}$:
+    \[
+        x^T A = x_1 \tilde{a}_1^T + x_2 \tilde{a}_2^T + \cdots + x_m \tilde{a}_m^T \in \mathbb{R}^{1\times n}.
+    \]
+
+    \item \textbf{Linear combination:} given vectors $a_1, \ldots, a_m$ and scalars $\beta_1, \ldots, \beta_m$, the result is $\displaystyle\sum_{i=1}^{m} \beta_i a_i$.
+\end{itemize}
+
+\subsection{Matrix--Matrix Multiplication}
+Let $A \in \mathbb{R}^{m\times n}$ (columns $a_1,\ldots,a_n$, rows $\tilde{a}_1^T,\ldots,\tilde{a}_m^T$)
+and $B \in \mathbb{R}^{n\times p}$ (columns $b_1,\ldots,b_p$, rows $\tilde{b}_1^T,\ldots,\tilde{b}_n^T$).
+Then $C = AB \in \mathbb{R}^{m\times p}$:
+\begin{itemize}
+    \item \textbf{Entry-wise}: $C_{ij} = \displaystyle\sum_{r=1}^{n} A_{ir}\, B_{rj}$ \quad (dot product of $i$-th row of $A$ with $j$-th column of $B$).
+    \item \textbf{Column form} — each column of $C$ is $A$ times a column of $B$:
+    \[
+        C = \begin{bmatrix} Ab_1 & Ab_2 & \cdots & Ab_p \end{bmatrix}.
+    \]
+    \item \textbf{Row form} — each row of $C$ is a row of $A$ times $B$:
+    \[
+        C = \begin{bmatrix} \tilde{a}_1^T B \\ \tilde{a}_2^T B \\ \vdots \\ \tilde{a}_m^T B \end{bmatrix}.
+    \]
+    \item \textbf{Outer-product (rank-1) form}:
+    \[
+        C = \sum_{r=1}^{n} a_r\, \tilde{b}_r^T
+          = \begin{bmatrix} a_1 & \cdots & a_n \end{bmatrix}
+            \begin{bmatrix} \tilde{b}_1^T \\ \vdots \\ \tilde{b}_n^T \end{bmatrix}.
+    \]
+\end{itemize}
+
+\textbf{Algebraic properties.} Matrix--vector multiplication is linear: $A(u+v)=Au+Av$, $(A+B)u=Au+Bu$, $(\alpha A)u = \alpha(Au) = A(\alpha u)$, $\mathbf 0 u = \mathbf 0$, $A\mathbf 0 = \mathbf 0$, and $Iu = u$. Matrix--matrix multiplication is \textbf{associative} ($(AB)C = A(BC)$) and \textbf{distributive} ($A(B+C) = AB+AC$), but \emph{not commutative} ($AB \neq BA$ in general — the dimensions may not even match).
+
+% ============================================================
+\section{Systems of Linear Equations}
+% ============================================================
+
+\subsection{Setup and Terminology}
+\begin{itemize}
+    \item A system of $m$ equations in $n$ unknowns:
+    \[
+        A_{11}x_1 + \cdots + A_{1n}x_n = y_1, \quad \ldots, \quad A_{m1}x_1 + \cdots + A_{mn}x_n = y_n.
+    \]
+    Written compactly as $Ax = y$, where $A$ is the $m\times n$ \textbf{coefficient matrix} and $[A \mid y]$ is the \textbf{augmented matrix}.
+    \item $y = \mathbf{0}$ $\rightarrow$ \textbf{homogeneous system}.
+    \item \textbf{Equivalence}: Systems $S_1$ and $S_2$ are \emph{equivalent} if every equation of each system is a linear combination of the equations of the other — they then have exactly the same solution set.
+\end{itemize}
+
+\subsection{Gaussian Elimination and Elementary Matrices}
+\begin{itemize}
+    \item \textbf{Elementary Row Operations (ERO):}
+    \begin{itemize}
+        \item \textbf{Scaling} — multiply one row by a nonzero scalar $c \neq 0$.
+        \item \textbf{Replacement} — add $c$ times one row to another row.
+        \item \textbf{Interchange} — swap two rows.
+    \end{itemize}
+    \item Each ERO is represented by left-multiplication by an \textbf{elementary matrix}. Examples ($3\times 3$):
+    \[
+        \text{Scaling (row 2):}\quad
+        \begin{bmatrix}1&0&0\\0&c&0\\0&0&1\end{bmatrix},\quad
+        \text{inverse:}\quad
+        \begin{bmatrix}1&0&0\\0&\tfrac{1}{c}&0\\0&0&1\end{bmatrix}.
+    \]
+    \[
+        \text{Replacement (row 1} \mathrel{+}= c \cdot \text{row 2):}\quad
+        \begin{bmatrix}1&c&0\\0&1&0\\0&0&1\end{bmatrix},\quad
+        \text{inverse:}\quad
+        \begin{bmatrix}1&-c&0\\0&1&0\\0&0&1\end{bmatrix}.
+    \]
+    \[
+        \text{Interchange (rows 2\&3):}\quad
+        \begin{bmatrix}1&0&0\\0&0&1\\0&1&0\end{bmatrix},\quad
+        \text{inverse:}\quad
+        \begin{bmatrix}1&0&0\\0&0&1\\0&1&0\end{bmatrix}.
+    \]
+    \item \textbf{Row-equivalence}: $A \xrightarrow{\text{EROs}} B$ means $B = E_k \cdots E_1 A = PA$, where $P = \prod E_i$ is a product of elementary matrices. Every ERO is invertible; its inverse is another ERO of the same type.
+    \item Two matrices are \textbf{row-equivalent} iff one can be obtained from the other by a sequence of EROs, i.e., $A \sim B$. Row-equivalence is an \textbf{equivalence relation}: it is reflexive ($A\sim A$), symmetric ($A\sim B \Rightarrow B\sim A$), and transitive ($A\sim B,\, B\sim C \Rightarrow A\sim C$).
+    \item \textbf{Theorem}: $B$ is row-equivalent to $A$ $\iff$ $B = PA$ for some $P$ that is a product of elementary matrices; and every elementary matrix is itself invertible.
+\end{itemize}
+
+\subsection{Row Reduction and Pivots}
+\begin{itemize}
+    \item The \textbf{leading entry} (pivot candidate) of a nonzero row is its left-most nonzero entry.
+    \item A column with a pivot $\rightarrow$ \textbf{basic variable}; a column without a pivot $\rightarrow$ \textbf{free variable}.
+    \item \textbf{Solution types:}
+    \begin{itemize}
+        \item No solution $\rightarrow$ \textbf{inconsistent}.
+        \item Exactly one solution $\rightarrow$ \textbf{consistent} (no free variables).
+        \item Infinitely many solutions $\rightarrow$ \textbf{consistent} (at least one free variable).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Echelon Form (EF)}
+A matrix is in \textbf{echelon form} if:
+\begin{itemize}
+    \item All zero rows are at the bottom.
+    \item Each leading entry is strictly to the right of the leading entry in the row above it.
+    \item All entries \emph{below} a leading entry (in the same column) are zero.
+\end{itemize}
+The pivots lie on or above the main diagonal, forming a staircase (upper-triangular shape).
+
+\subsection{Row-Reduced Echelon Form (RREF)}
+A matrix is in \textbf{RREF} if it is in echelon form and additionally:
+\begin{itemize}
+    \item Every leading entry equals $1$ (a \emph{pivot of 1}).
+    \item Each leading $1$ is the \emph{only} nonzero entry in its column (zeros above and below).
+\end{itemize}
+\textbf{Theorem (Uniqueness):} Every matrix $A_{m\times n}$ is row-equivalent to a \emph{unique} RREF.
+
+\subsection{Consistency Criterion}
+A linear system $[A\mid b]$ is \textbf{consistent} iff the rightmost column of the augmented matrix is \emph{not} a pivot column — equivalently, the echelon form contains no row of the form $[\,0 \;\cdots\; 0 \mid b\,]$ with $b \neq 0$.
+
+\subsection{Finding All Solutions}
+\begin{enumerate}
+    \item Write the augmented matrix $[A \mid b]$.
+    \item Reduce to EF and check consistency (if a zero row on the left has a nonzero $b$-entry, stop: inconsistent).
+    \item Reduce further to RREF.
+    \item Write the corresponding system; express each basic variable in terms of the free variables.
+    \item The general solution is: (particular solution) $+$ (any element of $N(A)$).
+\end{enumerate}
+
+\subsection{Homogeneous Systems}
+\begin{itemize}
+    \item $Au = \mathbf{0}$ is always consistent: the \textbf{trivial solution} $x = \mathbf{0}$ always exists.
+    \item \textbf{Non-trivial solutions} ($x \neq \mathbf{0}$) exist if and only if there is at least one free variable, i.e., $\mathrm{rank}(A) < n$.
+\end{itemize}
+
+\subsection{Existence of Solutions}
+$Au = b$ has a solution if and only if $b$ is a linear combination of the columns of $A$, i.e., $b \in C(A)$.
+
+% ============================================================
+\section{LU Factorization and Complex Numbers}
+% ============================================================
+
+\subsection{LU Factorization}
+\begin{itemize}
+    \item \textbf{Setting}: Gaussian elimination on square $A_{n\times n}$, applied to solve $Au = b$.
+    \item \textbf{Without pivoting} ($A$ can be reduced to echelon form without row interchanges):
+    \[
+        A = LU \;\Longrightarrow\; LUu = b.
+    \]
+    Solve in two triangular steps: first $Ly = b$ (\emph{forward substitution}), then $Ux = y$ (\emph{backward substitution}).
+    \item \textbf{With partial pivoting} (general case): a permutation matrix $P$ is needed:
+    \[
+        PA = LU \;\Longrightarrow\; LUu = Pb.
+    \]
+    \item \textbf{How $L$ is constructed}: if $E_k\cdots E_1 A = U$ (via elimination matrices), then $L = E_1^{-1}\cdots E_k^{-1}$.
+    \item $L$ is \textbf{unit lower triangular} (1's on diagonal); $U$ is \textbf{upper triangular}.
+    \item \textbf{Non-square}: $A_{m\times n} = L_{m\times m}\, U_{m\times n}$.
+    \item \textbf{Existence}: $A$ has an LU factorization (without pivoting) if and only if every leading principal submatrix of $A$ is invertible (equivalently, $A$ can be reduced to echelon form without row interchanges).
+\end{itemize}
+
+\subsection{Complex Numbers and Algebraic Structures}
+\begin{itemize}
+    \item $\mathbb{C}$ is a plane; a complex number is $z = a + bi$ with $a, b \in \mathbb{R}$, $i^2 = -1$.
+    \item \textbf{Conjugate}: $\bar{z} = \overline{a+bi} = a - bi$.
+    \item \textbf{Modulus (magnitude)}: $|a+bi| = \sqrt{(a+bi)\overline{(a+bi)}} = \sqrt{a^2+b^2}$.
+    \item \textbf{Arithmetic}: $(a+bi)+(c+di) = (a+c)+(b+d)i$;\quad $(a+bi)(c+di) = (ac-bd)+(bc+ad)i$;\quad $\dfrac{a+bi}{c+di} = \dfrac{ac+bd}{c^2+d^2} + \dfrac{bc-ad}{c^2+d^2}\,i$.
+    \item \textbf{Standard inner product over $\mathbb{C}^n$} (conjugate-linear in first argument, linear in second — physics convention):
+    \[
+        \langle x, y \rangle = \bar{x}_1 y_1 + \bar{x}_2 y_2 + \cdots + \bar{x}_n y_n = \bar{x}^T y.
+    \]
+    \item \textbf{Tuple} $\rightarrow$ an ordered list of numbers.
+    \item \textbf{Binary operation} on a set $A$: any function $f : A \times A \rightarrow A$.
+    \item \textbf{Closure}: a set is \emph{closed} under an operation if applying the operation to any elements of the set always produces a result still within the set.
+\end{itemize}
+
+% ============================================================
+\section{Fields and Vector Spaces}
+% ============================================================
+
+\subsection{Fields}
+A \textbf{field} $(F, +, \cdot)$ is a set $F$ with two binary operations satisfying:
+\begin{itemize}
+    \item \textbf{Closure}: $a+b \in F$,\; $a \cdot b \in F$.
+    \item \textbf{Associativity}: $a+(b+c)=(a+b)+c$;\quad $a\cdot(b\cdot c)=(a\cdot b)\cdot c$.
+    \item \textbf{Commutativity}: $a+b=b+a$;\quad $a\cdot b=b\cdot a$.
+    \item \textbf{Identity elements}: $0$ (additive: $a+0=a$),\; $1$ (multiplicative: $a\cdot 1=a$).
+    \item \textbf{Inverses}: additive inverse $-a$;\; multiplicative inverse $\dfrac{1}{a}$ for $a\neq 0$.
+    \item \textbf{Distributivity}: $a\cdot(b+c)=a\cdot b+a\cdot c$;\quad $(a+b)\cdot c=a\cdot c+b\cdot c$.
+\end{itemize}
+Common fields: $\mathbb{R}$ (reals), $\mathbb{C}$ (complex numbers), $\mathbb{Q}$ (rationals).
+
+\subsection{Vector Spaces}
+A \textbf{vector space} $(V, F, +, \cdot)$ is a non-empty set $V$ over a field $F$ with:
+\begin{itemize}
+    \item vector addition $+: V\times V \rightarrow V$,
+    \item scalar multiplication $\cdot: F\times V \rightarrow V$,
+\end{itemize}
+satisfying the 8 standard axioms (associativity, commutativity of addition, distributivity, etc.).
+
+Key consequences:
+\begin{itemize}
+    \item Every vector space has a \emph{unique} additive identity $\mathbf{0}$.
+    \item Every $v\in V$ has a \emph{unique} additive inverse $-v$.
+    \item $0 \cdot v = \mathbf{0}$ and $\alpha \cdot \mathbf{0} = \mathbf{0}$ for all $\alpha\in F$, $v\in V$.
+    \item \textbf{Examples}: $\mathbb{R}^n$ over $\mathbb{R}$; $M_{m,n}(\mathbb{R})$; $P_n(\mathbb{R})$ (polynomials of degree $\le n$, dimension $n+1$); $\mathbb{C}$ over $\mathbb{R}$. The set of \textbf{functions} $F^X = \{f: X\to F\}$ with $(f+g)(x)=f(x)+g(x)$ and $(af)(x)=af(x)$ is a vector space — as are its subsets of continuous / differentiable functions and all polynomials $P(\mathbb{R})$. Note $\mathbb{Z}$ over $\mathbb{R}$ is \emph{not} a vector space (not closed under scalar multiplication).
+\end{itemize}
+
+\subsection{Span and Subspaces}
+\begin{itemize}
+    \item \textbf{Coordinates}: any $n$-vector $b\in\mathbb{R}^n$ is a linear combination of the standard basis vectors $e_1,\ldots,e_n$: $b = \sum_{i=1}^n b_i e_i$.
+    \item \textbf{Span}: the set of all linear combinations of a given set of vectors:
+    \[
+        \mathrm{Span}\{v_1, \ldots, v_k\} = \left\{\sum_{i=1}^k c_i v_i \;\Big|\; c_i \in F\right\}.
+    \]
+    \item \textbf{Subspace}: a non-empty subset $W \subseteq V$ is a subspace iff it is closed under both vector addition and scalar multiplication — equivalently, for all $u, v \in W$ and $\alpha \in F$: $\alpha u + v \in W$. The zero vector $\mathbf{0}$ is always in a subspace.
+\end{itemize}
+
+% ============================================================
+\section{Subspaces, Linear Independence, and Basis}
+% ============================================================
+
+\subsection{Subspace Operations}
+\begin{itemize}
+    \item \textbf{Intersection}: If $W_1, W_2$ are subspaces of $V$, then $W_1 \cap W_2$ is a subspace — it is the \emph{largest} subspace contained in both $W_1$ and $W_2$. More generally, the intersection of \emph{any} collection of subspaces of $V$ is a subspace.
+    \item \textbf{Union}: $W_1 \cup W_2$ is a subspace if and only if $W_1 \subseteq W_2$ or $W_2 \subseteq W_1$ (i.e., one contains the other).
+    \item \textbf{Sum}: For subsets $A, B \subseteq V$, define $A + B = \{a + b \mid a\in A,\; b\in B\}$. If $W_1, \ldots, W_m$ are subspaces of $V$, then $W_1 + \cdots + W_m$ is also a subspace. In particular, $\mathrm{Span}\{v_1,\ldots,v_p\}$ is a subspace of $V$.
+    \item \textbf{Direct sum}: $U + W$ is a \textbf{direct sum} $U \oplus W$ if every vector in $U+W$ decomposes \emph{uniquely} as $u+w$ with $u\in U$, $w\in W$.
+    \begin{itemize}
+        \item Equivalently: $U$ and $W$ are subspaces of $V$ with $U \cap W = \{\mathbf{0}\}$.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Linear Independence}
+\begin{itemize}
+    \item A list $\{v_1, \ldots, v_n\}$ is \textbf{linearly independent (LI)} if
+    \[
+        \lambda_1 v_1 + \cdots + \lambda_n v_n = \mathbf{0} \;\Longrightarrow\; \lambda_1 = \cdots = \lambda_n = 0.
+    \]
+    Otherwise the list is \textbf{linearly dependent (LD)}.
+    \item If $\mathbf{0} \in \{v_1,\ldots,v_n\}$, the list is linearly dependent.
+    \item If a collection is LD, every superset is also LD.
+    \item Every non-empty subset of an LI collection is LI.
+    \item \textbf{Characterization of LD sets}: an indexed set $S = \{v_1,\ldots,v_n\}$ of two or more vectors is LD $\iff$ at least one vector is a linear combination of the others. In fact, if $S$ is LD and $v_1\neq\mathbf 0$, then some $v_j$ ($j>1$) is a linear combination of the \emph{preceding} vectors $v_1,\ldots,v_{j-1}$. (Caution: this does \emph{not} say every vector is a combination of the preceding ones.)
+    \item If $v_1,\ldots,v_n$ are LD with $c_1\neq 0$ in a dependence relation, then dropping $v_1$ does not shrink the span: $\mathrm{Span}\{v_1,\ldots,v_n\} = \mathrm{Span}\{v_2,\ldots,v_n\}$ (so spanning lists can be trimmed to a basis).
+    \item If $v_1,\ldots,v_p$ are LI and $u = \beta_1 v_1 + \cdots + \beta_p v_p$, the coefficients $\beta_i$ are \emph{unique}.
+    \item \textbf{Dimension bound} (key theorem): In a vector space of dimension $d$:
+    \begin{itemize}
+        \item Any list of more than $d$ vectors is linearly dependent.
+        \item Any LI list has \emph{at most} $d$ vectors; a list of exactly $d$ LI vectors is a basis.
+    \end{itemize}
+    \item \textbf{Algorithm for checking independence}:
+    \begin{enumerate}
+        \item If the number of vectors $p > \dim(V)$: automatically dependent. Stop.
+        \item If any vector is $\mathbf{0}$: dependent. Stop.
+        \item Form $\lambda_1 v_1 + \cdots + \lambda_p v_p = \mathbf{0}$ and solve the system. If only solution is all $\lambda_i = 0$: independent. Otherwise: dependent.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Basis}
+A list $\{v_1, \ldots, v_n\}$ is a \textbf{basis} for $V$ if it is:
+\begin{itemize}
+    \item linearly independent, \emph{and}
+    \item spans $V$ (every vector in $V$ is a linear combination of $v_1,\ldots,v_n$).
+\end{itemize}
+
+\subsection{Dimension}
+\begin{itemize}
+    \item A vector space is \textbf{finite-dimensional} if it is spanned by a finite set; otherwise \textbf{infinite-dimensional}.
+    \item $\dim(V)$ = number of vectors in any basis of $V$ (all bases of a finite-dimensional space have the same size — this is a theorem).
+    \item $\dim(\{\mathbf{0}\}) = 0$ \quad (the trivial vector space has dimension zero).
+    \item Any set of $m > \dim(V)$ vectors is linearly dependent.
+    \item Any set of $m < \dim(V)$ vectors cannot span $V$.
+\end{itemize}
+
+\subsection{Basis of a Subspace and Dimension of Sums}
+\begin{itemize}
+    \item \textbf{Adjoining lemma}: if $S$ is linearly independent and $u\notin\mathrm{Span}(S)$, then $S\cup\{u\}$ is still linearly independent. (This is the engine behind extending an independent set to a basis.)
+    \item If $W$ is a subspace of a finite-dimensional $V$: every LI subset of $W$ can be extended to a basis of $W$, and further to a basis of $V$.
+    \item If $W$ is a \emph{proper} subspace of $V$ ($W \neq V$), then $\dim(W) < \dim(V)$.
+    \item Every LI set in a finite-dimensional $V$ is part of some basis.
+    \item \textbf{Dimension of sum} (inclusion-exclusion):
+    \[
+        \dim(W_1 + W_2) = \dim(W_1) + \dim(W_2) - \dim(W_1 \cap W_2).
+    \]
+    For three subspaces:
+    \begin{align*}
+        \dim(W_1+W_2+W_3) &\leq \dim(W_1)+\dim(W_2)+\dim(W_3) \\
+        &\quad -\dim(W_1\cap W_2)-\dim(W_2\cap W_3)-\dim(W_1\cap W_3) \\
+        &\quad +\dim(W_1\cap W_2\cap W_3).
+    \end{align*}
+    For \emph{three} subspaces only the inequality holds — equality can fail (e.g.\ $W_1 = \mathrm{Span}\{e_1\}$, $W_2=\mathrm{Span}\{e_2\}$, $W_3 = \mathrm{Span}\{e_1+e_2\}$ in $\mathbb{R}^2$).
+    \item \textbf{Standard dimensions}: $\dim(F^n) = n$;\quad $\dim(P_p) = p+1$;\quad $\dim(M_{m,n}) = mn$;\quad and $P$ (all polynomials), $F$ (all functions), $C$ (continuous functions) are all infinite-dimensional.
+\end{itemize}
+
+% ============================================================
+\section{Coordinates, Spaces, and Rank}
+% ============================================================
+
+\subsection{Dimensionality Theorems}
+Let $V$ be a finite-dimensional vector space. Then:
+\begin{itemize}
+    \item Any LI list in $V$ can be \emph{extended} to a basis of $V$.
+    \item Any spanning list of $V$ \emph{contains} a basis as a sublist.
+    \item Any LI list of length exactly $\dim(V)$ is automatically a basis.
+    \item Any spanning list of length exactly $\dim(V)$ is automatically a basis.
+\end{itemize}
+
+\subsection{Ordered Basis and Coordinate Vectors}
+\begin{itemize}
+    \item An \textbf{ordered basis} of $V$ is a basis written as an ordered tuple $(b_1,\ldots,b_p)$.
+    \item Given ordered basis $B = (b_1, \ldots, b_p)$ of $V$: for every $u \in V$ there exist \emph{unique} scalars $c_1, \ldots, c_p$ with $u = c_1 b_1 + \cdots + c_p b_p$.
+    \[
+        [u]_B = \begin{bmatrix}c_1\\ \vdots \\ c_p\end{bmatrix} \quad\text{(coordinate vector of $u$ with respect to basis $B$)}.
+    \]
+\end{itemize}
+
+\subsection{Row Space and Column Space}
+\begin{itemize}
+    \item \textbf{Column space}: $C(A) = \{Au \mid u \in F^n\}$ — all linear combinations of the columns of $A$. This is a subspace of $F^m$.
+    \item \textbf{Row space}: $R(A) = C(A^T)$ — all linear combinations of the rows of $A$. This is a subspace of $F^n$.
+    \item \textbf{EROs and spaces}: Elementary row operations \emph{do not change} $R(A)$, but they \emph{do change} $C(A)$ as a set (though they preserve linear dependency relations among columns).
+    \item \textbf{Row-equivalence}: $A \sim B$ $\Longrightarrow$ $R(A) = R(B)$.
+    \begin{itemize}
+        \item Non-zero rows of a row-echelon form of $A$ form a basis for $R(A)$.
+    \end{itemize}
+    \item \textbf{Pivot columns} of $A$ (identified from the echelon form) form a basis for $C(A)$.
+\end{itemize}
+
+\subsection{Null Space, Rank, Nullity, and the Four Fundamental Subspaces}
+\begin{itemize}
+    \item \textbf{Null space (kernel)}: $N(A) = \ker(A) = \{u \mid Au = \mathbf{0}\}$ — a subspace of $F^n$.
+    \item \textbf{Left null space}: $N(A^T) = \{u \mid A^T u = \mathbf{0}\} = \{u \mid u^T A = \mathbf{0}\}$ — a subspace of $F^m$.
+    \item \textbf{Rank}: $\mathrm{rank}(A) = \dim(C(A)) = \dim(R(A))$ \quad (column rank $=$ row rank — a non-trivial theorem).
+    \item \textbf{Nullity}: $\mathrm{Nullity}(A) = \dim(N(A))$.
+    \item \textbf{Rank-Nullity Theorem} for $A_{m\times n}$:
+    \[
+        \mathrm{rank}(A) + \mathrm{Nullity}(A) = n.
+    \]
+    \item $\mathrm{rank}(AB) \leq \min\{\mathrm{rank}(A),\, \mathrm{rank}(B)\}$.
+    \item \textbf{Column rank $=$ row rank}: $\mathrm{rank}(A) = \mathrm{rank}(A^T)$. The proof uses two lemmas that are useful in their own right: $Ax = \mathbf 0 \iff A^TAx = \mathbf 0$ (so $N(A) = N(A^TA)$), hence $\mathrm{rank}(A^TA) = \mathrm{rank}(A)$; and $\mathrm{rank}(BD) \le \mathrm{rank}(B)$.
+\end{itemize}
+\textbf{Four Fundamental Subspaces} of $A_{m\times n}$ with $\mathrm{rank}(A) = r$:
+\[
+\begin{array}{ll}
+    C(A): & \text{subspace of } \mathbb{R}^m,\quad \dim = r.\\
+    R(A) = C(A^T): & \text{subspace of } \mathbb{R}^n,\quad \dim = r.\\
+    N(A): & \text{subspace of } \mathbb{R}^n,\quad \dim = n-r.\\
+    N(A^T): & \text{subspace of } \mathbb{R}^m,\quad \dim = m-r.
+\end{array}
+\]
+Moreover, $C(A) \perp N(A^T)$ and $R(A) \perp N(A)$ (orthogonal complements in their respective spaces).
+
+\textbf{Solvability of $Ax=b$} by shape (rank $r$):
+\[
+\begin{array}{llll}
+    \textbf{shape} & \dim R(A),C(A) & \dim N(A),N(A^T) & Ax=b\\[2pt]
+    m=n=r & r,\; r & 0,\; 0 & \text{unique } x = A^{-1}b\\
+    m>n=r \text{ (tall)} & r,\; r & 0,\; m-r & \text{solvable iff } b\in C(A);\ \text{unique}\\
+    n>m=r \text{ (wide)} & r,\; r & n-r,\; 0 & \text{always solvable; } x = x_p + N(A)\\
+    r<\min(m,n) & r,\; r & n-r,\; m-r & \text{solvable iff } b\in C(A);\ \infty\text{ solutions}
+\end{array}
+\]
+
+% ============================================================
+\section{Linear Transformations}
+% ============================================================
+
+\subsection{Definition and Basic Properties}
+\begin{itemize}
+    \item A map $T: V \rightarrow W$ is a \textbf{linear transformation} (linear map) if for all $u, v\in V$ and $\alpha\in F$:
+    \[
+        T(\alpha u + v) = \alpha T(u) + T(v). \quad\text{(linearity / superposition)}
+    \]
+    Equivalently: $T(\mathbf{0}) = \mathbf{0}$ and $T\!\bigl(\sum_i \alpha_i v_i\bigr) = \sum_i \alpha_i T(v_i)$.
+    \item For a matrix $A \in F^{m\times n}$, $T_A(u) = Au$ is linear with domain $F^n$ and codomain $F^m$.
+    \item $\mathcal{L}(V, W)$ $\rightarrow$ the set of all linear maps from $V$ to $W$; this is itself a vector space.
+    \item $\mathcal{L}(V) := \mathcal{L}(V,V)$ $\rightarrow$ linear operators on $V$.
+    \item \textbf{Unique determination}: given an ordered basis $(v_1,\ldots,v_n)$ of $V$ and any list $(w_1,\ldots,w_n)$ in $W$, there is a \emph{unique} $T\in\mathcal{L}(V,W)$ with $T(v_i)=w_i$ for all $i$.
+    \item \textbf{Composition}: If $T\in\mathcal{L}(U,V)$ and $S\in\mathcal{L}(V,W)$, then $S\circ T\in\mathcal{L}(U,W)$, written $ST$, with $ST(u)=S(T(u))$.
+\end{itemize}
+
+\subsection{Standard Transformations in $\mathbb{R}^2$}
+\begin{itemize}
+    \item \textbf{Rotation} by angle $\theta$ (counterclockwise):
+    \[
+        R_\theta = \begin{bmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos\theta\end{bmatrix}.
+    \]
+    \item \textbf{Projection} onto the line through the origin at angle $\theta$:
+    \[
+        P_\theta = \begin{bmatrix}\cos^2\!\theta & \cos\theta\sin\theta \\ \cos\theta\sin\theta & \sin^2\!\theta\end{bmatrix},\qquad P_\theta^2 = P_\theta \quad\text{(idempotent)}.
+    \]
+    \item \textbf{Reflection} across the line through the origin at angle $\theta$ (use $\mathrm{Ref}_\theta$ to avoid clash with rotation):
+    \[
+        \mathrm{Ref}_\theta = \begin{bmatrix}\cos(2\theta) & \sin(2\theta) \\ \sin(2\theta) & -\cos(2\theta)\end{bmatrix}.
+    \]
+    Note: $\mathrm{Ref}_\theta^2 = I$ (reflecting twice returns to original).
+    \item \textbf{Norms} are \emph{not} linear maps — they fail $\|c v\| = c\|v\|$ for negative scalars ($c < 0$ gives $|c|\|v\| \neq c\|v\|$), and the triangle inequality $\|u+v\|\leq\|u\|+\|v\|$ replaces additivity.
+    \item \textbf{Translation} by a fixed nonzero vector $t$ is \emph{not} a linear map — it does not satisfy $T(\mathbf{0})=\mathbf{0}$ (since $\mathbf{0}+t = t \neq \mathbf{0}$). It is an \textbf{affine} map.
+    \item \textbf{Other common maps}: uniform scaling $S = sI$; non-uniform scaling $\mathrm{diag}(s_x, s_y)$; shear $\begin{bmatrix}1&\lambda\\0&1\end{bmatrix}$ (and its transpose). Powers of a rotation compose the angle: $R_\theta^{\,n} = R_{n\theta}$, i.e. $\begin{bmatrix}\cos\theta & -\sin\theta\\ \sin\theta&\cos\theta\end{bmatrix}^{n} = \begin{bmatrix}\cos n\theta & -\sin n\theta\\ \sin n\theta & \cos n\theta\end{bmatrix}$. \textbf{Selector} matrices (rows are standard unit vectors) pick out / reorder / down-sample entries of $x$.
+\end{itemize}
+
+\subsection{Null Space, Range, and the Fundamental Theorem}
+\begin{itemize}
+    \item \textbf{Null space}: $\mathrm{Null}(T) = \{v\in V \mid T(v) = \mathbf{0}\}$ — a subspace of $V$; $\mathrm{Nullity}(T) = \dim(\mathrm{Null}(T))$.
+    \item \textbf{Range}: $\mathrm{range}(T) = \{T(v) \mid v\in V\}$ — a subspace of $W$.
+    \item \textbf{Fundamental Theorem of Linear Maps} (Rank-Nullity for maps):
+    \[
+        \dim(V) = \mathrm{Nullity}(T) + \dim(\mathrm{range}(T)).
+    \]
+    \item \textbf{Corollaries}: a linear map to a \emph{lower}-dimensional space ($\dim W < \dim V$) is never injective; a linear map to a \emph{higher}-dimensional space ($\dim W > \dim V$) is never surjective.
+\end{itemize}
+
+\subsection{Injective, Surjective, Bijective}
+\begin{itemize}
+    \item \textbf{Injective (one-to-one)}: $T(v_1)=T(v_2) \Longrightarrow v_1=v_2$.
+    \begin{itemize}
+        \item $T$ is injective $\iff$ $\mathrm{Null}(T)=\{\mathbf{0}\}$ $\iff$ $T(u)=\mathbf{0}$ has only the trivial solution.
+        \item For matrix $A$: $T_A$ injective $\iff$ columns of $A$ are linearly independent $\iff$ $\mathrm{rank}(A) = n$.
+        \item $T(u)=b$ has \emph{at most} one solution.
+        \item Wide matrices ($A_{m\times n}$, $n > m$) cannot be injective (more columns than rows means columns must be dependent).
+    \end{itemize}
+    \item \textbf{Surjective (onto)}: For every $w\in W$, $T(v)=w$ has at least one solution, i.e., $\mathrm{range}(T) = W$.
+    \begin{itemize}
+        \item For matrix $A$: $T_A$ surjective $\iff$ $\mathrm{rank}(A) = m$ (rows are linearly independent).
+        \item Tall matrices ($A_{m\times n}$, $m > n$) cannot be surjective (rank $\leq n < m$).
+    \end{itemize}
+    \item \textbf{Bijective}: injective \emph{and} surjective.
+    \begin{itemize}
+        \item For matrix $A_{m\times n}$: $T_A$ bijective $\iff$ $m = n$ and $A$ has full rank (i.e., $A$ is a square invertible matrix).
+        \item $T(u)=b$ has \emph{exactly} one solution.
+    \end{itemize}
+    \item \textbf{Square case}: for a \emph{square} matrix, injective $\iff$ surjective (a pivot in every column $\iff$ a pivot in every row). So a self-map $T:\mathbb{R}^n\to\mathbb{R}^n$ is one-to-one iff it is onto. Conversely, if a matrix map is both injective and surjective then $m=n$.
+\end{itemize}
+
+% ============================================================
+\section{Invertibility, Isomorphisms, and Matrix Inverse}
+% ============================================================
+
+\subsection{Invertible Linear Maps and Isomorphisms}
+\begin{itemize}
+    \item $T\in\mathcal{L}(V,W)$ is \textbf{invertible} if there exists $S\in\mathcal{L}(W,V)$ such that $ST = I_V$ (identity on $V$) and $TS = I_W$ (identity on $W$). Then $S = T^{-1}$ is the \emph{unique} inverse.
+    \item $T$ invertible $\iff$ $T$ bijective.
+    \item An invertible linear map is an \textbf{isomorphism}; $V$ and $W$ are \textbf{isomorphic} ($V \cong W$) if an isomorphism between them exists.
+    \item $T\in\mathcal{L}(V,W)$ bijective $\Rightarrow V\cong W$.
+    \item If $T\in\mathcal{L}(V,W)$ and $S\in\mathcal{L}(W,U)$ are both bijective, then $V\cong W\cong U$, so $V\cong U$ over $F$.
+    \item \textbf{Theorem}: Two finite-dimensional vector spaces over $F$ are isomorphic $\iff$ they have the same dimension.
+\end{itemize}
+
+\subsection{Change of Basis}
+\begin{itemize}
+    \item Given two ordered bases $B=(b_1,\ldots,b_n)$ and $C=(c_1,\ldots,c_n)$ of $V$:
+    \[
+        [u]_C = P_{C\leftarrow B}\,[u]_B.
+    \]
+    \item \textbf{Change-of-basis matrix}: $P_{C\leftarrow B} = \bigl[[b_1]_C \;\cdots\; [b_n]_C\bigr]$ (columns are coordinates of $b_i$ in basis $C$).
+    \item $P_{C\leftarrow B}$ is always invertible, and $(P_{C\leftarrow B})^{-1} = P_{B\leftarrow C}$.
+\end{itemize}
+
+\subsection{Matrix Representation of a Linear Map}
+Let $T\in\mathcal{L}(V,W)$, $E=(e_1,\ldots,e_n)$ an ordered basis of $V$, $B=(b_1,\ldots,b_m)$ an ordered basis of $W$. The \textbf{matrix of $T$} with respect to $E$ and $B$ is the $m\times n$ matrix:
+\[
+    \mathcal{M}(T)_{E,B} = \bigl[[T(e_1)]_B \;\cdots\; [T(e_n)]_B\bigr],
+    \quad \text{so that} \quad
+    [T(u)]_B = \mathcal{M}(T)_{E,B}\,[u]_E.
+\]
+
+\subsection{Matrix Inverse}
+\begin{itemize}
+    \item For square $A\in M_{n\times n}$: $B$ is the \textbf{inverse} of $A$ if $AB = BA = I_n$.
+    \begin{itemize}
+        \item If no such $B$ exists, $A$ is \textbf{singular} (non-invertible).
+        \item The inverse is \emph{unique} (if it exists); written $A^{-1}$.
+        \item $A$ invertible $\iff$ columns of $A$ are linearly independent $\iff$ $\mathrm{rank}(A) = n$ $\iff$ RREF of $A$ is $I_n$.
+    \end{itemize}
+    \item \textbf{Left inverse}: $X$ satisfying $XA = I$ is a left inverse of $A$; $A$ is \textbf{left-invertible} if such $X$ exists.
+    \begin{itemize}
+        \item $A$ left-invertible $\iff$ columns of $A$ are linearly independent (i.e., $A$ has full column rank).
+        \item $Au=b \xrightarrow{X \text{ is left inv.}} u = Xb$ gives the unique solution.
+        \item Wide matrices ($n > m$) are not left-invertible.
+        \item The left inverse is generally \emph{not} unique for non-square matrices.
+    \end{itemize}
+    \item \textbf{Left inverse of a vector} $a\in\mathbb{R}^n$: since $a^T a = \|a\|^2$, we get $\dfrac{a^T a}{\|a\|^2} = 1$, so the pseudo-inverse of $a$ (as a column matrix) is:
+    \[
+        a^{-1} = \frac{a^T}{\|a\|^2} \quad \text{(a }1\times n\text{ left inverse of the }n\times 1\text{ vector }a\text{)}.
+    \]
+    \item \textbf{Right inverse}: $X$ satisfying $AX = I$ is a right inverse of $A$; $A$ is \textbf{right-invertible} if such $X$ exists.
+    \begin{itemize}
+        \item $A$ right-invertible $\iff$ rows of $A$ are linearly independent (full row rank).
+        \item $Au=b \Rightarrow u=Xb$ is \emph{a} solution for every $b$ (not necessarily unique).
+        \item Tall matrices ($m > n$) are not right-invertible.
+    \end{itemize}
+    \item $A$ is right-invertible $\iff$ $A^T$ is left-invertible (transpose $AX=I$ to get $X^TA^T=I$).
+    \item \textbf{Square matrices}: left inverse $=$ right inverse $= A^{-1}$ (and rows and columns are both linearly independent).
+    \item \textbf{$2\times 2$ formula}: $\begin{bmatrix}a&b\\c&d\end{bmatrix}^{-1} = \dfrac{1}{ad-bc}\begin{bmatrix}d&-b\\-c&a\end{bmatrix}$, valid iff $ad-bc\neq 0$.
+\end{itemize}
+
+\subsection{Gauss-Jordan Elimination and Inverse Properties}
+\begin{itemize}
+    \item \textbf{Gauss-Jordan method} to find $A^{-1}$: form augmented $[A \mid I_n]$, reduce to RREF:
+    \begin{itemize}
+        \item RREF $\rightarrow [I_n \mid A^{-1}]$ \checkmark
+        \item RREF $\rightarrow [B \mid C]$ with $B \neq I_n$: $A$ is singular (not invertible).
+    \end{itemize}
+    \item \textbf{Inverse identities}:
+    \begin{itemize}
+        \item $(A^{-1})^{-1} = A$
+        \item $(A^k)^{-1} = (A^{-1})^k$
+        \item $(cA)^{-1} = \dfrac{1}{c}\,A^{-1}$ \quad ($c\neq 0$)
+        \item $(A^T)^{-1} = (A^{-1})^T$
+        \item $(AB)^{-1} = B^{-1}A^{-1}$ \quad (reverse order!)
+    \end{itemize}
+    \item \textbf{Solution set}: the complete solution of $Au=b$ is $K = \{s_p + n \mid n \in N(A)\}$, where $s_p$ is any particular solution.
+\end{itemize}
+
+\subsection{Triangular Matrices and Rank}
+\begin{itemize}
+    \item Upper or lower triangular matrices with all nonzero diagonal entries are invertible.
+    \item The change-of-basis matrix is always invertible.
+    \item $\mathrm{rank}(A) = \mathrm{rank}(A^{-1})$ for invertible $A$.
+    \item If $B_{n\times n}$ is invertible: $\mathrm{rank}(AB) = \mathrm{rank}(A)$ (multiplying by invertible matrix preserves rank).
+\end{itemize}
+
+\subsection{The Invertible Matrix Theorem}
+For a square $A\in M_{n\times n}$, the following are \textbf{all equivalent} — if one holds, they all do:
+\begin{itemize}
+    \item $A$ is invertible (nonsingular); $A^T$ is invertible.
+    \item $A$ is row-equivalent to $I_n$; the RREF of $A$ is $I_n$; $A$ has $n$ pivot positions.
+    \item $\det A \neq 0$; $0$ is not an eigenvalue of $A$.
+    \item The columns of $A$ are linearly independent and span $\mathbb{R}^n$; likewise the rows. $\mathrm{rank}(A) = n$.
+    \item $Ax=\mathbf 0$ has only the trivial solution; $Ax=b$ has exactly one solution for every $b$.
+    \item The map $x\mapsto Ax$ is one-to-one and onto ($\mathbb{R}^n\to\mathbb{R}^n$).
+    \item $A$ has a left inverse ($\exists\,C: CA=I$) and a right inverse ($\exists\,D: AD=I$); these coincide with $A^{-1}$.
+\end{itemize}
+
+% ============================================================
+\section{Linear Functionals and Bilinear Forms}
+% ============================================================
+
+\subsection{Linear Functionals}
+\begin{itemize}
+    \item A \textbf{linear functional} $f: V \rightarrow F$ is a linear map into the scalar field. For $V = \mathbb{R}^n$, $f$ satisfies the \textbf{superposition property}:
+    \[
+        f(\alpha x + \beta y) = \alpha f(x) + \beta f(y).
+    \]
+    \item \textbf{Riesz representation}: every linear functional on $\mathbb{R}^n$ has the unique representation $f(u) = a^T u$ for some fixed $a\in\mathbb{R}^n$.
+    Equivalently, every linear functional is an inner product with a fixed vector.
+    \item \textbf{Dual space}: $V^* = \mathcal{L}(V, F)$, the set of all linear functionals on $V$. $V^*$ is itself a vector space with $\dim(V^*) = \dim(V)$.
+\end{itemize}
+
+\subsection{Bilinear Forms}
+\begin{itemize}
+    \item A \textbf{bilinear form} is a map $f: V\times W \rightarrow F$ that is linear in \emph{both} arguments separately.
+    \item A \textbf{symmetric bilinear form} on $V$ satisfies $f(v,w)=f(w,v)$ for all $v,w\in V$. With respect to a basis, it is represented by a \emph{symmetric} matrix $A = A^T$:
+    \[
+        f(v,w) = v^T A w = w^T A v.
+    \]
+    \item \textbf{Associated (Gram) matrix}: given ordered basis $B=(b_1,\ldots,b_n)$ of $V$ and bilinear form $f: V\times V\rightarrow F$, the matrix $[f]_B \in F^{n\times n}$ has entries
+    \[
+        ([f]_B)_{ij} = f(b_i, b_j),\quad\text{so that}\quad f(v,w) = [v]_B^T\, [f]_B\, [w]_B.
+    \]
+    \item \textbf{Sesquilinear form over $\mathbb{C}$}: a map $f: V\times V\rightarrow\mathbb{C}$ that is linear in the first argument and \emph{conjugate-linear} (anti-linear) in the second:
+    \[
+        f(v, \lambda w) = \bar{\lambda}\, f(v, w).
+    \]
+    This is the correct generalization of bilinear forms to complex spaces, needed for Hermitian inner products.
+\end{itemize}
+
+% ============================================================
+\section{Inner Product Spaces}
+% ============================================================
+
+\subsection{Inner Product Axioms}
+An \textbf{inner product} on a vector space $V$ over $F$ ($= \mathbb{R}$ or $\mathbb{C}$) is a map $\langle\cdot,\cdot\rangle: V\times V \rightarrow F$ satisfying, for all $u, v, w\in V$ and $c\in F$:
+\begin{itemize}
+    \item \textbf{Positive definiteness}: $\langle v,v\rangle \geq 0$;\quad and\quad $\langle v,v\rangle = 0 \iff v = \mathbf{0}$.
+    \item \textbf{Conjugate symmetry}: $\langle w,v\rangle = \overline{\langle v,w\rangle}$ \quad (reduces to $\langle w,v\rangle=\langle v,w\rangle$ over $\mathbb{R}$).
+    \item \textbf{Linearity in first argument}: $\langle u+v,w\rangle = \langle u,w\rangle + \langle v,w\rangle$;\quad $\langle cv,w\rangle = c\langle v,w\rangle$.
+\end{itemize}
+Note: conjugate linearity in the second argument follows: $\langle v, cw\rangle = \bar{c}\langle v,w\rangle$. Over $\mathbb{R}$, an inner product is exactly a \textbf{positive-definite symmetric bilinear form}, so the four real axioms (symmetry, additivity, homogeneity in the first slot, positive-definiteness) suffice — the second-slot properties follow. Also $\langle \mathbf 0, v\rangle = \langle v, \mathbf 0\rangle = 0$.
+
+Standard examples:
+\[
+    \langle x,y\rangle = x^T y \quad \text{(over } \mathbb{R}\text{)}; \qquad
+    \langle x,y\rangle = \bar{x}^T y = \sum_{i=1}^n \bar{x}_i y_i \quad \text{(over } \mathbb{C}\text{)}.
+\]
+
+\subsection{Inner Products for Matrices and Functions}
+\begin{itemize}
+    \item \textbf{Frobenius inner product} for matrices ($X,Y\in\mathbb{R}^{m\times n}$):
+    \[
+        \langle X,Y\rangle = \mathrm{trace}(X^T Y) = \sum_i\sum_j X_{ij}Y_{ij}.
+    \]
+    \item \textbf{$L^2$ inner product} for functions: $C[a,b]$ = continuous real functions on $[a,b]$; for $f,g\in C[a,b]$:
+    \[
+        \langle f,g\rangle = \int_a^b f(t)\,g(t)\,dt.
+    \]
+    \item An \textbf{inner product space} (real: Euclidean space; complex: Unitary/Hilbert space) is a vector space equipped with an inner product.
+\end{itemize}
+
+\subsection{Norms and Metrics}
+\begin{itemize}
+    \item Every inner product induces a \textbf{norm}: $\|v\| = \sqrt{\langle v,v\rangle}$.
+    \item $\|v\|$ is the \textbf{length} of $v$; $\|u-v\|$ is the \textbf{distance} between $u$ and $v$ (a metric).
+    \item $\|v\|=1$ $\Rightarrow$ $v$ is a \textbf{unit vector}. \textbf{Normalizing}: $\hat{v} = \dfrac{v}{\|v\|}$ is a unit vector.
+    \item \textbf{Norm axioms}: a norm $\|\cdot\|: V\rightarrow\mathbb{R}_{\geq 0}$ satisfies:
+    \begin{itemize}
+        \item $\|\alpha v\| = |\alpha|\,\|v\|$ \quad \textbf{(absolute homogeneity)} — note the \emph{absolute value} around $\alpha$.
+        \item $\|u+v\| \leq \|u\| + \|v\|$ \quad \textbf{(triangle inequality)}.
+        \item $\|v\| = 0 \iff v = \mathbf{0}$ \quad \textbf{(non-degeneracy)}.
+    \end{itemize}
+    \item \textbf{Norm expansion}:
+    \[
+        \|u+v\|^2 = \|u\|^2 + 2\,\mathrm{Re}\langle u,v\rangle + \|v\|^2.
+    \]
+    Over $\mathbb{R}$, $\mathrm{Re}\langle u,v\rangle = \langle u,v\rangle = u^T v$, so $\|u+v\|^2 = \|u\|^2 + 2u^Tv + \|v\|^2$.
+\end{itemize}
+
+% ============================================================
+\section{Orthogonality and Gram-Schmidt}
+% ============================================================
+
+\subsection{Orthogonal and Orthonormal Sets}
+\begin{itemize}
+    \item Vectors $u, v$ are \textbf{orthogonal} ($u\perp v$) if $\langle u,v\rangle = 0$.
+    \item A set $\{a_1,\ldots,a_k\}$ is \textbf{orthogonal} if $\langle a_i, a_j\rangle = 0$ for all $i\neq j$.
+    \item It is \textbf{orthonormal} if additionally $\|a_i\| = 1$ for all $i$:
+    \[
+        \langle a_i, a_j\rangle = \delta_{ij} = \begin{cases}1 & i=j\\ 0 & i\neq j\end{cases}.
+    \]
+    \item \textbf{Pythagorean theorem}: $u\perp v$ $\iff$ $\|u+v\|^2 = \|u\|^2 + \|v\|^2$.
+    \item \textbf{Theorem}: An orthogonal set of \emph{nonzero} vectors is linearly independent, and forms a basis for its span.
+    \item If $\{a_1,\ldots,a_n\}$ is orthonormal in $\mathbb{R}^n$, it is an orthonormal basis for $\mathbb{R}^n$.
+    \item \textbf{Expansion (Fourier) coefficients}: if $\{a_1,\ldots,a_k\}$ is orthonormal, then $y\in\mathrm{Span}\{a_i\}$ has the direct expansion
+    \[
+        y = (a_1^Ty)\,a_1 + \cdots + (a_k^Ty)\,a_k.
+    \]
+    For a merely \emph{orthogonal} set, $y = \sum_j c_j a_j$ with $c_j = \dfrac{y\cdot a_j}{a_j\cdot a_j}$ — no linear system to solve.
+\end{itemize}
+
+\subsection{Orthogonal Subspaces and Complement}
+\begin{itemize}
+    \item Subspaces $W_1, W_2\subseteq V$ are \textbf{orthogonal} ($W_1\perp W_2$) if $\langle w_1, w_2\rangle = 0$ for all $w_1\in W_1$, $w_2\in W_2$.
+    \begin{itemize}
+        \item Equivalent: the bases of $W_1$ and $W_2$ are pairwise orthogonal.
+    \end{itemize}
+    \item \textbf{Orthogonal complement} of $W\subseteq V$:
+    \[
+        W^\perp = \{v\in V \mid \langle v,w\rangle = 0 \;\text{for all}\; w\in W\}.
+    \]
+    $W^\perp$ is a subspace of $V$, and $W^\perp \cap W = \{\mathbf{0}\}$.
+    \item Orthogonal subspaces need not be complements: $W_1 = \mathrm{Span}(e_1)$ and $W_2 = \mathrm{Span}(e_2)$ in $\mathbb{R}^3$ are orthogonal but do not span $\mathbb{R}^3$.
+    \item In a finite-dimensional inner product space: $V = W \oplus W^\perp$, so $\dim(W^\perp) = \dim(V) - \dim(W)$.
+    \item \textbf{Fundamental orthogonality}: $C(A) \perp N(A^T)$ and $R(A) \perp N(A)$.
+\end{itemize}
+
+\subsection{Gram-Schmidt Orthogonalization}
+Given a list $S = (a_1,\ldots,a_k)$ in an inner product space, the \textbf{Gram-Schmidt} process constructs an orthonormal list $(q_1,\ldots,q_r)$ that is a basis for $\mathrm{Span}(S)$:
+\begin{itemize}
+    \item Step 1: $\tilde{q}_1 = a_1$,\quad $q_1 = \dfrac{\tilde{q}_1}{\|\tilde{q}_1\|}$.
+    \item Step 2: $\tilde{q}_2 = a_2 - \langle q_1,a_2\rangle\, q_1$,\quad $q_2 = \dfrac{\tilde{q}_2}{\|\tilde{q}_2\|}$.
+    \item Step 3: $\tilde{q}_3 = a_3 - \langle q_1,a_3\rangle\, q_1 - \langle q_2,a_3\rangle\, q_2$,\quad $q_3 = \dfrac{\tilde{q}_3}{\|\tilde{q}_3\|}$.
+    \item \textbf{General step $i$}:
+    \[
+        \tilde{q}_i = a_i - \sum_{j=1}^{i-1}\langle q_j,\, a_i\rangle\, q_j,\qquad q_i = \frac{\tilde{q}_i}{\|\tilde{q}_i\|}.
+    \]
+    \item \textbf{If} $\tilde{q}_i = \mathbf{0}$: skip (do not produce $q_i$). This happens iff $a_i \in \mathrm{Span}\{a_1,\ldots,a_{i-1}\}$, i.e., $S$ is linearly dependent and:
+    \[
+        a_i = \langle q_1,a_i\rangle q_1 + \cdots + \langle q_{i-1},a_i\rangle q_{i-1}.
+    \]
+    \item If no step is skipped $\Rightarrow$ $S$ is linearly independent and $(q_1,\ldots,q_k)$ is an orthonormal basis for $\mathrm{Span}(S)$.
+    \item \textbf{Complexity}: $O(nk^2)$ (where $n$ is the dimension of each vector).
+\end{itemize}
+
+\textbf{Theorem (Existence of Orthonormal Basis):} Every finite-dimensional inner product space has an orthonormal basis (apply Gram-Schmidt to any basis).
+
+% ============================================================
+\section{Determinants}
+% ============================================================
+
+\subsection{Geometric Meaning}
+\begin{itemize}
+    \item $|\det A|$ measures how much $A$ scales space: it is the area (2D), volume (3D), or hypervolume of the image of the unit square/cube under the linear map $A$.
+    \item A $2\times 2$ matrix $A$ maps the unit square (sides $e_1, e_2$) to a parallelogram with sides $Ae_1, Ae_2$ (the columns of $A$); $\det A$ is the signed area of that parallelogram.
+    \item For $T$ with matrix $A$ and a region $S$: $\mathrm{area}(T(S)) = |\det A|\cdot\mathrm{area}(S)$ (and analogously for volume in $\mathbb{R}^3$).
+    \item A rotation $\begin{bmatrix}\cos\theta & -\sin\theta\\ \sin\theta & \cos\theta\end{bmatrix}$ has determinant $1$ (preserves area).
+\end{itemize}
+
+\subsection{Volume as an Alternating Multilinear Form}
+The volume $V(a_1,\ldots,a_n)$ of the parallelepiped with legs $a_1,\ldots,a_n$ is characterized by:
+\begin{itemize}
+    \item \textbf{Multilinearity (scaling)}: $V(\ldots,\lambda a_i,\ldots) = \lambda\, V(\ldots,a_i,\ldots)$.
+    \item \textbf{Multilinearity (additivity)}: $V(\ldots,a_i + \omega,\ldots) = V(\ldots,a_i,\ldots) + V(\ldots,\omega,\ldots)$.
+    \item \textbf{Alternating}: swapping two legs flips the sign, $V(a_1,a_2)=-V(a_2,a_1)$; hence $V=0$ whenever two legs are equal (or linearly dependent).
+    \item \textbf{Normalization}: $V(e_1,\ldots,e_n) = 1$.
+\end{itemize}
+Expanding $V\!\left(\begin{bmatrix}a\\b\end{bmatrix},\begin{bmatrix}c\\d\end{bmatrix}\right)$ by multilinearity gives $ad-bc$ — the familiar $2\times 2$ formula.
+
+\subsection{Multilinear and Alternating Forms}
+\begin{itemize}
+    \item A \textbf{multilinear form} $f:\mathcal V_1\times\cdots\times\mathcal V_p\to F$ is linear in each argument separately.
+    \item An $m$-linear form $\alpha$ on $V$ is \textbf{alternating} if $\alpha(v_1,\ldots,v_m)=0$ whenever two of the inputs are equal. Equivalently (bilinear case) $\alpha(u,w) = -\alpha(w,u)$.
+    \item $V^2 = V^2_{\mathrm{sym}} \oplus V^2_{\mathrm{alt}}$; and $V^m_{\mathrm{alt}}$ is a subspace of $V^m$.
+    \item \textbf{Linear dependence}: if $v_1,\ldots,v_m$ is linearly dependent, then $\alpha(v_1,\ldots,v_m)=0$ for every alternating $\alpha$. There is no nonzero alternating $m$-linear form when $m > \dim V$.
+    \item \textbf{Swaps}: for alternating $\alpha$, each transposition of two inputs multiplies the value by $-1$.
+\end{itemize}
+
+\subsection{Permutations and the Leibniz Formula}
+\begin{itemize}
+    \item A \textbf{permutation} of $(1,\ldots,m)$ is a reordering $(j_1,\ldots,j_m)$; the set is $\mathrm{perm}(m)$.
+    \item The \textbf{sign} is $\mathrm{sign}(j_1,\ldots,j_m) = (-1)^N$, where $N$ counts inversions (pairs $k<l$ with $k$ appearing after $l$). The identity permutation has sign $+1$.
+    \item For an alternating form, $\alpha(v_{j_1},\ldots,v_{j_m}) = \mathrm{sign}(j_1,\ldots,j_m)\,\alpha(v_1,\ldots,v_m)$.
+    \item \textbf{Leibniz formula}: for an $n\times n$ matrix $A$,
+    \[
+        \det A = \sum_{(j_1,\ldots,j_n)\in\mathrm{perm}(n)} \mathrm{sign}(j_1,\ldots,j_n)\, A_{j_1,1}\,A_{j_2,2}\cdots A_{j_n,n}.
+    \]
+    The determinant is the unique alternating $n$-linear form (as a function of the columns) with $\det I = 1$.
+\end{itemize}
+
+\subsection{Cofactor Expansion}
+\begin{itemize}
+    \item Let $A_{ij}$ be the submatrix obtained by deleting row $i$ and column $j$. The \textbf{$(i,j)$-cofactor} is $C_{ij} = (-1)^{i+j}\det(A_{ij})$.
+    \item \textbf{Recursive definition} (expansion along the first row):
+    \[
+        \det A = \sum_{j=1}^{n} (-1)^{1+j} a_{1j}\det(A_{1j}) = \sum_{j=1}^n a_{1j} C_{1j}.
+    \]
+    \item The expansion may be taken along \emph{any} row $i$ or \emph{any} column $j$:
+    \[
+        \det A = \sum_{k=1}^n a_{ik} C_{ik} = \sum_{k=1}^n a_{kj} C_{kj}.
+    \]
+    \item \textbf{Closed forms}:
+    \[
+        \det\begin{bmatrix}a&b\\c&d\end{bmatrix} = ad-bc,\qquad
+        \det\begin{bmatrix}a&b&c\\d&e&f\\g&h&i\end{bmatrix} = aei+bfg+cdh-afh-bdi-ceg.
+    \]
+    \item \textbf{Adjugate}: $\mathrm{adj}(A) = C^T$ (transpose of the cofactor matrix), giving
+    \[
+        A^{-1} = \frac{1}{\det A}\,\mathrm{adj}(A).
+    \]
+\end{itemize}
+
+\subsection{Properties of the Determinant}
+\begin{itemize}
+    \item \textbf{Row operations}: adding a multiple of one row to another leaves $\det$ unchanged; swapping two rows flips the sign; scaling a row by $k$ multiplies $\det$ by $k$. Hence $\det(kA_{n\times n}) = k^n\det A$.
+    \item A zero row/column, two equal rows/columns, or linearly dependent columns all force $\det A = 0$. In fact columns are linearly dependent $\iff \det A = 0$.
+    \item \textbf{Triangular}: $\det$ of a (upper/lower) triangular matrix is the product of its diagonal entries; $\det I = 1$.
+    \item \textbf{Multiplicativity}: $\det(AB) = \det(A)\det(B)$; but $\det$ is \emph{not} linear ($\det(A+B)\neq\det A + \det B$ in general).
+    \item \textbf{Invertibility}: $A$ is invertible $\iff \det A \neq 0$, and then $\det(A^{-1}) = 1/\det A$.
+    \item \textbf{Transpose}: $\det(A^T) = \det A$. For orthogonal/unitary $U$: $|\det U| = 1$.
+\end{itemize}
+
+\subsection{Cramer's Rule}
+Let $A$ be invertible and $A_i(b)$ denote $A$ with its $i$-th column replaced by $b$. The unique solution of $Ax=b$ has entries
+\[
+    x_i = \frac{\det A_i(b)}{\det A},\qquad i = 1,\ldots,n.
+\]
+Applying this to $Ax = e_j$ recovers the adjugate formula $A^{-1} = \frac{1}{\det A}\,\mathrm{adj}(A)$.
+
+% ============================================================
+\section{Eigenvalues and Eigenvectors}
+% ============================================================
+
+\subsection{Definitions}
+\begin{itemize}
+    \item For a square $A$, a nonzero $v$ with $Av = \lambda v$ is an \textbf{eigenvector} and $\lambda$ the corresponding \textbf{eigenvalue}. An eigenvector must be nonzero, but $\lambda = 0$ is allowed.
+    \item \textbf{Eigenspace}: $E_\lambda = N(A-\lambda I) = \mathrm{Span}\{\text{eigenvectors for }\lambda\}\cup\{\mathbf 0\}$, a subspace of $\mathbb{R}^n$.
+    \item \textbf{Spectrum}: $\sigma(A)$ is the set of all eigenvalues of $A$.
+\end{itemize}
+
+\subsection{Characteristic Polynomial}
+\begin{itemize}
+    \item $Av=\lambda v \iff (A-\lambda I)v = \mathbf 0$ with $v\neq\mathbf 0$, so $A-\lambda I$ must be \emph{singular}: $\det(A-\lambda I)=0$.
+    \item \textbf{Characteristic polynomial} $p(\lambda) = \det(A - \lambda I)$; \textbf{characteristic equation} $p(\lambda)=0$. To get a monic polynomial (leading coefficient $+1$) one often uses $\det(\lambda I - A) = (-1)^n\det(A-\lambda I)$.
+    \item An $n\times n$ matrix has $n$ eigenvalues counted with multiplicity (over $\mathbb{C}$).
+    \item Writing $p(\lambda) = (\lambda-\lambda_1)\cdots(\lambda-\lambda_n)$: the coefficient $c_{n-1} = -\mathrm{trace}(A)$ and $c_0 = (-1)^n\det A$.
+\end{itemize}
+
+\subsection{Key Facts}
+\begin{itemize}
+    \item \textbf{Sum} of eigenvalues $= \mathrm{trace}(A)$;\quad \textbf{product} of eigenvalues $= \det(A)$.
+    \item $0\in\sigma(A) \iff \det A = 0 \iff A$ singular. Thus $A$ is invertible $\iff 0$ is not an eigenvalue.
+    \item \textbf{Triangular matrices}: the eigenvalues are the diagonal entries.
+    \item \textbf{Structured matrices}: a projection has eigenvalues $\{0,1\}$ (with $0$ of multiplicity $n-r$ and $1$ of multiplicity $r=\mathrm{rank}$); reflection and permutation matrices have eigenvalues among $\{1,-1\}$.
+    \item The nonzero eigenvalues of $AB$ equal the nonzero eigenvalues of $BA$.
+\end{itemize}
+
+% ============================================================
+\section{Diagonalization}
+% ============================================================
+
+\subsection{Similarity}
+\begin{itemize}
+    \item $A$ and $B$ are \textbf{similar} if $A = Q^{-1}BQ$ for some invertible $Q$. This is exactly a change of basis: if $\bar A = P^{-1}AP$, then $\bar A$ is the matrix of the same linear map in the new basis.
+    \item \textbf{Similarity invariants}: similar matrices share determinant, characteristic polynomial, eigenvalues, trace, and rank; their inverses (when they exist) are also similar.
+    \item \textbf{Warnings}: equal eigenvalues do \emph{not} imply similarity — e.g. $\begin{bmatrix}2&1\\0&2\end{bmatrix}$ is not similar to $2I$. Similarity is \emph{not} row-equivalence; row operations generally change eigenvalues.
+\end{itemize}
+
+\subsection{Diagonalizable Matrices}
+\begin{itemize}
+    \item $A$ is \textbf{diagonalizable} if $A = Q\Lambda Q^{-1}$ with $\Lambda$ diagonal. Stacking $Aq_i = \lambda_i q_i$ into columns gives $AQ = Q\Lambda$, so the columns of $Q$ are eigenvectors and $\Lambda = \mathrm{diag}(\lambda_1,\ldots,\lambda_n)$.
+    \item $A_{n\times n}$ is diagonalizable $\iff$ $A$ has $n$ linearly independent eigenvectors. \textbf{Corollary}: $n$ distinct eigenvalues $\Rightarrow$ diagonalizable.
+    \item \textbf{Multiplicities}: the \emph{algebraic} multiplicity of $\lambda$ is its multiplicity as a root of $p(\lambda)$; the \emph{geometric} multiplicity is $\dim E_\lambda$. Always $\text{geometric} \le \text{algebraic}$.
+    \item $A$ is diagonalizable $\iff$ the geometric multiplicities sum to $n$ $\iff$ for every eigenvalue geometric $=$ algebraic. E.g. $\begin{bmatrix}0&1\\0&0\end{bmatrix}$ is \emph{not} diagonalizable.
+\end{itemize}
+
+\subsection{Powers and Cayley--Hamilton}
+\begin{itemize}
+    \item Diagonalization turns matrix powers into scalar powers: $A^k = Q\Lambda^k Q^{-1}$, with $\Lambda^k = \mathrm{diag}(\lambda_1^k,\ldots,\lambda_n^k)$.
+    \item \textbf{Cayley--Hamilton}: every square matrix satisfies its own characteristic polynomial, $p(A) = 0$. This reduces high powers of $A$ to low ones, lets $A^{-1}$ be written as a polynomial in $A$ (when invertible), and computes powers even of non-diagonalizable matrices.
+\end{itemize}
+
+% ============================================================
+\section{Matrix Factorizations}
+% ============================================================
+
+\subsection{QR Factorization}
+\begin{itemize}
+    \item If $A_{m\times n}$ has linearly independent columns, then $A = QR$ where $Q$ has orthonormal columns ($Q^TQ = I$) and $R$ is upper triangular with positive diagonal.
+    \item $Q$ comes from running Gram-Schmidt on the columns of $A$; then $R = Q^TA$, with $R_{jk} = \langle a_k, q_j\rangle$ for $j<k$ and $R_{ii} = \|\tilde q_i\|$.
+    \item If $A$ is square, $Q$ is orthogonal ($Q^TQ = QQ^T = I$). Every matrix has a QR factorization, though $R$ need not be invertible (for rank-deficient $A$, $R$ is block upper-triangular).
+    \item \textbf{Determinant}: if $A = UT$ with $U$ unitary and $T$ upper triangular, then $|\det A| = |t_{11}t_{22}\cdots t_{nn}|$.
+\end{itemize}
+
+\subsection{Schur Triangularization}
+For every $A\in M_n(\mathbb{C})$ there exist a unitary $U$ and an upper-triangular $T$ with
+\[
+    A = UTU^{*}.
+\]
+The diagonal of $T$ holds the eigenvalues of $A$. Schur forms are highly non-unique. A real matrix with non-real eigenvalues (e.g. $\begin{bmatrix}1&-2\\1&-1\end{bmatrix}$) has no real Schur triangularization, only a complex one.
+
+\subsection{Spectral Decomposition}
+\begin{itemize}
+    \item \textbf{Complex}: $A = UDU^{*}$ with $U$ unitary and $D$ diagonal $\iff$ $A$ is \textbf{normal} ($A^{*}A = AA^{*}$).
+    \item \textbf{Real}: $A = UDU^{T}$ with $U$ orthogonal and $D$ real diagonal $\iff$ $A$ is \textbf{symmetric} ($A = A^T$).
+    \item Eigenvectors of a normal matrix belonging to distinct eigenvalues are orthogonal.
+    \item Spectral decomposition applies only to normal (complex) / symmetric (real) matrices; the general tool for \emph{all} matrices is the SVD.
+\end{itemize}
+
+\subsection{LU and PLU Factorization}
+\begin{itemize}
+    \item $A = LU$ with $L$ unit lower-triangular and $U$ upper-triangular. Construct $U$ by Gaussian elimination (no row swaps); place the reciprocals/negatives of the elimination multipliers into $L$.
+    \item To solve $Ax=b$: set $Ux = y$, solve $Ly = b$ (forward substitution), then $Ux = y$ (back substitution).
+    \item \textbf{Existence}: an invertible $A$ has an LU factorization $\iff$ all leading principal minors are nonzero; a rank-$k$ singular matrix has one if its first $k$ leading principal minors are nonzero.
+    \item \textbf{PLU} (partial pivoting): any nonsingular $A$ factors as $A = PLU$ with $P$ a permutation matrix; equivalently factor $P^TA = LU$. Also called Gaussian elimination with partial pivoting (GEPP); not unique.
+    \item \textbf{Cost}: LU takes $\approx \tfrac{2}{3}n^3$ flops (vs.\ $\approx 2n^3$ to form $A^{-1}$); each triangular solve is $\approx 2n^2$ flops; sparsity of $A$ tends to carry over to $L,U$ but not to $A^{-1}$.
+\end{itemize}
+
+\subsection{Cholesky and Low-Rank Factorization}
+\begin{itemize}
+    \item \textbf{Cholesky}: every positive definite $A$ factors as $A = R^TR$ with $R$ upper-triangular and positive diagonal ($R$ is the ``square root'' of $A$). Cost $\approx \tfrac{1}{3}n^3$ flops; it also serves as a practical positive-definiteness test.
+    \item \textbf{Low-rank}: a rank-$r$ matrix $A\in\mathbb{R}^{m\times n}$ factors as $A = BC^T$ with $B\in\mathbb{R}^{m\times r}$ (a basis of the range) and $C\in\mathbb{R}^{n\times r}$ (coordinate matrix). Useful for approximating $A$ when $r\ll m,n$.
+\end{itemize}
+
+% ============================================================
+\section{Symmetric Matrices and Quadratic Forms}
+% ============================================================
+
+\subsection{Symmetric Matrices}
+\begin{itemize}
+    \item $A$ is \textbf{symmetric} if $A^T = A$ (necessarily square; entries mirror across the diagonal).
+    \item \textbf{Real eigenvalues}: for $A=A^T$ and $Ax=\lambda x$ with $x\neq 0$, $\lambda = \dfrac{x^TAx}{x^Tx}\in\mathbb{R}$.
+    \item Eigenvectors from \emph{distinct} eigenspaces are orthogonal; for symmetric matrices geometric multiplicity $=$ algebraic multiplicity.
+    \item \textbf{Spectral theorem}: $A$ is \textbf{orthogonally diagonalizable} ($A = Q\Lambda Q^T$, $Q$ orthogonal) $\iff$ $A$ is symmetric.
+    \item For a symmetric matrix, the signs of the pivots match the signs of the eigenvalues (and both products equal $\det A$).
+\end{itemize}
+
+\subsection{Quadratic Forms}
+\begin{itemize}
+    \item A \textbf{quadratic form} on $\mathbb{R}^n$ is $\mathcal Q(x) = x^TAx$ with $A$ symmetric:
+    \[
+        x^TAx = \sum_{i}\sum_j A_{ij}x_ix_j.
+    \]
+    \item \textbf{Reading off $A$}: diagonal entry $A_{ii}$ is the coefficient of $x_i^2$; off-diagonal $A_{ij}=A_{ji}$ is \emph{half} the coefficient of $x_ix_j$. Any $B$ can be symmetrized without changing the form via $A = \tfrac12(B+B^T)$.
+    \item \textbf{Change of variable} $x = Py$ ($P$ invertible): the form becomes $y^T(P^TAP)y$. Since $A$ is symmetric, an orthogonal $P$ makes $P^TAP = D$ diagonal, eliminating cross terms: $\mathcal Q = \sum_i \lambda_i y_i^2$.
+\end{itemize}
+
+\subsection{Definiteness and Classification}
+A symmetric $A$ (equivalently its form $\mathcal Q$) is:
+\begin{itemize}
+    \item \textbf{Positive definite} ($A\succ 0$): $x^TAx > 0$ for all $x\neq 0$ $\iff$ all eigenvalues $> 0$.
+    \item \textbf{Positive semidefinite} ($A\succeq 0$): $x^TAx \ge 0$ $\iff$ all eigenvalues $\ge 0$.
+    \item \textbf{Negative (semi)definite}: reverse the inequalities / eigenvalue signs.
+    \item \textbf{Indefinite}: $A$ has both positive and negative eigenvalues (the form takes both signs).
+\end{itemize}
+
+\subsection{Positive-Definiteness Tests}
+For symmetric $A$, the following are equivalent statements that $A$ is positive definite:
+\begin{enumerate}
+    \item $x^TAx > 0$ for all $x\neq \mathbf 0$.
+    \item $A = S^TS$ for some $S$ with linearly independent columns.
+    \item Every eigenvalue is $> 0$.
+    \item \textbf{Sylvester's criterion}: every leading principal minor (upper-left $k\times k$ determinant) is $> 0$.
+    \item Every pivot is $> 0$.
+\end{enumerate}
+For positive \emph{semi}definiteness, replace ``$>0$'' by ``$\ge 0$'' and use \emph{all} principal minors (not just leading ones).
+
+\subsection{Gram Matrices and Properties}
+\begin{itemize}
+    \item The \textbf{Gram matrix} $A^TA$ is symmetric with real, nonnegative eigenvalues and orthonormal eigenvectors — always positive semidefinite. It is positive definite $\iff$ the columns of $A$ are linearly independent.
+    \item If $A,B$ are positive (semi)definite and $c>0$: $A+B$, $cA$, $A^T$, and $P^{*}AP$ are positive (semi)definite. $P^{*}AP$ is positive \emph{definite} iff $\mathrm{rank}(P)=m$.
+    \item Positive/negative definite matrices are full rank, hence invertible; $A\succ 0 \Rightarrow A^{-1}\succ 0$.
+\end{itemize}
+
+% ============================================================
+\section{Singular Value Decomposition (SVD)}
+% ============================================================
+
+\subsection{Singular Values and Vectors}
+\begin{itemize}
+    \item For any $S\in\mathbb{R}^{m\times n}$, the \textbf{singular values} are $\sigma_i = \sqrt{\lambda_i}$ where $\lambda_i$ are the (nonnegative) eigenvalues of $S^TS$, ordered $\sigma_1\ge\sigma_2\ge\cdots\ge 0$.
+    \item If $v_1,\ldots,v_n$ are orthonormal eigenvectors of $S^TS$, then $\|Sv_i\| = \sigma_i$.
+    \item If $\sigma_1\ge\cdots\ge\sigma_r > 0$ (with $\sigma_{r+1}=\cdots=0$), then $\{Sv_1,\ldots,Sv_r\}$ is an orthogonal basis of $\mathrm{range}(S)$, so $\mathrm{rank}(S) = r =$ number of nonzero singular values.
+    \item Define $u_i = \dfrac{Sv_i}{\sigma_i}$ for $i\le r$: the $u_i$ are orthonormal ($Sv = \sigma u$), forming a basis of $\mathrm{range}(S)$.
+\end{itemize}
+
+\subsection{The Decomposition}
+Every $A\in\mathbb{R}^{m\times n}$ factors as
+\[
+    A = U\Sigma V^T \qquad (\text{or } U\Sigma V^{*}\text{ over }\mathbb{C}),
+\]
+where
+\begin{itemize}
+    \item $U$ is $m\times m$ orthogonal — columns (\textbf{left singular vectors}) are eigenvectors of $AA^T$;
+    \item $V$ is $n\times n$ orthogonal — columns (\textbf{right singular vectors}) are eigenvectors of $A^TA$;
+    \item $\Sigma$ is $m\times n$ diagonal with nonnegative singular values $\sigma_i$.
+\end{itemize}
+Consistency checks: $A^TA = V\Sigma^2 V^T$ and $AA^T = U\Sigma^2 U^T$, so $\sigma_i^2 = \lambda_i$. The SVD always exists (even for rectangular / rank-deficient $A$) and is essentially unique up to permutation / repeated singular values.
+
+\subsection{Computing an SVD}
+\begin{enumerate}
+    \item Find eigenpairs $(\lambda_i, v_i)$ of $A^TA$; normalize the $v_i$ into $V$ (right singular vectors).
+    \item Form $\Sigma$ from $\sigma_i = \sqrt{\lambda_i}$, ordered decreasingly.
+    \item Recover $U$ from $AV = U\Sigma$, i.e. $U = AV\Sigma^{-1}$ (columns are the $u_i = Av_i/\sigma_i$, extended to an orthonormal basis of $\mathbb{R}^m$).
+\end{enumerate}
+\textbf{Reduced SVD}: keeping only the $k=\min(m,n)$ meaningful directions gives $A = U_R\Sigma_R V_R^T$ with $U_R$ ($m\times k$), $\Sigma_R$ ($k\times k$), $V_R$ ($n\times k$); $U_R, V_R$ have orthonormal columns but are no longer square.
+
+\subsection{Comparison with Other Factorizations}
+\begin{itemize}
+    \item \textbf{SVD} applies to \emph{every} matrix (even rectangular), $\Sigma$ is diagonal with real nonnegative entries, and it uses \emph{two} orthogonal/unitary matrices $U,V$.
+    \item \textbf{Diagonalization} needs a basis of eigenvectors and one invertible matrix.
+    \item \textbf{Spectral decomposition} needs a normal matrix and one unitary matrix.
+\end{itemize}
+
+\subsection{Consequences and Applications}
+\begin{itemize}
+    \item \textbf{Determinant}: $|\det A| = \prod_i \sigma_i$ (since $|\det U| = |\det V^{*}| = 1$).
+    \item \textbf{Outer-product form}: $A = \sum_{i=1}^r \sigma_i u_i v_i^T$, and $A_k = \sum_{i=1}^k \sigma_i u_i v_i^T$ has $\mathrm{rank}(A_k) = k$.
+    \item \textbf{Best rank-$k$ approximation}: keep the $k$ largest singular values (zero the rest); this is the closest rank-$k$ matrix to $A$ (Eckart--Young).
+    \item \textbf{Four fundamental subspaces}: $\{u_1,\ldots,u_r\}$ is an orthonormal basis of $\mathrm{range}(A)$; $\{u_{r+1},\ldots,u_m\}$ of $N(A^{*})$; $\{v_1,\ldots,v_r\}$ of $\mathrm{range}(A^{*})$; $\{v_{r+1},\ldots,v_n\}$ of $N(A)$.
+    \item If $A$ is positive semidefinite, its singular values equal its eigenvalues.
+\end{itemize}
+
+\subsection{Pseudo-Inverse}
+\begin{itemize}
+    \item The \textbf{Moore--Penrose pseudo-inverse} is $A^{+} = V\Sigma^{+}U^T$, where $\Sigma^{+}$ inverts the nonzero singular values and leaves zeros in place: $(\Sigma^{+})_i = 1/\sigma_i$ if $\sigma_i\neq 0$, else $0$.
+    \item It is defined for all matrices (non-square, singular, \ldots). When $A^TA$ is invertible (tall, full rank), $A^{+} = (A^TA)^{-1}A^T$ gives the least-squares solution; when $AA^T$ is invertible (wide, full rank), $A^{+} = A^T(AA^T)^{-1}$ gives the least-norm solution.
+    \item In general $x = A^{+}b$ is the minimum-norm least-squares solution.
+\end{itemize}
+
+% ============================================================
+\section{Vector and Matrix Norms}
+% ============================================================
+
+\subsection{The \texorpdfstring{$p$}{p}-Norm Family}
+\begin{itemize}
+    \item A \textbf{norm} $f:\mathbb{R}^n\to\mathbb{R}$ satisfies positivity ($f(x)\ge 0$, $=0\iff x=\mathbf 0$), homogeneity ($f(\alpha x)=|\alpha|f(x)$), and the triangle inequality ($f(x+y)\le f(x)+f(y)$).
+    \item \textbf{$p$-norm} ($p\ge 1$): $\displaystyle \|x\|_p = \Big(\sum_{i}|x_i|^p\Big)^{1/p}$.
+    \begin{itemize}
+        \item $\|x\|_1 = \sum_i|x_i|$ (Manhattan distance).
+        \item $\|x\|_2 = \sqrt{\sum_i x_i^2}$ (Euclidean).
+        \item $\|x\|_\infty = \max_i|x_i|$ (max norm).
+    \end{itemize}
+    \item \textbf{Not true norms}: $\|x\|_0 = \#\{i: x_i\neq 0\}$ (counts nonzeros; violates homogeneity) and $\|x\|_{1/2}$ (fails the triangle inequality). The unit ``ball'' $\|x\|_p = 1$ is convex only for $p\ge 1$.
+\end{itemize}
+
+\subsection{$L^1$ vs.\ $L^2$ and Sparsity}
+\begin{itemize}
+    \item $L^1$ regularization tends to produce \textbf{sparse} solutions (its diamond-shaped unit ball has corners on the axes), while $L^2$ spreads weight out and is more stable.
+    \item Since $\|x\|_0$ minimization is NP-hard, the $\ell_1$ norm is used as a \textbf{convex relaxation}: $\min_x \|x\|_1$ s.t.\ $\|Ax-b\|_2 < \epsilon$.
+\end{itemize}
+
+\subsection{Norm Inequalities}
+For all $x\in\mathbb{R}^d$:
+\[
+    \|x\|_2 \le \|x\|_1 \le \sqrt{d}\,\|x\|_2,\qquad
+    \|x\|_\infty \le \|x\|_1 \le d\,\|x\|_\infty,\qquad
+    \|x\|_\infty \le \|x\|_2 \le \sqrt{d}\,\|x\|_\infty.
+\]
+Every inner product induces a norm $\|x\| = \sqrt{\langle x,x\rangle}$, but not every norm comes from an inner product (e.g.\ $\|\cdot\|_\infty$).
+
+\subsection{Matrix Norms}
+\begin{itemize}
+    \item \textbf{Entrywise / Frobenius}: $\displaystyle \|A\|_F = \Big(\sum_{i,j}|a_{ij}|^2\Big)^{1/2} = \sqrt{\mathrm{trace}(A^{*}A)} = \Big(\sum_i \sigma_i^2\Big)^{1/2}$. It is invariant under unitary multiplication: $\|A\|_F = \|UA\|_F = \|AU\|_F$.
+    \item \textbf{Induced (operator) norm}: $\displaystyle \|A\|_p = \max_{x\neq 0}\frac{\|Ax\|_p}{\|x\|_p}$, so $\|Ax\|\le \|A\|\,\|x\|$ and $\|AB\|\le\|A\|\,\|B\|$ (submultiplicative).
+    \item Special cases: $\|A\|_1 = \max_j \sum_i |a_{ij}|$ (max absolute column sum); $\|A\|_\infty = \max_i\sum_j|a_{ij}|$ (max absolute row sum).
+\end{itemize}
+
+% ============================================================
+\section{Vector and Matrix Calculus}
+% ============================================================
+
+\subsection{Fields, Gradients, and Jacobians}
+\begin{itemize}
+    \item A \textbf{scalar field} is $f:\mathbb{R}^n\to\mathbb{R}$; a \textbf{vector field} $f:\mathbb{R}^n\to\mathbb{R}^m$; a \textbf{matrix field} maps into matrices. Differentiating a scalar field gives the gradient (a vector); differentiating again gives the Hessian (a matrix).
+    \item \textbf{Gradient / Jacobian} (numerator layout): for $f:\mathbb{R}^n\to\mathbb{R}$, the derivative $\dfrac{\partial f}{\partial x}$ is a \emph{row} vector. Machine-learning texts often use the transposed ``denominator layout''; the chain rule reverses order accordingly.
+    \item \textbf{Directional derivative}: for $f:\mathbb{R}^n\to\mathbb{R}$ and direction $v$, $\;D_v f = v\cdot\nabla f$.
+    \item \textbf{Jacobian}: for $f:\mathbb{R}^n\to\mathbb{R}^m$, $\big(J\big)_{ij} = \partial f_i/\partial x_j$; the \textbf{Hessian} of a scalar field is the Jacobian of its gradient.
+\end{itemize}
+
+\subsection{Useful Identities}
+\begin{itemize}
+    \item Vector-by-vector (numerator layout):
+    \[
+        \frac{\partial(Ax)}{\partial x} = A,\qquad
+        \frac{\partial(x^Ta)}{\partial x} = a^T,\qquad
+        \frac{\partial(x^TAx)}{\partial x} = x^T(A + A^T)\;\big(= 2x^TA\text{ if }A=A^T\big).
+    \]
+    \item \textbf{Product rule} (with $x,y$ functions of $z$): $\dfrac{\partial(x^Ty)}{\partial z} = x^T\dfrac{\partial y}{\partial z} + y^T\dfrac{\partial x}{\partial z}$.
+    \item Matrix-valued derivatives:
+    \[
+        \frac{\partial\det(A)}{\partial A} = \det(A)\,A^{-1},\qquad
+        \frac{\partial\ln|\det A|}{\partial A} = A^{-1},\qquad
+        \frac{\partial (A^{-1})}{\partial t} = -A^{-1}\frac{\partial A}{\partial t}A^{-1}.
+    \]
+    \[
+        \frac{\partial(y^TAx)}{\partial A} = xy^T,\qquad
+        \frac{\partial(x^TAx)}{\partial A} = xx^T.
+    \]
+\end{itemize}
+
+% ============================================================
+\section{Projections and Orthogonal Matrices}
+% ============================================================
+
+\subsection{Projection onto a Vector / Subspace}
+\begin{itemize}
+    \item \textbf{Onto a vector}: for $u\neq\mathbf 0$, $\;\mathrm{proj}_u(v) = \dfrac{u\cdot v}{u\cdot u}\,u$.
+    \item \textbf{Orthogonal decomposition theorem}: if $W$ has orthogonal basis $u_1,\ldots,u_p$, then every $y$ splits uniquely as $y = \hat y + z$ with $\hat y\in W$, $z\in W^\perp$, where
+    \[
+        \hat y = \frac{y\cdot u_1}{u_1\cdot u_1}u_1 + \cdots + \frac{y\cdot u_p}{u_p\cdot u_p}u_p
+    \]
+    is the orthogonal projection of $y$ onto $W$.
+\end{itemize}
+
+\subsection{Orthogonal Matrices}
+\begin{itemize}
+    \item An \textbf{orthogonal matrix} has orthonormal columns. If \emph{square}: $A^TA = AA^T = I$ and $A^{-1} = A^T$.
+    \item \textbf{Tall} $A\in\mathbb{R}^{m\times n}$, $m>n$: $A^TA = I_n$ but $AA^T\neq I_m$ ($AA^T$ is the projection onto $C(A)$).
+    \item \textbf{Wide} $A$, $m<n$: $AA^T = I_m$ but $A^TA\neq I_n$.
+    \item The map $f(x)=Ax$ (orthonormal columns) preserves inner products, norms, distances, and angles: $(Ax)^T(Ay) = x^Ty$.
+    \item Every $2\times 2$ orthogonal matrix is a rotation $\begin{bmatrix}\cos\theta & -\sin\theta\\ \sin\theta&\cos\theta\end{bmatrix}$ or a reflection $\begin{bmatrix}\cos 2\theta & \sin 2\theta\\ \sin 2\theta & -\cos 2\theta\end{bmatrix}$.
+\end{itemize}
+
+\subsection{Projection Matrices}
+\begin{itemize}
+    \item For $A$ with independent columns, the orthogonal projection onto $C(A)$ is
+    \[
+        P = A(A^TA)^{-1}A^T.
+    \]
+    \item $P$ is \textbf{symmetric} ($P^T = P$) and \textbf{idempotent} ($P^2 = P$); it fixes vectors in $C(A)$ and annihilates vectors in $C(A)^\perp = N(A^T)$.
+    \item This rests on the fundamental orthogonality $C(A)\perp N(A^T)$ and $R(A)\perp N(A)$.
+\end{itemize}
+
+% ============================================================
+\section{Least Squares}
+% ============================================================
+
+\subsection{The Problem}
+When $Ax=b$ has no solution ($b\notin C(A)$), we instead minimize the residual $\|Ax-b\|$. The bad news is $Ax=b$ is unsolvable; the good news is $A\hat x = \hat b$ (with $\hat b$ the projection of $b$ onto $C(A)$) always is.
+
+\subsection{Normal Equations (Method 1)}
+\begin{itemize}
+    \item The residual $b-A\hat x$ must be orthogonal to $C(A)$, i.e.\ lie in $N(A^T)$: $A^T(b-A\hat x)=\mathbf 0$. This gives the \textbf{normal equations}
+    \[
+        A^TA\,\hat x = A^Tb.
+    \]
+    \item If $A$ has linearly independent columns then $A^TA$ is invertible and
+    \[
+        \hat x = (A^TA)^{-1}A^Tb = A^{+}b,
+    \]
+    the unique least-squares solution; $(A^TA)^{-1}A^T$ is the left inverse of $A$, and $A(A^TA)^{-1}A^T$ is the projection onto $C(A)$.
+    \item When $A$ is square and invertible this reduces to $\hat x = A^{-1}b$.
+\end{itemize}
+
+\subsection{Derivation and QR (Methods 2--3)}
+\begin{itemize}
+    \item \textbf{Calculus}: minimizing $f(x) = (Ax-b)^T(Ax-b)$ via $\nabla f(x) = 0$ gives $2A^TAx - 2A^Tb = 0$, i.e.\ the same normal equations (using $\partial(x^TBx)/\partial x = 2x^TB$ for symmetric $B$).
+    \item \textbf{QR}: with $A = QR$, solve $R\,x_{LS} = Q^Tb$ by back substitution. Cost $\approx 2mn^2$; numerically more stable than forming $A^TA$.
+\end{itemize}
+
+\subsection{Rank-Deficient Case and SVD (Method 4)}
+\begin{itemize}
+    \item $A^TA$ is invertible $\iff$ $A$ has linearly independent columns (typical when the number of equations $N$ greatly exceeds the number of unknowns $D$).
+    \item When $A^TA$ is singular (e.g.\ $N < D$), the three methods above fail and there are infinitely many solutions. Using the SVD $A = U\Sigma V^T$,
+    \[
+        x = V\Sigma^{+}U^Tb
+    \]
+    is the \textbf{minimum-norm} least-squares solution; the full solution set adds any element of $N(A)$.
+\end{itemize}
+
+\subsection{Weighted and Constrained Least Squares}
+\begin{itemize}
+    \item \textbf{Weighted}: minimizing $\sum_k \|\lambda_k(A_kx - b_k)\|^2$ stacks the weighted blocks; if the stacked matrix has independent columns,
+    \[
+        \hat x = \Big(\textstyle\sum_k \lambda_k A_k^TA_k\Big)^{-1}\Big(\textstyle\sum_k \lambda_k A_k^Tb_k\Big).
+    \]
+    \item \textbf{Constrained} ($\min\|Ax-b\|^2$ s.t.\ $Cx=d$): form the Lagrangian $L(x,\lambda) = \|Ax-b\|^2 + \lambda^T(Cx-d)$ and solve the KKT system
+    \[
+        \begin{bmatrix} 2A^TA & C^T\\ C & 0\end{bmatrix}\begin{bmatrix}x^{*}\\ \lambda^{*}\end{bmatrix} = \begin{bmatrix}2A^Tb\\ d\end{bmatrix}.
+    \]
+\end{itemize}
+
+% ============================================================
+\section{Cheat Sheet}
+% ============================================================
+\begin{multicols}{2}
+\small
+\raggedright
+
+\textbf{\color{Thistle}Core objects}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item $Ax$ = lin.\ comb.\ of columns of $A$; $(Ax)_i = \tilde a_i^Tx$.
+    \item $C(A)=$ span of columns; $R(A)=C(A^T)$; $N(A)=\ker A$; $N(A^T)=$ left null space.
+    \item $\mathrm{rank}(A)=\dim C(A)=\dim R(A)=r$.
+    \item \textbf{Rank--nullity}: $\mathrm{rank}(A)+\dim N(A)=n$.
+    \item \textbf{Four subspaces}: $C(A),N(A^T)\subseteq\mathbb{R}^m$; $R(A),N(A)\subseteq\mathbb{R}^n$; $C(A)\perp N(A^T)$, $R(A)\perp N(A)$.
+\end{itemize}
+
+\textbf{\color{Thistle}Independence / basis}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item LD $\iff$ some vector is a lin.\ comb.\ of the others; contains $\mathbf 0\Rightarrow$ LD.
+    \item Coeffs in a basis are unique; two bases have equal size $=\dim V$.
+    \item $p>\dim V$ vectors $\Rightarrow$ LD; $p<\dim V$ can't span.
+    \item $\dim(W_1{+}W_2)=\dim W_1+\dim W_2-\dim(W_1\cap W_2)$.
+    \item $\dim F^n{=}n$, $\dim P_p{=}p{+}1$, $\dim M_{m,n}{=}mn$.
+\end{itemize}
+
+\textbf{\color{Thistle}Solving $Ax=b$}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item Consistent $\iff b\in C(A)$ $\iff$ last column not a pivot in $[A\mid b]$.
+    \item General solution $=$ particular $+$ $N(A)$.
+    \item Homogeneous $Ax=\mathbf 0$ has nontrivial solutions $\iff \mathrm{rank}(A)<n$.
+    \item $N(A)=N(A^TA)$, so $\mathrm{rank}(A^TA)=\mathrm{rank}(A)$; $\mathrm{rank}(A)=\mathrm{rank}(A^T)$.
+\end{itemize}
+
+\textbf{\color{Thistle}Invertible Matrix Thm ($A_{n\times n}$)}\\
+Equivalent: invertible $\iff\det A\neq0\iff\mathrm{rank}=n\iff$ RREF $=I\iff$ cols (rows) independent \& span $\iff Ax{=}\mathbf0$ only trivial $\iff x\mapsto Ax$ 1-1 \& onto $\iff 0\notin\sigma(A)\iff$ has left \& right inverse.
+
+\textbf{\color{Thistle}Linear maps}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item $\dim V=\mathrm{nullity}(T)+\dim\mathrm{range}(T)$.
+    \item 1-1 $\iff N(T)=\{\mathbf0\}\iff$ cols indep; onto $\iff$ cols span.
+    \item Square: 1-1 $\iff$ onto. Wide: never 1-1; tall: never onto.
+    \item $[T]_B=P^{-1}[T]_E P$ (change of basis); $R_\theta^n=R_{n\theta}$.
+\end{itemize}
+
+\textbf{\color{Thistle}Inverse}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item $A^{-1}$ exists $\iff \det A\neq 0 \iff \mathrm{rank}=n \iff$ RREF $=I$.
+    \item $(AB)^{-1}=B^{-1}A^{-1}$, $(A^T)^{-1}=(A^{-1})^T$.
+    \item $A^{-1}=\frac{1}{\det A}\mathrm{adj}(A)$, $\mathrm{adj}(A)=C^T$.
+\end{itemize}
+
+\textbf{\color{Thistle}Determinant}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item $\det\!\begin{bmatrix}a&b\\c&d\end{bmatrix}=ad-bc$.
+    \item Cofactor: $\det A=\sum_j a_{ij}C_{ij}$, $C_{ij}=(-1)^{i+j}\det A_{ij}$.
+    \item $\det(AB)=\det A\det B$; $\det(A^T)=\det A$; $\det(kA)=k^n\det A$; $\det(A^{-1})=1/\det A$.
+    \item Triangular $\Rightarrow \det=\prod$ diagonal; swap flips sign; add-multiple keeps it.
+    \item Cramer: $x_i=\det A_i(b)/\det A$.
+\end{itemize}
+
+\textbf{\color{Thistle}Eigenvalues}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item $Av=\lambda v$, $v\neq 0$; $E_\lambda=N(A-\lambda I)$; solve $\det(A-\lambda I)=0$.
+    \item $\sum\lambda_i=\mathrm{trace}(A)$; $\prod\lambda_i=\det A$.
+    \item Triangular: $\lambda_i=$ diagonal. $0\in\sigma(A)\iff$ singular.
+    \item geo.\ mult.\ $\le$ alg.\ mult.
+\end{itemize}
+
+\textbf{\color{Thistle}Diagonalization}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item $A=Q\Lambda Q^{-1}\iff n$ indep.\ eigenvectors; $n$ distinct $\lambda\Rightarrow$ yes.
+    \item $A^k=Q\Lambda^kQ^{-1}$.
+    \item Similar $A=Q^{-1}BQ$: same $\det,\mathrm{tr},\mathrm{rank}$, char.\ poly, $\lambda$.
+    \item Cayley--Hamilton: $p(A)=0$.
+\end{itemize}
+
+\textbf{\color{Thistle}Symmetric / quadratic}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item $A=A^T\Rightarrow$ real $\lambda$, orthonormal eigenvectors, $A=Q\Lambda Q^T$.
+    \item $\mathcal Q(x)=x^TAx$; diag.\ entry $=$ coeff.\ $x_i^2$, off-diag.\ $=\tfrac12$ cross term.
+    \item PD $\iff$ all $\lambda>0 \iff$ leading minors $>0 \iff$ pivots $>0 \iff A=S^TS$ (indep.\ cols).
+    \item $A^TA\succeq 0$ always; $\succ 0\iff$ cols independent.
+\end{itemize}
+
+\textbf{\color{Thistle}Orthogonality}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item Orthogonal set of nonzero vectors is independent.
+    \item Orthonormal expansion: $y=\sum_i(a_i^Ty)a_i$; orthogonal: $c_j=\frac{y\cdot a_j}{a_j\cdot a_j}$.
+    \item $\mathrm{proj}_u v=\frac{u\cdot v}{u\cdot u}u$; projection onto $C(A)$: $P=A(A^TA)^{-1}A^T$, $P^2=P=P^T$.
+    \item Orthogonal $A$: $A^TA=I$, preserves norm/angle; square $\Rightarrow A^{-1}=A^T$.
+    \item Gram--Schmidt: $\tilde q_i=a_i-\sum_{j<i}\langle q_j,a_i\rangle q_j$, $q_i=\tilde q_i/\|\tilde q_i\|$.
+\end{itemize}
+
+\textbf{\color{Thistle}Factorizations}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item $A=QR$: $Q^TQ=I$, $R$ upper-$\triangle$, $R=Q^TA$.
+    \item $A=LU$ (leading minors $\neq0$); $A=PLU$ general.
+    \item $A=R^TR$ (Cholesky, PD).
+    \item Normal $\Rightarrow A=UDU^{*}$; symmetric $\Rightarrow A=UDU^T$; general $\Rightarrow$ SVD.
+\end{itemize}
+
+\textbf{\color{Thistle}SVD}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item $A=U\Sigma V^T$; $\sigma_i=\sqrt{\lambda_i(A^TA)}$; $V$: eigvecs of $A^TA$, $U$: eigvecs of $AA^T$, $u_i=Av_i/\sigma_i$.
+    \item $\mathrm{rank}=\#\{\sigma_i>0\}$; $|\det A|=\prod\sigma_i$; $\|A\|_F^2=\sum\sigma_i^2$.
+    \item $A=\sum_i\sigma_i u_iv_i^T$; best rank-$k$: keep top $k$ $\sigma_i$.
+    \item $A^{+}=V\Sigma^{+}U^T$ ($1/\sigma_i$ if $\sigma_i\neq0$, else $0$).
+\end{itemize}
+
+\textbf{\color{Thistle}Norms}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item $\|x\|_p=(\sum|x_i|^p)^{1/p}$; $\|x\|_1,\|x\|_2,\|x\|_\infty=\max|x_i|$.
+    \item $\|x\|_2\le\|x\|_1\le\sqrt d\|x\|_2$; $\|x\|_\infty\le\|x\|_2\le\sqrt d\|x\|_\infty$.
+    \item $\|A\|_F=\sqrt{\mathrm{tr}(A^{*}A)}$; $\|A\|_1=$ max col sum, $\|A\|_\infty=$ max row sum; $\|AB\|\le\|A\|\|B\|$.
+\end{itemize}
+
+\textbf{\color{Thistle}Calculus}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item $\partial(Ax)/\partial x=A$; $\partial(x^Ta)/\partial x=a^T$.
+    \item $\partial(x^TAx)/\partial x=x^T(A+A^T)=2x^TA$ (sym).
+    \item $\partial\det A/\partial A=\det A\,A^{-1}$; $\partial\ln|\det A|/\partial A=A^{-1}$.
+\end{itemize}
+
+\textbf{\color{Thistle}Least squares}
+\begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=1pt]
+    \item Normal eq.: $A^TA\hat x=A^Tb\Rightarrow\hat x=(A^TA)^{-1}A^Tb=A^{+}b$.
+    \item Residual $b-A\hat x\perp C(A)$ (in $N(A^T)$).
+    \item Rank-deficient: $x=V\Sigma^{+}U^Tb$ (min-norm).
+\end{itemize}
+
+\end{multicols}
+
+\end{document}
