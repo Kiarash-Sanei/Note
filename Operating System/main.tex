@@ -1,0 +1,139 @@
+\documentclass[hidelinks]{article}
+\usepackage{float}
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tkz-euclide}
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{caption}
+
+\usetikzlibrary{angles, calc, decorations.pathreplacing, shapes.geometric, arrows.meta, positioning}
+
+\tikzset{
+    state/.style={circle, draw, minimum size=1cm},
+    action/.style={rectangle, draw, minimum width=1cm, minimum height=0.7cm},
+    reward/.style={diamond, draw, aspect=2, minimum height=0.8cm},
+    arrow/.style={->, thick},
+    box/.style={draw=white, rectangle, minimum width=3cm, minimum height=0.8cm, align=center, text=white},
+    level/.style={minimum width=3cm}
+}
+\tikzstyle{triangle} = [regular polygon, regular polygon sides=3, draw, minimum size=1cm]
+\tikzstyle{circleState} = [circle, draw, minimum size=1cm]
+
+\definecolor{carminered}{rgb}{1.0, 0.0, 0.22}
+\definecolor{capri}{rgb}{0.0, 0.75, 1.0}
+\definecolor{brightlavender}{rgb}{0.75, 0.58, 0.89}
+
+\titleformat{\section}
+    {\bfseries\color{brightlavender}\Large}
+    {\thesection}
+    {0.5em}
+    {}
+
+\titleformat{\subsection}
+    {\color{Thistle}\bfseries}
+    {\thesubsection}
+    {0.5em}
+    {}
+
+\setlist[itemize,1]{label=$\bullet$}
+\setlist[itemize,2]{label=$\circ$}
+\setlist[itemize,3]{label=$\bullet$}
+\setlist[itemize,4]{label=$\circ$}
+
+\lstdefinestyle{C}{
+    language=C,
+    basicstyle=\footnotesize\ttfamily,
+    tabsize=4,
+    backgroundcolor=\color{black},
+    keywordstyle=\bfseries\color{cyan},
+    commentstyle=\itshape\color{green},
+    identifierstyle=\color{gray!50},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray!50},
+    stepnumber=1,
+    numbersep=8pt,
+    showspaces=false,
+    showstringspaces=false,
+    breaklines=false,
+    frame=single,
+    framerule=0.5pt,
+    captionpos=b
+}
+
+\lstdefinestyle{Java}{
+    language=Java,
+    basicstyle=\footnotesize\ttfamily,
+    tabsize=4,
+    backgroundcolor=\color{black},
+    keywordstyle=\bfseries\color{cyan},
+    commentstyle=\itshape\color{green},
+    identifierstyle=\color{gray!50},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray!50},
+    stepnumber=1,
+    numbersep=8pt,
+    showspaces=false,
+    showstringspaces=false,
+    breaklines=false,
+    frame=single,
+    framerule=0.5pt,
+    captionpos=b
+}
+
+\title{\color{carminered}\textbf{Operating Systems}}
+\author{\color{Thistle}Kiarash Sanei}
+\date{\color{SkyBlue}Febuary, 2026}
+\begin{document}
+    \hypersetup{bookmarksnumbered=true}
+    \pagecolor{black}
+    \color{white}
+    \maketitle
+    
+    \begin{Large}
+    \tableofcontents
+    \end{Large}
+    \pagebreak
+    
+    \input{./sections/1.tex}
+    \pagebreak
+    
+    \input{./sections/2.tex}
+    \pagebreak
+
+    \input{./sections/3.tex}
+    \pagebreak
+
+    \input{./sections/4.tex}
+    \pagebreak
+
+    \input{./sections/5.tex}
+    \pagebreak
+
+    \input{./sections/6.tex}
+    \pagebreak
+
+    \input{./sections/7.tex}
+    \pagebreak
+
+    \input{./sections/8.tex}
+    \pagebreak
+
+    \input{./sections/9.tex}
+    \pagebreak
+
+    \input{./sections/10.tex}
+    \pagebreak
+
+    \input{./sections/11.tex}
+    \pagebreak
+\end{document}
