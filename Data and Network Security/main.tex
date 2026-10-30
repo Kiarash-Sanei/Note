@@ -100,55 +100,6 @@ The first session introduces the vocabulary of information security through a si
     \item \textbf{Part 5:} security claims, counterexamples, and test evidence.
 \end{itemize}
 
-\subsection{Course Calendar (1405)}
-
-\textbf{Mehr 1405:}
-\[
-\begin{array}{lll}
-\textbf{Date} & \textbf{Type} & \textbf{Event}\\ \hline
-\text{14 Mehr} & \text{Release} & \text{Exercise 1 released}\\
-\text{28 Mehr} & \text{Due}     & \text{Exercise 1 due}\\
-\text{29 Mehr} & \text{Release} & \text{Project 1 released}\\
-\end{array}
-\]
-
-\textbf{Aban 1405:}
-\[
-\begin{array}{lll}
-\textbf{Date} & \textbf{Type} & \textbf{Event}\\ \hline
-\text{11 Aban} & \text{Exam}      & \text{Midterm 1}\\
-\text{15 Aban} & \text{Selection} & \text{Open-source project selection opens}\\
-\text{15 Aban} & \text{Release}   & \text{Exercise 2 released}\\
-\text{18 Aban} & \text{Due}       & \text{Project 1 due}\\
-\text{21 Aban} & \text{Due}       & \text{Open-source project selection due}\\
-\text{28 Aban} & \text{Selection} & \text{TAs approve or reject project selections}\\
-\text{30 Aban} & \text{Due}       & \text{Exercise 2 due}\\
-\end{array}
-\]
-
-\textbf{Azar 1405:}
-\[
-\begin{array}{lll}
-\textbf{Date} & \textbf{Type} & \textbf{Event}\\ \hline
-\text{2 Azar}  & \text{Selection} & \text{Open-source project selection finalized}\\
-\text{3 Azar}  & \text{Release}   & \text{Project 2 released}\\
-\text{5 Azar}  & \text{Release}   & \text{Exercise 3 released}\\
-\text{16 Azar} & \text{Exam}      & \text{Midterm 2}\\
-\text{20 Azar} & \text{Due}       & \text{Exercise 3 due}\\
-\text{25 Azar} & \text{Due}       & \text{Project 2 due}\\
-\text{30 Azar} & \text{Release}   & \text{Exercise 4 released}\\
-\end{array}
-\]
-
-\textbf{Dey 1405:}
-\[
-\begin{array}{lll}
-\textbf{Date} & \textbf{Type} & \textbf{Event}\\ \hline
-\text{14 Dey} & \text{Due} & \text{Exercise 4 due}\\
-\text{23 Dey} & \text{Due} & \text{Open-source vulnerability finding due}\\
-\end{array}
-\]
-
 \subsection{Running Example: A Coursework Document Portal}
 
 \subsubsection{An Unshared Draft}
@@ -718,6 +669,8 @@ Mandatory policy assigns labels and access rules; ordinary owners cannot overrid
 \end{itemize}
 Here $L(p)$ is the process's fixed current label, bounded by its clearance. A process cannot lower its label after reading secret data.
 
+\callout{\textbf{Intuition.} BLP protects \emph{secrecy}, so it stops secrets from flowing \emph{downward}. ``No read up'': a Confidential clerk cannot open a Top-Secret file. ``No write down'': someone who has read a Top-Secret file cannot then paste it into a Public note --- otherwise the secret leaks. Think of information as only ever allowed to move \emph{up} the classification ladder, never down. Mnemonic: \textbf{read down, write up}.}
+
 \subsubsection{Applying the Bell--LaPadula Rules}
 
 A process with current label Secret~$\{A\}$:
@@ -754,6 +707,8 @@ Writing up places information in a more restrictive destination. It does not gra
     \item \textbf{Integrity $\star$-property (no write up):} write $o$ only if $I(o) \le I(p)$. A process writes data of equal or lower integrity.
 \end{itemize}
 The integrity order describes trustworthiness of data, not its secrecy classification.
+
+\callout{\textbf{Intuition.} Biba protects \emph{integrity}, so it is the exact mirror of BLP: it stops \emph{untrusted} (low) data from flowing \emph{upward} and contaminating trusted data. ``No read down'': a trusted installer should not execute a script downloaded from a random website. ``No write up'': a low-integrity web form cannot overwrite a high-integrity system file. Picture dirty water: it may flow down to lower-integrity sinks, never up into the clean reservoir. Mnemonic: \textbf{read up, write down} --- the opposite of BLP.}
 
 \subsubsection{Strict Integrity Labels Constrain a Processing Pipeline}
 
@@ -1382,6 +1337,8 @@ alias->done();  // use-after-free: undefined behavior
 
 \callout{Nulling one pointer cannot invalidate every alias. The final access through \texttt{alias} is undefined behavior.}
 
+\callout{\textbf{Intuition.} \texttt{free(p)} is like checking out of a hotel room: you no longer own it, but if you kept a spare key (\texttt{alias}) you can still walk back in. Setting \texttt{p = NULL} only throws away \emph{one} key. Worse, the hotel may have already given the room to a new guest (reuse), so when you let yourself in with the old key you find someone else's belongings where you expected yours --- that mismatch is the ``type confusion'' that makes use-after-free exploitable.}
+
 \subsubsection{The Same Address Can Later Hold a Different Object}
 
 \begin{enumerate}
@@ -1574,6 +1531,8 @@ G2: inc rdi      ; modify the value
     ret
 \end{lstlisting}
 Each trailing \texttt{ret} loads the next code address, so the stack ``drives'' a small program.
+
+\callout{\textbf{Intuition.} ROP is like writing a ransom note by cutting words out of a magazine: you are forbidden to \emph{write} new letters (NX blocks injected code), so instead you assemble your message from snippets that already exist. Each gadget is a ``word'' already printed in the program's code, and the stack is the order in which you glue them together. The \texttt{ret} at the end of each gadget is what flips to the next cut-out word.}
 
 \subsubsection{The ROP Stack Contains Both Pointers and Operands}
 
@@ -1907,6 +1866,289 @@ For a dangling heap pointer whose \texttt{done} is invoked after free and reuse:
 \end{itemize}
 
 \callout{Next (Session 8): finding and diagnosing the remaining bugs --- fuzzing, static analysis, taint analysis, and symbolic execution.}
+
+\newpage
+%=================================================
+\section{Vulnerability Discovery and Program Analysis}
+%=================================================
+
+\subsection{Session Outline}
+
+The previous sessions showed how bugs become attacks and how mitigations raise the bar. This session asks the complementary question: \emph{how do we find the bugs in the first place?} It surveys the four main techniques and how to turn a crash into a fixed, tested vulnerability.
+\begin{itemize}
+    \item \textbf{Part 1:} coverage-guided fuzzing and reliable test harnesses.
+    \item \textbf{Part 2:} static analysis and dynamic taint tracking.
+    \item \textbf{Part 3:} symbolic execution and path constraints.
+    \item \textbf{Part 4:} root-cause analysis, patching, and regression tests.
+\end{itemize}
+
+\callout{A single \textbf{running example} ties the whole session together: a \emph{length-controlled record parser} with a destination-capacity bug. Every technique is shown finding or fixing that one bug.}
+
+\subsubsection{Evidence in Vulnerability Discovery}
+
+A failure needs an \emph{explanation} before it becomes a security finding. Four questions turn a crash into evidence:
+\[
+\begin{array}{ll}
+\textbf{Reachability} & \text{can attacker-controlled input reach the faulty operation?}\\
+\textbf{Failure}      & \text{which invariant does the operation violate?}\\
+\textbf{Impact}       & \text{what security property can the violation affect?}\\
+\textbf{Repair}       & \text{which change restores the invariant for related inputs?}\\
+\end{array}
+\]
+
+\callout{A crash is evidence of a \emph{failure}, not automatically of an \emph{exploit}: exploitability depends on the surrounding system and threat model (the same end-to-end point as Session~4).}
+
+\subsection{Part 1 --- Coverage-Guided Fuzzing and Reliable Harnesses}
+
+\subsubsection{Running Example: a Length-Controlled Record}
+
+\begin{lstlisting}[language=C]
+if (size < 3) return;
+if (data[0] != 'M' || data[1] != 'G') return;  // header: two magic bytes
+size_t n = data[2];                             // + one length byte
+if (n > size - 3) return;                       // checks the SOURCE extent
+char out[16];
+memcpy(out, data + 3, n);                        // writes into a 16-byte DEST
+consume(out, n);
+\end{lstlisting}
+The record has a \textbf{header} (magic bytes \texttt{'M'}, \texttt{'G'} and a length byte), a \textbf{source} payload that must contain \texttt{n} bytes, and a \textbf{destination} \texttt{out} that holds only 16 bytes.
+
+\callout{\textbf{The bug:} the check \texttt{n > size - 3} only validates that the \emph{source} has \texttt{n} readable bytes. It says nothing about the \emph{destination}'s 16-byte capacity. Any \texttt{n} in $17\ldots255$ (with a long enough input) passes the check and overflows \texttt{out}. This is the same ``check the wrong bound'' mistake as the integer examples in Session~5.}
+
+\subsubsection{Input-Generation Strategies}
+
+There are three complementary ideas for producing test inputs:
+\begin{itemize}
+    \item \textbf{Mutation:} alter existing sample inputs with byte flips, insertions, and boundary values. From the seed \texttt{MG|05|HELLO}: flip a byte (\texttt{MG|05|HXLLO}), change the length (\texttt{MG|00|HELLO}), try a boundary (\texttt{MG|FF|HELLO}), or insert a byte. Needs a useful starting \textbf{corpus}.
+    \item \textbf{Generation:} create inputs from a format or grammar model (Magic \texttt{= "MG"}, Length \texttt{= 1 byte}, Payload \texttt{= Length bytes}). Models the input \textbf{structure}, so it gets past format checks that random mutation rarely satisfies.
+    \item \textbf{Coverage guidance:} use execution feedback to prioritize inputs that reach \emph{new} behavior. Guides \emph{either} of the strategies above.
+\end{itemize}
+
+\callout{Distinction worth keeping straight: generation and mutation describe \emph{how inputs are built}; coverage describes \emph{how the search receives feedback}. They are orthogonal and usually combined.}
+
+\subsubsection{The Coverage-Feedback Loop}
+
+Coverage-guided fuzzing (e.g.\ libFuzzer, AFL) repeats a three-step loop:
+\begin{enumerate}
+    \item \textbf{Select and mutate:} choose a corpus input and produce a candidate.
+    \item \textbf{Execute:} run the instrumented target; record coverage and any failures.
+    \item \textbf{Keep useful input:} save inputs that hit \emph{new} coverage and preserve crash reproducers.
+\end{enumerate}
+
+\callout{\textbf{Intuition.} Coverage is like exploring a dark building by keeping only the inputs that opened a door you had not been through before. Over many rounds the corpus drifts toward inputs that exercise deep, rarely-reached code --- which is where bugs hide. But reaching a path only shows it \emph{runs}; it never \emph{proves} the path is safe.}
+
+\subsubsection{A Harness Exposes the Code Under Test}
+
+\begin{lstlisting}[language=C++]
+extern "C" int
+LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    parse_record(data, size);   // call the real parser
+    return 0;
+}
+\end{lstlisting}
+A good harness has three properties: it calls the \emph{real} code in \textbf{scope}, it \textbf{tolerates} empty and malformed \textbf{inputs} without its own crashes, and it \textbf{resets state} between iterations so runs are independent. A fast, repeatable harness both speeds the search and makes failures easier to reproduce.
+
+\subsubsection{Fuzzing Oracles}
+
+The \textbf{oracle} decides which observed behavior counts as a failure:
+\[
+\begin{array}{ll}
+\textbf{Crash}        & \text{a fatal signal or unexpected termination}\\
+\textbf{Sanitizer}    & \text{e.g.\ an out-of-bounds or use-after-free report (ASan)}\\
+\textbf{Invariant}    & \text{an assertion or security-specific consistency check}\\
+\textbf{Differential} & \text{a disagreement between two equivalent implementations}\\
+\end{array}
+\]
+
+\callout{Why sanitizers matter: an overflow of a few bytes often does \emph{not} crash on its own, so a crash-only oracle misses it. \textbf{ASan} (AddressSanitizer) makes many memory errors observable \emph{at the moment they happen}, before they turn into an unexplained crash much later.}
+
+\subsubsection{Worked Fuzzing Trace for the Record Parser}
+
+\[
+\begin{array}{lll}
+\textbf{Input} & \textbf{Path reached} & \textbf{Observation}\\ \hline
+\text{wrong magic}          & \text{header rejects input} & \text{parser returns}\\
+n=16,\ \text{size}=19       & \text{valid header and copy} & \text{16-byte destination fits}\\
+n=17,\ \text{size}=20       & \text{same copy location}    & \text{\textbf{invalid destination write}}\\
+\end{array}
+\]
+The \texttt{n = 17} input reuses the \emph{same} copy path as \texttt{n = 16}; only the length differs, and the oracle (ASan) flags the one-past-capacity write.
+
+\subsubsection{Fuzzing Blind Spots}
+
+The harness and the search budget bound what fuzzing can see:
+\begin{itemize}
+    \item \textbf{Barriers:} magic values, checksums, and complex formats --- random input fails the \texttt{MG} header check.
+    \item \textbf{State:} authentication, protocol sequences, persistent state --- e.g.\ \texttt{WRITE} is rejected until \texttt{LOGIN} succeeds.
+    \item \textbf{Oracle:} silent logic errors escape a crash-only check --- e.g.\ Bob is credited but Alice is not debited.
+    \item \textbf{Budget:} incomplete environments and limited time --- e.g.\ an interrupt-only path is never exercised.
+\end{itemize}
+
+\callout{Key epistemic point: ``no failure found'' means ``no failure \emph{observed under this harness and budget},'' not ``no bug exists.''}
+
+\subsection{Part 2 --- Static Analysis and Dynamic Taint Tracking}
+
+\subsubsection{Static Analysis Reasons About Modeled Executions}
+
+Static analysis inspects code \emph{without running it}. It builds a model of control flow and data flow, tracks possible values, aliases, and constraints, and reports a suspicious operation together with the path or condition that could reach it. No target run is required; a useful result states \emph{which property was checked} and \emph{what assumptions} the analysis made.
+
+\subsubsection{False Alarms and Missed Bugs}
+
+Because static analysis approximates, it makes two kinds of error:
+\begin{itemize}
+    \item \textbf{False positive:} it reports a bug that cannot actually occur in the relevant execution model (wasted review effort).
+    \item \textbf{False negative:} a real bug occurs in behavior the analysis fails to report (missed vulnerability).
+\end{itemize}
+
+\callout{\textbf{Intuition.} There is an inherent tension: an analysis tuned to miss nothing (few false negatives) tends to cry wolf often (many false positives), and vice versa. The approximations and model choices decide which warnings need human validation and which bugs stay hidden.}
+
+\subsubsection{Dynamic Taint Tracks Selected Data Dependencies}
+
+Taint tracking follows untrusted data through a \emph{real} execution:
+\[
+\text{Source} \;\xrightarrow{\text{propagation}}\; \text{Sink}.
+\]
+\begin{itemize}
+    \item \textbf{Source:} mark input bytes with a provenance label (e.g.\ network input).
+    \item \textbf{Propagation:} follow the labels through executed assignments and supported operations (e.g.\ \texttt{n = data[2]} carries the label into \texttt{n}).
+    \item \textbf{Sink:} inspect the label on a security-sensitive argument (e.g.\ the \texttt{memcpy} length).
+\end{itemize}
+The label shows \emph{where} data came from; a separate policy decides whether its use is unsafe.
+
+\subsubsection{Validation Must Match the Sink's Contract}
+
+\begin{lstlisting}[language=C]
+n = data[2];
+if (n > size - 3) return;   // checks: enough readable SOURCE bytes
+/* n still comes from input */
+memcpy(out, data + 3, n);
+/* missing: n <= sizeof(out) -- enough writable DEST bytes */
+\end{lstlisting}
+\texttt{n} has input provenance. The existing check validates the \emph{source} extent; the \emph{missing} check validates the \emph{destination}.
+
+\callout{General lesson: passing \emph{one} validation check does not establish \emph{every} property the sink needs. Each sink has its own contract --- here, the \texttt{memcpy} needs \emph{both} a readable source of \texttt{n} bytes \emph{and} a writable destination of \texttt{n} bytes.}
+
+\subsection{Part 3 --- Symbolic Execution and Path Constraints}
+
+\subsubsection{What Replaces a Concrete Input?}
+
+Instead of one fixed input, symbolic execution treats input bytes as \emph{symbols} and asks a constraint solver for inputs that reach a chosen path:
+\[
+\text{concrete bytes} \to \text{symbolic variables} \to \text{a solver-produced test input}.
+\]
+For the parser, \texttt{data[0]=B0}, \texttt{data[1]=B1}, \texttt{data[2]=N}, \texttt{size=S}. To reach the overflow the solver must satisfy \texttt{B0='M'}, \texttt{B1='G'}, \texttt{N > 16}, and \texttt{N <= S-3}; one solution is \texttt{N=17, S=20}, i.e.\ the input \texttt{MG|11|A$\times$17}.
+
+Two modes:
+\begin{itemize}
+    \item \textbf{Static symbolic:} start with symbolic values and explore feasible paths in a program model, using a solver to create concrete tests.
+    \item \textbf{Dynamic / concolic:} run a concrete seed (e.g.\ \texttt{n=5}), track the symbolic constraints along that run, and solve for \emph{another} concrete input that takes a different branch.
+\end{itemize}
+
+\subsubsection{A Solver Can Propose a Concrete Failing Input}
+
+Collecting the path constraints \texttt{B0='M'}, \texttt{B1='G'}, \texttt{0 <= n <= 255}, \texttt{n <= size-3}, \texttt{n > 16} and handing them to the solver yields a candidate (\texttt{n=17, size=20}).
+
+\callout{The solver satisfies the \emph{modeled} conditions; a concrete \textbf{replay} on the real build then checks whether the model actually matched the target. Model and reality can differ, so replay is essential.}
+
+\subsubsection{Three Path Classes in the Record Parser}
+
+Exploring \texttt{parse\_record} yields three families of paths:
+\begin{itemize}
+    \item \textbf{Reject:} short header, wrong magic, or \texttt{n > size-3}.
+    \item \textbf{Copy within capacity:} valid header and source, with \texttt{n <= 16}.
+    \item \textbf{Copy beyond capacity (the bug):} valid header and source, with \texttt{n > 16}.
+\end{itemize}
+The bug path needs \emph{both} a valid source extent \emph{and} an excessive destination length. A path condition records those decisions, and the solver searches for an input satisfying them.
+
+\subsubsection{Symbolic Execution Has Practical Limits}
+
+\[
+\begin{array}{ll}
+\textbf{Paths}  & \text{branches and loops multiply execution states (path explosion)}\\
+\textbf{Models} & \text{files, system calls, and libraries need usable models}\\
+\textbf{Solver} & \text{complex constraints may exhaust time or memory}\\
+\textbf{Bounds} & \text{input-size and loop limits restrict explored behavior}\\
+\end{array}
+\]
+Generated tests are evidence; unexplored behavior stays outside the result.
+
+\subsubsection{The Methods Answer Different Questions}
+
+\begin{center}
+\color{white}
+\begin{tabular}{p{3.0cm}p{4.6cm}p{4.6cm}}
+\hline
+\textbf{Method} & \textbf{Main evidence} & \textbf{Important limitation}\\ \hline
+Fuzzing & concrete inputs and observed failures & harness, oracle, test budget\\
+Static analysis & potential violation in a code model & approximations, incomplete models\\
+Dynamic taint & input provenance on an executed path & label policy, propagation coverage\\
+Symbolic execution & path conditions and candidate inputs & path explosion, environment models\\ \hline
+\end{tabular}
+\end{center}
+
+\callout{The categories overlap, and a practical workflow \emph{combines} their evidence: e.g.\ fuzz to find a crash, use taint/symbolic reasoning to explain which input reaches it, and static analysis to find siblings of the same bug.}
+
+\subsection{Part 4 --- Root-Cause Analysis and Security Patching}
+
+\subsubsection{A Reproducer Begins the Root-Cause Analysis}
+
+\begin{enumerate}
+    \item \textbf{Reproduce:} record the input, build, and environment for a repeatable failure (retain evidence).
+    \item \textbf{Minimize:} remove irrelevant bytes while preserving the same failure (a smaller explanation).
+    \item \textbf{Explain:} trace the invalid operation back to the violated validation or lifetime rule (the root cause).
+\end{enumerate}
+
+\callout{Minimization simplifies the \emph{witness}, but the patch must address the \emph{vulnerable operation} for \emph{all} inputs, not just that one witness.}
+
+\subsubsection{A Patch Restores Both Copy Bounds}
+
+\begin{lstlisting}[language=C]
+if (size < 3) return;
+if (data[0] != 'M' || data[1] != 'G') return;
+size_t n = data[2];
+char out[16];
+if (n > sizeof(out)) return;   // ADDED: destination bound (n <= 16)
+if (n > size - 3) return;      // source bound, after header check
+memcpy(out, data + 3, n);
+consume(out, n);
+\end{lstlisting}
+The fix adds the missing \textbf{destination} check (\texttt{n <= sizeof(out)}), keeps the \textbf{source} check (\texttt{n <= size-3}), and keeps the header check \emph{before} the subtraction (\textbf{order} matters, so \texttt{size-3} is never computed on a too-short input).
+
+\callout{The patch rejects \emph{all} excessive lengths while preserving valid records up to 16 bytes --- it repairs the invariant, not just the one failing sample.}
+
+\subsubsection{Regression Tests Cover the Boundary and Valid Use}
+
+\[
+\begin{array}{lll}
+\textbf{Case} & \textbf{Input condition} & \textbf{Expected behavior}\\ \hline
+\text{Empty payload}    & \text{valid header, } n=0              & \text{accept}\\
+\text{Exact capacity}   & n=16,\ 16\text{ payload bytes}         & \text{accept (no invalid write)}\\
+\text{Over capacity}    & n=17,\ 17\text{ payload bytes}         & \text{reject}\\
+\text{Truncated source} & n=16,\ \text{only }15\text{ bytes}     & \text{reject}\\
+\text{Wrong magic}      & \text{header not } \texttt{MG}         & \text{reject}\\
+\end{array}
+\]
+The original failure, the nearby lengths (the boundary \texttt{n=16} vs \texttt{n=17}), malformed records, and valid behavior all need tests so the bug cannot silently return.
+
+\subsubsection{Checkpoint: a Patch That Blocks One Sample}
+
+Suppose someone ``fixes'' the bug by rejecting only the exact failing input:
+\begin{enumerate}
+    \item \textbf{Does it repair the destination-bound invariant?} No --- it blocks one witness, not the class.
+    \item \textbf{Which nearby input still violates it?} Any other \texttt{n > 16} (e.g.\ \texttt{n = 18}).
+    \item \textbf{Which valid case must the real patch preserve?} \texttt{n = 16} must stay valid.
+\end{enumerate}
+The correct repair blocks \emph{all} \texttt{n > 16}, retains the source-length check, and keeps \texttt{n = 16} valid.
+
+\subsection{References (Session 8)}
+
+\begin{itemize}
+    \item \textbf{Courses:} Stanford CS~155, Lecture~4 (Brandon Azad, 2026); Berkeley CS~161 Software Security, 2020 (fuzz-testing introduction).
+    \item \textbf{Lab:} UW CSE~484 / M584, Lab~4 (Root-Cause Analysis and Patching), Spring 2025.
+    \item \textbf{Tools:} LLVM libFuzzer, AddressSanitizer, Clang Static Analyzer, DataFlowSanitizer; KLEE Tutorial One.
+\end{itemize}
+
+\callout{Next (Session~9): operating-system isolation and sandboxing --- how a compromised process's authority is constrained (setuid, TOCTOU, sandboxing, and isolation via processes, containers, VMs, and SFI).}
 
 \newpage
 %=================================================
