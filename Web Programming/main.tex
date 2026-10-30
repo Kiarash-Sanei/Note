@@ -1,0 +1,2172 @@
+\documentclass[hidelinks]{article}
+% Page Layout
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+% Colors
+\usepackage[dvipsnames]{xcolor}
+% Math
+\usepackage{amsmath,amssymb,mathrsfs}
+% Lists
+\usepackage{enumitem}
+% Section Styling
+\usepackage{titlesec}
+% Hyperlinks
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+% Code listings
+\usepackage{listings}
+\usepackage{inconsolata}
+
+% --------------------------------------------------
+% Color Palette
+% --------------------------------------------------
+\definecolor{carminered}{rgb}{1.0,0.0,0.22}
+\definecolor{capri}{rgb}{0.0,0.75,1.0}
+\definecolor{brightlavender}{rgb}{0.75,0.58,0.89}
+\definecolor{nudelavender}{rgb}{0.78, 0.66, 0.70}
+\definecolor{codebg}{rgb}{0.10,0.10,0.14}
+\definecolor{codecomment}{rgb}{0.5,0.55,0.5}
+\definecolor{codekeyword}{rgb}{0.55,0.78,0.98}
+\definecolor{codestring}{rgb}{0.8,0.65,0.4}
+\definecolor{codenumber}{rgb}{0.72,0.53,0.86}
+
+% --------------------------------------------------
+% Dark Theme
+% --------------------------------------------------
+\pagecolor{black}
+\color{white}
+
+% --------------------------------------------------
+% Code Listing Style
+% --------------------------------------------------
+\lstdefinestyle{darkcode}{
+  backgroundcolor=\color{codebg},
+  commentstyle=\color{codecomment}\itshape,
+  keywordstyle=\color{codekeyword}\bfseries,
+  stringstyle=\color{codestring},
+  numberstyle=\tiny\color{codenumber},
+  basicstyle=\ttfamily\small\color{white},
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  numbers=left,
+  numbersep=6pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  frame=single,
+  rulecolor=\color{brightlavender},
+  framesep=4pt,
+}
+\lstset{style=darkcode}
+\lstdefinelanguage{CSS}{
+  keywords={color,background,margin,padding,font,etc.},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  morestring=[b]',
+}
+
+% --------------------------------------------------
+% Section Style
+% --------------------------------------------------
+\titleformat{\section}
+  {\bfseries\Large\color{brightlavender}}
+  {\thesection}{0.5em}{}
+
+\titleformat{\subsection}
+  {\bfseries\color{Thistle}}
+  {\thesubsection}{0.5em}{}
+
+\titleformat{\subsubsection}
+  {\bfseries\color{nudelavender}}
+  {\thesubsubsection}{0.5em}{}
+
+% --------------------------------------------------
+% Bullet Style
+% --------------------------------------------------
+\setlist[itemize,1]{label=$\bullet$}
+\setlist[itemize,2]{label=$\circ$}
+\setlist[itemize,3]{label=$\bullet$}
+\setlist[itemize,4]{label=$\circ$}
+
+% --------------------------------------------------
+% Title
+% --------------------------------------------------
+\title{\color{carminered}\textbf{Web Programming}}
+\author{\color{Thistle}Kiarash Sanei}
+\date{\color{SkyBlue}June, 2026}
+
+\begin{document}
+\maketitle
+\begin{Large}
+\tableofcontents
+\end{Large}
+\newpage
+
+% ==================================================
+\section{Introduction to Web Programming}
+% ==================================================
+
+\subsection{Brief History of the Web}
+\begin{itemize}
+  \item The internet began as \textbf{ARPANET}, a US Department of Defense network (1960s--70s).
+  \item Initial services: electronic mail and file transfer.
+  \item Opened to commercial interests and most universities in the late 1980s.
+  \item \textbf{WWW} (World Wide Web) created in 1989--91 by \textbf{Tim Berners-Lee}.
+  \item Early browsers: Mosaic (1992), Netscape (1994), Internet Explorer (1995).
+  \item Amazon.com opened in 1995; Google launched in January 1996.
+\end{itemize}
+
+\subsection{Internet vs. the WWW}
+\begin{itemize}
+  \item \textbf{The Internet}: A network of networks using the Internet Protocol suite to link billions of devices worldwide.
+  \item Consists of millions of private, public, academic, business, and government networks.
+  \item Networks are linked by electronic, wireless, and optical networking technologies.
+  \item Carries services such as the WWW, email, FTP, streaming, etc.
+  \item \textbf{The WWW}: A system of interlinked hypertext documents accessed via the internet using HTTP.
+\end{itemize}
+
+\subsection{Web Architecture Evolution}
+\begin{itemize}
+  \item \textbf{1990s}: Static websites --- simple HTML pages served directly from a web server.
+  \item \textbf{Early 2000s}: Dynamic web --- server-side rendering with PHP, ASP, and JSP.
+  \item \textbf{Mid-2000s}: MVC frameworks --- Rails, Django, and Spring MVC for cleaner app design.
+  \item \textbf{2010s}: Single-Page Apps (SPA) --- React, Angular, and Vue move logic to the client side.
+  \item \textbf{Late 2010s}: Serverless \& Microservices --- apps split into small, independent services.
+  \item \textbf{2020s}: Modern hybrids --- Next.js, Remix, and Astro blend SSR, SPA, and static generation.
+\end{itemize}
+
+\subsection{The Layers of the Web}
+\begin{center}
+  \texttt{Client (Front-end)} $\xrightarrow{\text{HTTP Request}}$ \texttt{Network} $\xrightarrow{\text{HTTP Response}}$ \texttt{Server (Back-end)}
+\end{center}
+\begin{itemize}
+  \item The \textbf{front-end} handles the user interface and runs in the browser.
+  \item The \textbf{back-end} handles business logic, databases, and API endpoints.
+  \item Communication happens over \textbf{HTTP} using URLs and API endpoints.
+\end{itemize}
+
+\subsection{The Holy Trinity of the Web}
+\begin{itemize}
+  \item \textbf{HTML} --- Structure (what the content \emph{is}).
+  \item \textbf{CSS} --- Style (how it \emph{looks}).
+  \item \textbf{JavaScript} --- Behaviour (how it \emph{reacts}).
+\end{itemize}
+
+\subsection{Technology Stacks}
+\begin{itemize}
+  \item A \textbf{stack} is the set of technologies used to build a web application.
+  \item Combines frontend, backend, database, and infrastructure layers.
+  \item Each layer handles a different part of the application (UI, logic, data, hosting).
+  \item Choosing the right stack affects performance, scalability, and developer workflow.
+  \item \textbf{Full-stack developers} work across all layers.
+\end{itemize}
+
+\subsection{Developer Roles}
+\begin{itemize}
+  \item \textbf{Front-End Developer}: Builds interactive, user-friendly web interfaces using HTML, CSS, JavaScript, and frameworks like React or Vue.
+  \item \textbf{Back-End Developer}: Develops server-side logic, APIs, and database integrations using Python, Node.js, Golang, or .NET.
+  \item \textbf{Full-Stack Developer}: Combines front-end and back-end skills to deliver complete web solutions.
+  \item \textbf{Web DevOps \& Cloud Engineer}: Manages deployments, CI/CD pipelines, and scalable cloud hosting.
+\end{itemize}
+
+\subsection{Software Engineering Principles}
+\begin{itemize}
+  \item \textbf{Clean Code}: Ensures readability, consistency, and collaboration across teams.
+  \item \textbf{Maintainable Code}: Easier debugging, feature additions, and long-term scalability.
+  \item \textbf{Dead Code Removal}: Eliminates unused, redundant logic to reduce complexity.
+  \item \textbf{Fail Fast Approach}: Detects errors early, improving reliability and lowering costs.
+\end{itemize}
+
+\subsection{LLM Best Practices}
+\begin{itemize}
+  \item \textbf{Define clear goals}: Know exactly what you want the model to achieve before prompting.
+  \item \textbf{Prompt precisely}: Use clear, specific, and contextual instructions.
+  \item \textbf{Iterate \& refine}: Test, review, and adjust prompts or parameters for consistency.
+  \item \textbf{Keep context short \& relevant}: Provide only necessary information to reduce confusion.
+  \item \textbf{Validate outputs}: Always fact-check and post-process model responses.
+  \item \textbf{Respect safety \& ethics}: Ensure responsible AI use.
+  \item Use of LLMs in this course is permitted \textbf{as long as you understand the code}.
+\end{itemize}
+
+\newpage
+% ==================================================
+\section{HTML --- The Building Blocks of the Web}
+% ==================================================
+
+\subsection{What is HTML?}
+\begin{itemize}
+  \item \textbf{HTML} stands for \textbf{HyperText Markup Language}.
+  \item Used to \textbf{structure and describe} the content of a webpage.
+  \item Consists of \textbf{elements} that describe different types of content.
+  \item Web browsers understand HTML and render it as websites.
+  \item \textbf{HTML is not a programming language} --- it is a markup language.
+\end{itemize}
+
+\subsection{HTML Document Structure}
+\begin{lstlisting}[language=HTML, caption={Basic HTML5 document structure}]
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Page</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Hello, World!</h1>
+    <p>This is a paragraph.</p>
+  </body>
+</html>
+\end{lstlisting}
+\begin{itemize}
+  \item \texttt{<!DOCTYPE html>} declares the HTML version (HTML5).
+  \item \texttt{<html>} wraps the entire document.
+  \item \texttt{<head>} contains meta information (not displayed directly).
+  \item \texttt{<body>} holds all visible content.
+  \item Tags are structured hierarchically and must be properly opened and closed.
+\end{itemize}
+
+\subsection{HTML Elements}
+An HTML element typically has:
+\begin{itemize}
+  \item An \textbf{opening tag}: \texttt{<button>}
+  \item A \textbf{closing tag}: \texttt{</button>}
+  \item \textbf{Attributes} (key-value pairs): \texttt{id="submit"}
+  \item \textbf{Child elements or content} inside the tags.
+\end{itemize}
+
+\subsection{The \texttt{<head>} Element}
+\begin{itemize}
+  \item Contains information \emph{about} the page, not displayed directly.
+  \item Helps browsers, search engines, and devices understand your page.
+  \item \texttt{<title>} --- sets the page title (shown on the browser tab).
+  \item \texttt{<meta>} --- defines metadata such as charset, author, viewport, and description.
+  \item \texttt{<link>} --- connects external resources like stylesheets or favicons.
+  \item \texttt{<script>} --- links or embeds JavaScript files.
+\end{itemize}
+
+\subsection{Text Elements}
+\begin{itemize}
+  \item \texttt{<p>} --- paragraph text.
+  \item \texttt{<h1>} through \texttt{<h6>} --- headings (largest to smallest).
+  \item \texttt{<strong>} or \texttt{<b>} --- bold font (\texttt{<strong>} carries semantic emphasis).
+  \item \texttt{<em>} or \texttt{<i>} --- italic font (\texttt{<em>} carries semantic emphasis).
+  \item \texttt{<code>} --- displays a piece of computer code inline.
+  \item \texttt{<pre>} --- preserves whitespace and displays preformatted text (often wraps \texttt{<code>}).
+  \item \texttt{<span>} --- generic inline container for styling parts of text.
+  \item \texttt{<blockquote>} --- block-level quotation.
+  \item \texttt{<br>} --- line break (void element, no closing tag).
+  \item \texttt{<hr>} --- horizontal rule / thematic break (void element, no closing tag).
+\end{itemize}
+
+\begin{lstlisting}[language=HTML, caption={Text element examples}]
+<h1>Main Title</h1>
+<h2>Subtitle</h2>
+<p>This is a <strong>bold</strong> and <em>italic</em> paragraph.</p>
+<p>Inline code: <code>console.log("hello")</code></p>
+<pre><code>
+function greet(name) {
+  return "Hello, " + name;
+}
+</code></pre>
+\end{lstlisting}
+
+\subsection{Hyperlinks}
+\begin{itemize}
+  \item Created using the \texttt{<a>} (anchor) tag.
+  \item The \texttt{href} attribute specifies the URL or location to link to.
+  \item \texttt{target="\_blank"} opens a link in a new tab.
+  \item The \texttt{download} attribute triggers a file download.
+  \item \textbf{Internal links}: \texttt{href="/about"}
+  \item \textbf{External links}: \texttt{href="https://wikipedia.org"}
+  \item \textbf{Anchor links}: \texttt{href="\#section-id"} (jumps to a section on the same page)
+  \item \textbf{Mail links}: \texttt{href="mailto:info@example.com"}
+  \item \textbf{Tel links}: \texttt{href="tel:+9821000000"}
+\end{itemize}
+
+\begin{lstlisting}[language=HTML, caption={Hyperlink examples}]
+<a href="https://google.com" target="_blank">Visit Google</a>
+<a href="/contact">Contact Us</a>
+<a href="#top">Back to Top</a>
+<a href="mailto:hello@example.com">Email Us</a>
+<a href="report.pdf" download>Download Report</a>
+\end{lstlisting}
+
+\subsection{List Elements}
+\begin{itemize}
+  \item \texttt{<ul>} --- unordered list (bulleted).
+  \item \texttt{<ol>} --- ordered list (numbered).
+  \item \texttt{<li>} --- list item (used inside both \texttt{<ul>} and \texttt{<ol>}).
+  \item \texttt{<dl>}, \texttt{<dt>}, \texttt{<dd>} --- description list with terms and definitions.
+\end{itemize}
+
+\begin{lstlisting}[language=HTML, caption={List examples}]
+<ul>
+  <li>Apple</li>
+  <li>Banana</li>
+</ul>
+
+<ol>
+  <li>Step one</li>
+  <li>Step two</li>
+</ol>
+
+<dl>
+  <dt>HTML</dt>
+  <dd>HyperText Markup Language</dd>
+</dl>
+\end{lstlisting}
+
+\subsection{Media Elements}
+\begin{itemize}
+  \item \texttt{<img src="..." alt="...">} --- embed an image (\texttt{alt} is required for accessibility).
+  \item \texttt{<audio controls>} --- embed an audio player.
+  \item \texttt{<video controls width="...">} --- embed a video player.
+  \item \texttt{<source>} --- specifies multiple media sources inside \texttt{<audio>} or \texttt{<video>}.
+  \item \texttt{<iframe>} --- embeds another webpage or external content.
+\end{itemize}
+
+\begin{lstlisting}[language=HTML, caption={Media elements}]
+<img src="photo.jpg" alt="A landscape photo" width="600" />
+
+<audio controls>
+  <source src="song.mp3" type="audio/mpeg" />
+  Your browser does not support audio.
+</audio>
+
+<video controls width="640">
+  <source src="clip.mp4" type="video/mp4" />
+  Your browser does not support video.
+</video>
+\end{lstlisting}
+
+\subsection{Tables}
+\begin{itemize}
+  \item \texttt{<table>} --- defines the table.
+  \item \texttt{<tr>} --- table row.
+  \item \texttt{<th>} --- header cell (bold by default).
+  \item \texttt{<td>} --- data cell.
+  \item \texttt{<thead>}, \texttt{<tbody>}, \texttt{<tfoot>} --- optional sections for organizing large tables.
+  \item Use \texttt{colspan} and \texttt{rowspan} attributes to merge cells.
+\end{itemize}
+
+\begin{lstlisting}[language=HTML, caption={Table example with merged cell}]
+<table border="1">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Age</th>
+      <th colspan="2">Contact</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Alice</td>
+      <td>22</td>
+      <td>alice@mail.com</td>
+      <td>+1-555-0100</td>
+    </tr>
+  </tbody>
+</table>
+\end{lstlisting}
+
+\subsection{Forms}
+\begin{itemize}
+  \item \texttt{<form>} --- wraps all form controls; has \texttt{action} (where to send) and \texttt{method} (\texttt{GET}/\texttt{POST}).
+  \item \texttt{<input>} --- a variety of controls selected via the \texttt{type} attribute.
+  \item \texttt{<textarea>} --- multi-line text input.
+  \item \texttt{<select>} + \texttt{<option>} --- dropdown menu.
+  \item \texttt{<button>} --- clickable button.
+  \item \texttt{<label>} --- associates descriptive text with a control (use \texttt{for} attribute).
+  \item \texttt{<fieldset>} + \texttt{<legend>} --- groups related controls.
+\end{itemize}
+
+\begin{lstlisting}[language=HTML, caption={Sample HTML form}]
+<form action="/submit" method="POST">
+  <label for="name">Name:</label>
+  <input type="text" id="name" name="name" required />
+
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" />
+
+  <label for="role">Role:</label>
+  <select id="role" name="role">
+    <option value="dev">Developer</option>
+    <option value="design">Designer</option>
+  </select>
+
+  <label>
+    <input type="checkbox" name="agree" /> I agree to the terms
+  </label>
+
+  <button type="submit">Send</button>
+</form>
+\end{lstlisting}
+
+\subsection{Identifying Elements: \texttt{id} and \texttt{class}}
+\begin{itemize}
+  \item \texttt{id} --- a \textbf{unique} identifier for a single element on the page.
+  \item \texttt{class} --- groups multiple elements with shared styling or behaviour.
+  \item An element can have only \textbf{one} \texttt{id}, but \textbf{multiple} class values (space-separated).
+  \item \texttt{id} is used for anchors, scripting, or targeting specific elements.
+  \item \texttt{class} is used mostly for styling and reusable components.
+\end{itemize}
+
+\subsection{Sectioning the Page}
+
+\subsubsection{Using \texttt{<div>}}
+\begin{itemize}
+  \item A generic container to group HTML elements.
+  \item Does not carry any semantic meaning on its own.
+  \item Commonly used with \texttt{class} or \texttt{id} to apply styles or behaviour.
+\end{itemize}
+
+\subsubsection{Using Semantic Tags (Preferred)}
+\begin{itemize}
+  \item \texttt{<header>} --- introductory content or navigation links.
+  \item \texttt{<nav>} --- major navigation block.
+  \item \texttt{<main>} --- dominant content of the \texttt{<body>}.
+  \item \texttt{<section>} --- thematic grouping of content.
+  \item \texttt{<article>} --- self-contained composition (blog post, news story).
+  \item \texttt{<aside>} --- tangentially related content (sidebar).
+  \item \texttt{<footer>} --- footer for the page or a section.
+\end{itemize}
+Semantic tags improve readability, accessibility, and SEO compared to using \texttt{<div>} everywhere.
+
+\subsection{Inline vs.\ Block Elements}
+\begin{itemize}
+  \item \textbf{Block elements}: Start on a new line and take up the full width available (e.g.\ \texttt{<div>}, \texttt{<p>}, \texttt{<h1>}, \texttt{<ul>}).
+  \item \textbf{Inline elements}: Do not start on a new line; take only as much width as needed (e.g.\ \texttt{<span>}, \texttt{<a>}, \texttt{<strong>}, \texttt{<img>}).
+  \item Inline elements \textbf{cannot} contain block-level elements.
+\end{itemize}
+
+\subsection{Comments}
+\begin{lstlisting}[language=HTML, caption={HTML comment syntax}]
+<!-- This is a comment and will not appear in the browser -->
+<p>This text is visible.</p>
+\end{lstlisting}
+
+\subsection{Debugging HTML}
+\begin{itemize}
+  \item Use the browser's \textbf{Inspect Element} (DevTools) to analyze structure, debug layout, and experiment live.
+  \item Always look for the \textbf{root cause} of a problem, not just the symptom.
+  \item \textit{``Fix the problem, not the blame.''} --- The Pragmatic Programmer.
+  \item The first rule of debugging: \textbf{Don't Panic}.
+  \item Explaining a bug to someone else (``rubber duck debugging'') often reveals the issue.
+\end{itemize}
+
+\newpage
+% ==================================================
+\section{CSS --- Pages That Look Elegant}
+% ==================================================
+
+\subsection{What is CSS?}
+\begin{itemize}
+  \item \textbf{CSS} stands for \textbf{Cascading Style Sheets}.
+  \item Used to \textbf{style} HTML elements --- controls colors, fonts, layout, and animations.
+  \item CSS \textbf{separates content} (HTML) from \textbf{presentation} (design).
+  \item Helps create responsive, modern, and user-friendly designs.
+\end{itemize}
+
+\subsection{CSS Rule Syntax}
+\begin{lstlisting}[language=CSS, caption={CSS rule anatomy}]
+selector {
+  property: value;
+}
+
+/* Example */
+p {
+  color: white;
+  font-size: 16px;
+}
+\end{lstlisting}
+
+\subsection{CSS Selectors}
+\begin{itemize}
+  \item \texttt{element} --- targets all elements of a type (e.g.\ \texttt{p}, \texttt{div}).
+  \item \texttt{.class} --- targets elements with a specific class.
+  \item \texttt{\#id} --- targets a specific element with an ID.
+  \item \texttt{*} --- targets all elements (universal selector).
+  \item \texttt{A, B} --- targets both A and B elements.
+  \item \texttt{A B} --- targets B that is a \textbf{descendant} of A.
+  \item \texttt{A > B} --- targets B that is a \textbf{direct child} of A.
+  \item \texttt{A + B} --- targets B that is the \textbf{adjacent sibling} immediately after A.
+  \item \texttt{A \textasciitilde{} B} --- targets all siblings B after A.
+\end{itemize}
+
+\subsection{Pseudo-class Selectors}
+\begin{itemize}
+  \item \texttt{:hover} --- when the mouse is over the element.
+  \item \texttt{:focus} --- when the element is focused (e.g.\ an input field).
+  \item \texttt{:first-child} / \texttt{:last-child} --- first or last child of its parent.
+  \item \texttt{:nth-child(n)} --- every $n$th child (e.g.\ \texttt{:nth-child(2n)} for even rows).
+  \item \texttt{:not(.active)} --- all elements except those with \texttt{.active}.
+  \item \texttt{:checked}, \texttt{:disabled}, \texttt{:placeholder-shown} --- form-state selectors.
+\end{itemize}
+
+\subsection{Attribute Selectors}
+\begin{itemize}
+  \item \texttt{[type]} --- elements that have the \texttt{type} attribute.
+  \item \texttt{[type="text"]} --- elements where \texttt{type} equals \texttt{"text"}.
+  \item \texttt{[href\textasciicircum="https"]} --- \texttt{href} starting with \texttt{"https"}.
+  \item \texttt{[href\$=".pdf"]} --- \texttt{href} ending with \texttt{".pdf"}.
+  \item \texttt{[data-role*="btn"]} --- attribute containing \texttt{"btn"}.
+\end{itemize}
+
+\subsection{Element Selectors (Type Selectors)}
+\begin{itemize}
+  \item \texttt{p} --- selects all paragraphs.
+  \item \texttt{div} --- selects all \texttt{<div>} containers.
+  \item \texttt{h1}, \texttt{h2}, \texttt{h3} --- selects all headings of a specific level.
+  \item \texttt{ul li} --- descendant combination: all \texttt{<li>} inside any \texttt{<ul>}.
+\end{itemize}
+
+\subsection{Class Selectors}
+\begin{itemize}
+  \item \texttt{.classname} --- selects all elements that have \texttt{class="classname"}.
+  \item \texttt{div.classname} --- selects only \texttt{<div>} elements with that class.
+  \item \texttt{.class1.class2} --- selects elements that have \textbf{both} classes.
+  \item \texttt{.parent .child} --- descendant combination with classes.
+\end{itemize}
+
+\subsection{Pseudo-element Selectors}
+\begin{itemize}
+  \item \texttt{::before} --- inserts content before the element’s real content (requires \texttt{content}).
+  \item \texttt{::after} --- inserts content after the element’s real content (requires \texttt{content}).
+  \item \texttt{::first-line} --- styles the first line of a block of text.
+  \item \texttt{::first-letter} --- styles the first character of a block of text.
+  \item \texttt{::selection} --- styles the part of the text that the user highlights.
+  \item \texttt{::marker} --- styles the bullet or number in list items.
+  \item \texttt{::placeholder} --- styles the placeholder text inside an \texttt{<input>} or \texttt{<textarea>}.
+\end{itemize}
+
+\subsection{Including CSS in HTML}
+\begin{itemize}
+  \item \textbf{Inline CSS}: \texttt{<p style="color:red;">Hello</p>} --- highest specificity, not recommended for large projects.
+  \item \textbf{Internal CSS}: \texttt{<style>} block inside \texttt{<head>} --- good for single-page documents.
+  \item \textbf{External CSS}: \texttt{<link rel="stylesheet" href="style.css">} --- best practice; styles apply to multiple pages.
+\end{itemize}
+
+\begin{lstlisting}[language=HTML, caption={Linking an external stylesheet}]
+<head>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+\end{lstlisting}
+
+\subsection{CSS Specificity and the Cascade}
+Specificity determines which CSS rule wins when multiple rules target the same element.
+\begin{enumerate}
+  \item \textbf{Inline styles} --- highest priority.
+  \item \textbf{ID selectors} (\texttt{\#id}) --- very high.
+  \item \textbf{Class, pseudo-class, attribute selectors} --- medium.
+  \item \textbf{Element and pseudo-element selectors} --- lowest.
+\end{enumerate}
+\begin{itemize}
+  \item When specificity is \textbf{equal}, the \textbf{last rule declared} wins.
+  \item \texttt{!important} overrides all other rules (use sparingly).
+\end{itemize}
+
+\subsection{CSS Measurement Units}
+\begin{itemize}
+  \item \textbf{Absolute units}: \texttt{px} (pixels), \texttt{pt} (points), \texttt{cm}, \texttt{mm}, \texttt{in}.
+  \item \textbf{Relative units}:
+    \begin{itemize}
+      \item \texttt{em} --- relative to the \textbf{element's} font-size.
+      \item \texttt{rem} --- relative to the \textbf{root} element's font-size.
+      \item \texttt{vw} / \texttt{vh} --- 1\% of the viewport width / height.
+      \item \texttt{\%} --- relative to the \textbf{parent} element.
+      \item \texttt{ch} --- width of the ``0'' character; useful for text containers.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Text and Font Properties}
+\begin{lstlisting}[language={}, caption={Common text properties}]
+p {
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 1rem;         /* 16px by default */
+  font-weight: 600;        /* normal | bold | 100-900 */
+  line-height: 1.6;
+  text-align: justify;     /* left | center | right | justify */
+  text-decoration: none;   /* underline | line-through */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+\end{lstlisting}
+
+\subsection{Color Properties}
+\begin{itemize}
+  \item \texttt{color} --- sets the text color.
+  \item \texttt{background-color} --- sets the element background.
+  \item \texttt{background-image} --- sets a background image (\texttt{url(...)}).
+  \item Colors can be expressed as:
+    \begin{itemize}
+      \item Named: \texttt{red}, \texttt{cornflowerblue}
+      \item HEX: \texttt{\#ff4455}
+      \item RGB / RGBA: \texttt{rgb(255, 0, 0)} / \texttt{rgba(255, 0, 0, 0.5)}
+      \item HSL / HSLA: \texttt{hsl(0, 100\%, 50\%)}
+    \end{itemize}
+  \item Use high contrast for readability and accessibility.
+\end{itemize}
+
+\subsection{The CSS Box Model}
+Every element is a rectangular box composed of (inside-out):
+\[
+  \text{content} \;\to\; \text{padding} \;\to\; \text{border} \;\to\; \text{margin}
+\]
+\begin{itemize}
+  \item \texttt{width} / \texttt{height} --- size of the content area.
+  \item \texttt{padding} --- space inside the border, around content.
+  \item \texttt{border} --- line surrounding the padding.
+  \item \texttt{margin} --- space \textbf{outside} the border (collapses between vertical siblings).
+  \item \texttt{box-sizing: border-box} --- makes \texttt{width}/\texttt{height} include padding and border (recommended).
+\end{itemize}
+
+\begin{lstlisting}[language={}, caption={Box model reset (best practice)}]
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+\end{lstlisting}
+
+\subsection{Borders and Outlines}
+\begin{itemize}
+  \item \texttt{border}: shorthand --- \texttt{2px solid \#fff}.
+  \item Border styles: \texttt{solid}, \texttt{dashed}, \texttt{dotted}, \texttt{double}, \texttt{none}.
+  \item \texttt{border-radius} --- rounds corners; \texttt{50\%} creates a circle.
+  \item \texttt{outline} --- drawn outside the border; \textbf{does not affect layout} (no space taken).
+\end{itemize}
+
+\subsection{CSS Display and Layout}
+\begin{itemize}
+  \item \texttt{display: block} --- element starts on a new line and fills available width.
+  \item \texttt{display: inline} --- flows with surrounding text.
+  \item \texttt{display: inline-block} --- flows inline but respects width/height.
+  \item \texttt{display: none} --- removes element from layout entirely.
+  \item \texttt{display: flex} --- activates Flexbox on the container.
+  \item \texttt{display: grid} --- activates CSS Grid on the container.
+  \item \texttt{visibility: hidden} --- hides element but \textbf{keeps its space}.
+\end{itemize}
+
+\subsection{CSS Floats}
+\begin{itemize}
+  \item \texttt{float: left | right} --- element floats to the side; surrounding text wraps around it.
+  \item \texttt{clear: left | right | both} --- prevents the following element from wrapping around floats.
+  \item Mostly superseded by Flexbox and Grid for layout, but still used for text-wrapping around images.
+\end{itemize}
+
+\subsection{Flexbox}
+\begin{itemize}
+  \item A \textbf{one-dimensional} layout method (one row \emph{or} one column at a time).
+  \item \texttt{display: flex} --- makes the element a flex \textbf{container}; direct children become flex \textbf{items}.
+  \item \texttt{flex-direction: row | column | row-reverse | column-reverse}.
+  \item \texttt{justify-content} --- aligns items along the \textbf{main axis} (e.g.\ \texttt{center}, \texttt{space-between}).
+  \item \texttt{align-items} --- aligns items along the \textbf{cross axis} (e.g.\ \texttt{center}, \texttt{stretch}).
+  \item \texttt{flex-wrap: wrap} --- allows items to wrap to the next line.
+  \item \texttt{gap} --- spacing between flex items.
+  \item On a flex item: \texttt{flex: 1} distributes available space equally; \texttt{align-self} overrides \texttt{align-items}.
+\end{itemize}
+
+\begin{lstlisting}[language={}, caption={Flexbox centering example}]
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+\end{lstlisting}
+
+\subsection{CSS Grid}
+\begin{itemize}
+  \item A \textbf{two-dimensional} layout method (rows \emph{and} columns simultaneously).
+  \item \texttt{display: grid} --- makes the element a grid container.
+  \item \texttt{grid-template-columns} --- defines column sizes (e.g.\ \texttt{repeat(3, 1fr)}, \texttt{200px auto}).
+  \item \texttt{grid-template-rows} --- defines row sizes.
+  \item \texttt{gap} --- gutters between rows and columns.
+  \item \texttt{grid-column} / \texttt{grid-row} --- specifies where an item starts and ends.
+  \item \texttt{grid-template-areas} --- assigns named areas; \texttt{grid-area} places items into them.
+\end{itemize}
+
+\begin{lstlisting}[language={}, caption={CSS Grid layout example}]
+.layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  gap: 1rem;
+}
+
+.header { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.main   { grid-area: main; }
+.footer { grid-area: footer; }
+\end{lstlisting}
+
+\subsection{CSS Positioning}
+\begin{itemize}
+  \item \texttt{static} --- default; element flows normally in the page.
+  \item \texttt{relative} --- positioned relative to its \textbf{normal location}; still in flow.
+  \item \texttt{absolute} --- removed from flow; positioned relative to the nearest \textbf{positioned ancestor}.
+  \item \texttt{fixed} --- removed from flow; positioned relative to the \textbf{viewport}; stays when scrolling.
+  \item \texttt{sticky} --- toggles between \texttt{relative} and \texttt{fixed} based on scroll position.
+\end{itemize}
+
+\begin{lstlisting}[language={}, caption={Sticky header example}]
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #111;
+}
+\end{lstlisting}
+
+\subsection{Responsive Design and Media Queries}
+\begin{itemize}
+  \item Responsive design makes a webpage adjust to any screen size.
+  \item \textbf{Media queries} apply styles based on device/viewport properties.
+  \item Syntax: \texttt{@media (condition) \{ ... \}}
+  \item Common conditions: \texttt{max-width}, \texttt{min-width}, \texttt{orientation}, \texttt{prefers-color-scheme}.
+  \item \textbf{Mobile-first approach}: write base styles for mobile, then use \texttt{min-width} queries to enhance for larger screens.
+\end{itemize}
+
+\begin{lstlisting}[language={}, caption={Responsive breakpoints (mobile-first)}]
+/* Mobile base styles */
+.card { font-size: 14px; padding: 1rem; }
+
+/* Tablet */
+@media (min-width: 768px) {
+  .card { font-size: 16px; padding: 1.5rem; }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .card { font-size: 18px; padding: 2rem; }
+}
+\end{lstlisting}
+
+\subsection{CSS Variables (\texttt{:root})}
+\begin{itemize}
+  \item Define variables on the \texttt{:root} selector to make them globally available.
+  \item Variable names start with \texttt{--}.
+  \item Access with \texttt{var(--variable-name)}.
+  \item Makes styles consistent and easy to update globally.
+\end{itemize}
+
+\begin{lstlisting}[language={}, caption={CSS variables example}]
+:root {
+  --primary: #7a5af8;
+  --bg: #0d0d0d;
+  --text: #e8e8e8;
+  --radius: 8px;
+}
+
+button {
+  background-color: var(--primary);
+  color: var(--text);
+  border-radius: var(--radius);
+}
+\end{lstlisting}
+
+\newpage
+% ==================================================
+\section{JavaScript Fundamentals}
+% ==================================================
+
+JavaScript is the programming language of the web --- it adds \textbf{behaviour} to HTML and CSS, and (via Node.js) runs on the server too.
+
+\subsection{Variables and Data Types}
+\begin{itemize}
+  \item \texttt{var} --- function-scoped, hoisted, legacy (avoid in modern code).
+  \item \texttt{let} --- block-scoped, mutable.
+  \item \texttt{const} --- block-scoped, \textbf{immutable binding} (the value itself may still be mutable for objects/arrays).
+  \item \textbf{Primitive types}: \texttt{number}, \texttt{string}, \texttt{boolean}, \texttt{null}, \texttt{undefined}, \texttt{symbol}, \texttt{bigint}.
+  \item \textbf{Reference types}: \texttt{object}, \texttt{array}, \texttt{function}.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={Variable declarations}]
+let age = 25;            // mutable
+const name = "Alice";   // immutable binding
+var legacy = true;      // avoid -- function-scoped
+
+// typeof operator
+typeof 42;          // "number"
+typeof "hello";     // "string"
+typeof null;        // "object" (historical quirk!)
+typeof undefined;   // "undefined"
+typeof [];          // "object"
+typeof {};          // "object"
+typeof function(){}; // "function"
+\end{lstlisting}
+
+\subsection{Type Coercion}
+JavaScript is \textbf{dynamically typed} and performs implicit type conversion, which can produce surprising results.
+
+\begin{lstlisting}[language=Java, caption={Type coercion examples}]
+// Implicit coercion (loose equality ==)
+"5" == 5;       // true  (string coerced to number)
+0 == false;     // true
+null == undefined; // true
+null == 0;      // false
+
+// Always prefer strict equality ===
+"5" === 5;      // false (no coercion)
+0 === false;    // false
+
+// Addition vs concatenation
+"5" + 2;        // "52"  (number coerced to string)
+"5" - 2;        // 3     (string coerced to number)
+"5" * "3";      // 15
++"5";           // 5     (unary + converts string to number)
+!!"hello";      // true  (double negation to boolean)
+
+// Falsy values: false, 0, "", null, undefined, NaN
+// Everything else is truthy
+\end{lstlisting}
+
+\subsection{Functions}
+
+\subsubsection{Hoisting}
+\textbf{Hoisting} is JavaScript's behaviour of moving declarations to the top of their scope \emph{before} code executes.
+\begin{itemize}
+  \item \textbf{Function declarations} are fully hoisted --- the entire function body is available before its line in the code.
+  \item \textbf{\texttt{var} variables} are hoisted but initialised to \texttt{undefined} until the assignment line is reached.
+  \item \textbf{\texttt{let} and \texttt{const}} are hoisted but \textbf{not initialised} --- accessing them before their declaration throws a \texttt{ReferenceError} (the \textbf{Temporal Dead Zone}).
+  \item \textbf{Function expressions} and \textbf{arrow functions} assigned to variables follow the hoisting rules of \texttt{var}/\texttt{let}/\texttt{const} and are \textbf{not} callable before their declaration.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={Hoisting behaviour}]
+// Function declaration -- WORKS (fully hoisted)
+console.log(add(2, 3)); // 5
+function add(a, b) { return a + b; }
+
+// var -- hoisted as undefined, no error but unexpected value
+console.log(x); // undefined (not an error)
+var x = 10;
+console.log(x); // 10
+
+// let/const -- Temporal Dead Zone (TDZ)
+console.log(y); // ReferenceError: Cannot access 'y' before initialization
+let y = 20;
+
+// Function expression -- NOT hoisted
+console.log(multiply(2, 3)); // TypeError: multiply is not a function
+const multiply = (a, b) => a * b;
+\end{lstlisting}
+
+\subsubsection{Function Types}
+\begin{lstlisting}[language=Java, caption={All function declaration styles}]
+// 1. Function declaration (hoisted, has own `this`)
+function add(a, b) {
+  return a + b;
+}
+
+// 2. Function expression (not hoisted, has own `this`)
+const subtract = function(a, b) {
+  return a - b;
+};
+
+// 3. Arrow function (not hoisted, NO own `this`, NO `arguments`)
+const multiply = (a, b) => a * b;
+
+// Single parameter -- parens optional
+const double = n => n * 2;
+
+// No parameters -- parens required
+const greetWorld = () => "Hello, World!";
+
+// Multi-line arrow function -- need explicit return
+const divide = (a, b) => {
+  if (b === 0) throw new Error("Division by zero");
+  return a / b;
+};
+\end{lstlisting}
+
+\subsubsection{Parameters}
+\begin{lstlisting}[language=Java, caption={Default, rest, and spread in functions}]
+// Default parameters
+function greet(name = "World", greeting = "Hello") {
+  return `${greeting}, ${name}!`;
+}
+greet();              // "Hello, World!"
+greet("Alice");       // "Hello, Alice!"
+greet("Bob", "Hi");   // "Hi, Bob!"
+
+// Rest parameters (must be last)
+function sum(first, ...rest) {
+  return rest.reduce((acc, n) => acc + n, first);
+}
+sum(1, 2, 3, 4); // 10
+
+// Spread to pass array as arguments
+const nums = [1, 2, 3];
+Math.max(...nums); // 3
+\end{lstlisting}
+
+\subsubsection{Higher-Order Functions}
+A \textbf{higher-order function} is a function that either \textbf{takes a function as an argument} or \textbf{returns a function} (or both). This is the foundation of functional patterns in JS.
+
+\begin{lstlisting}[language=Java, caption={Higher-order functions}]
+// Takes a function as argument
+function repeat(n, action) {
+  for (let i = 0; i < n; i++) action(i);
+}
+repeat(3, console.log); // prints 0, 1, 2
+
+// Returns a function (function factory)
+function makeMultiplier(factor) {
+  return (n) => n * factor; // closure over `factor`
+}
+const triple = makeMultiplier(3);
+triple(5); // 15
+
+// Built-in HOFs: map, filter, reduce, forEach, sort
+[1, 2, 3].map(n => n ** 2);       // [1, 4, 9]
+[1, 2, 3, 4].filter(n => n % 2 === 0); // [2, 4]
+\end{lstlisting}
+
+\subsubsection{Immediately Invoked Function Expressions (IIFE)}
+An \textbf{IIFE} is a function that is defined and called immediately. It was commonly used to create a private scope before ES modules existed.
+
+\begin{lstlisting}[language=Java, caption={IIFE pattern}]
+// Classic IIFE
+(function() {
+  const secret = "hidden";
+  console.log("IIFE ran, secret:", secret);
+})();
+// `secret` is not accessible outside
+
+// Arrow IIFE
+(() => {
+  console.log("Arrow IIFE");
+})();
+
+// IIFE with return value
+const result = (() => {
+  const x = 10, y = 20;
+  return x + y;
+})();
+console.log(result); // 30
+\end{lstlisting}
+
+\subsection{Objects and JSON}
+\begin{itemize}
+  \item Objects group related data and behaviour as \textbf{key-value pairs}.
+  \item Values can be data (\textbf{properties}) or functions (\textbf{methods}).
+  \item \textbf{JSON} (JavaScript Object Notation) is a text format for storing and exchanging object data.
+  \item Technically, in JavaScript, almost everything is an object.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={Objects and JSON}]
+// Object literal
+const user = {
+  name: "Alice",
+  age: 25,
+  greet() {
+    return `Hi, I'm ${this.name}`;
+  },
+};
+
+// Property access
+user.name;          // dot notation
+user["age"];        // bracket notation (useful for dynamic keys)
+
+// Destructuring
+const { name, age } = user;
+
+// Spread operator
+const updated = { ...user, age: 26 };
+
+// JSON serialisation/deserialisation
+const json = JSON.stringify(user);   // '{"name":"Alice","age":25}'
+const parsed = JSON.parse(json);     // back to object
+\end{lstlisting}
+
+\subsection{Arrays}
+\begin{lstlisting}[language=Java, caption={Array methods}]
+const nums = [1, 2, 3, 4, 5];
+
+nums.map(n => n * 2);          // [2, 4, 6, 8, 10] -- transform each element
+nums.filter(n => n > 2);       // [3, 4, 5] -- keep matching elements
+nums.reduce((acc, n) => acc + n, 0); // 15 -- fold to single value
+nums.find(n => n > 3);         // 4 -- first match
+nums.findIndex(n => n > 3);    // 3 -- index of first match
+nums.some(n => n > 4);         // true -- at least one matches
+nums.every(n => n > 0);        // true -- all match
+nums.includes(3);              // true
+nums.slice(1, 3);              // [2, 3] -- non-mutating
+nums.splice(1, 2);             // removes & returns [2, 3], mutates original
+
+// Spread and destructuring
+const [first, second, ...rest] = nums;
+const combined = [...nums, 6, 7];
+\end{lstlisting}
+
+\subsection{The \texttt{this} Keyword}
+\begin{itemize}
+  \item Refers to the object that is \textbf{calling the function}.
+  \item In \textbf{objects}, \texttt{this} points to the object itself.
+  \item In \textbf{classes}, \texttt{this} points to the created instance.
+  \item In \textbf{arrow functions}, \texttt{this} is \textbf{inherited} from the outer (lexical) scope --- arrow functions have no own \texttt{this}.
+  \item The value of \texttt{this} depends on \textbf{how} a function is called, not where it is defined.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={this in different contexts}]
+const obj = {
+  name: "Alice",
+  greet() {
+    console.log(this.name); // "Alice" -- this = obj
+  },
+  greetArrow: () => {
+    console.log(this.name); // undefined -- arrow has no own this
+  },
+};
+
+class Counter {
+  count = 0;
+  increment() {
+    this.count++; // this = instance
+  }
+}
+\end{lstlisting}
+
+\subsection{Closures}
+A \textbf{closure} is a function that \textbf{remembers} the variables from its outer scope even after that scope has finished executing.
+
+\begin{lstlisting}[language=Java, caption={Closure example}]
+function makeCounter() {
+  let count = 0;        // outer variable
+  return function() {   // inner function closes over `count`
+    count++;
+    return count;
+  };
+}
+
+const counter = makeCounter();
+counter(); // 1
+counter(); // 2
+counter(); // 3
+// `count` is private and persists between calls
+\end{lstlisting}
+
+\subsection{The Event Loop and Asynchronous JavaScript}
+JavaScript is \textbf{single-threaded} but uses an event loop to handle asynchronous operations without blocking.
+
+\begin{itemize}
+  \item \textbf{Call stack}: where currently executing code runs (LIFO).
+  \item \textbf{Web APIs}: browser-provided APIs (timers, fetch, DOM events) that run outside the stack.
+  \item \textbf{Callback queue} (task queue): completed async callbacks waiting to be run.
+  \item \textbf{Microtask queue}: higher-priority queue for Promise callbacks (\texttt{.then}, \texttt{.catch}).
+  \item The event loop pushes tasks from the queues to the stack only when the stack is \textbf{empty}.
+  \item Microtasks always drain before the next macrotask runs.
+\end{itemize}
+
+\subsection{Callbacks}
+\begin{itemize}
+  \item A \textbf{callback} is a function passed as an argument to another function, to be called later.
+  \item Simple and flexible, but can lead to deeply nested \textbf{``callback hell''}.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={Callback example and callback hell}]
+// Simple callback
+setTimeout(() => console.log("Done!"), 1000);
+
+// Callback hell (pyramid of doom)
+fetchUser(id, (user) => {
+  fetchPosts(user.id, (posts) => {
+    fetchComments(posts[0].id, (comments) => {
+      console.log(comments); // deeply nested!
+    });
+  });
+});
+\end{lstlisting}
+
+\subsection{Promises}
+\begin{itemize}
+  \item A \textbf{Promise} represents a value that will be available in the future.
+  \item Three states: \textbf{pending}, \textbf{fulfilled}, \textbf{rejected}.
+  \item Chain with \texttt{.then()} (success) and \texttt{.catch()} (error) and \texttt{.finally()}.
+  \item \texttt{Promise.all()} --- waits for \textbf{all} promises; fails fast on any rejection.
+  \item \texttt{Promise.allSettled()} --- waits for all, regardless of outcome.
+  \item \texttt{Promise.race()} --- resolves/rejects as soon as the first settles.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={Promises}]
+const fetchData = () =>
+  new Promise((resolve, reject) => {
+    setTimeout(() => resolve({ id: 1, name: "Alice" }), 500);
+  });
+
+fetchData()
+  .then(user => { console.log(user.name); return user.id; })
+  .then(id => console.log("ID:", id))
+  .catch(err => console.error(err))
+  .finally(() => console.log("Done"));
+
+// Parallel execution
+Promise.all([fetch("/users"), fetch("/posts")])
+  .then(([users, posts]) => console.log(users, posts));
+\end{lstlisting}
+
+\subsection{Async / Await}
+\begin{itemize}
+  \item Built on top of Promises but with \textbf{synchronous-looking} syntax.
+  \item \texttt{async} before a function makes it return a Promise automatically.
+  \item \texttt{await} pauses execution inside the async function until the Promise resolves.
+  \item Use \texttt{try/catch} for error handling.
+  \item Easier to read than promise chains; preferred in modern code.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={async/await}]
+async function loadUser(id) {
+  try {
+    const res = await fetch(`/api/users/${id}`);
+    if (!res.ok) throw new Error("User not found");
+    const user = await res.json();
+    console.log(user.name);
+    return user;
+  } catch (err) {
+    console.error("Failed:", err.message);
+  }
+}
+
+// Parallel with async/await
+async function loadAll() {
+  const [users, posts] = await Promise.all([
+    fetch("/users").then(r => r.json()),
+    fetch("/posts").then(r => r.json()),
+  ]);
+  return { users, posts };
+}
+\end{lstlisting}
+
+\subsection{ES Modules}
+\begin{itemize}
+  \item A \textbf{module} is a file with its own private scope.
+  \item Use \texttt{export} to make values/functions visible to other files.
+  \item Use \texttt{import} to use code from other files.
+  \item \textbf{Named exports}: \texttt{export function foo() \{\}} --- imported as \texttt{\{ foo \}}.
+  \item \textbf{Default export}: \texttt{export default ...} --- imported without braces.
+  \item Modern browsers and Node.js support ES modules natively.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={ES module syntax}]
+// utils.js
+export const PI = 3.14159;
+export function square(x) { return x * x; }
+export default class MathHelper { /* ... */ }
+
+// main.js
+import MathHelper, { PI, square } from "./utils.js";
+import * as Utils from "./utils.js"; // import all as namespace
+\end{lstlisting}
+
+\newpage
+% ==================================================
+\section{JavaScript Beyond the Browser}
+% ==================================================
+
+\subsection{Limitations of Plain JavaScript}
+\begin{itemize}
+  \item Originally designed for simple browser interactions, not full-scale applications.
+  \item Single-threaded execution causes blocking during heavy I/O or computation.
+  \item Dynamic typing leads to unpredictable runtime errors in large projects.
+  \item Early JS lacked a proper module system, making code organisation difficult.
+  \item Limited tooling and poor scalability for complex applications.
+\end{itemize}
+
+\subsection{Node.js}
+\begin{itemize}
+  \item Powered by Google's \textbf{V8 engine} --- the same engine that runs Chrome.
+  \item \textbf{Event-driven, non-blocking I/O} model --- handles many requests concurrently.
+  \item Same language (\textbf{JavaScript}) for both frontend and backend.
+  \item Access to the \textbf{npm} ecosystem (millions of packages).
+  \item Turned JavaScript into a complete server-side platform.
+  \item Supports modern ES modules, \texttt{async/await}, and integrates with containers and cloud.
+\end{itemize}
+
+\subsection{NPM (Node Package Manager)}
+\begin{itemize}
+  \item Central registry to manage and distribute JavaScript packages.
+  \item Standardises project setup with \texttt{package.json}.
+  \item Key commands:
+    \begin{itemize}
+      \item \texttt{npm init} --- create a new project and generate \texttt{package.json}.
+      \item \texttt{npm install <package>} --- add a dependency.
+      \item \texttt{npm uninstall <package>} --- remove a package.
+      \item \texttt{npm update} --- update all dependencies.
+      \item \texttt{npm run <script>} --- execute a custom script defined in \texttt{package.json}.
+    \end{itemize}
+\end{itemize}
+
+\begin{lstlisting}[language={}, caption={package.json scripts section}]
+{
+  "scripts": {
+    "start":  "node server.js",
+    "dev":    "nodemon server.js",
+    "build":  "tsc",
+    "test":   "jest"
+  }
+}
+\end{lstlisting}
+
+\subsection{Popular npm Packages}
+\begin{itemize}
+  \item \textbf{Express} --- minimalist web framework for APIs and servers.
+  \item \textbf{React} --- library for building interactive UIs.
+  \item \textbf{Lodash} --- utility functions for arrays, objects, strings.
+  \item \textbf{Axios} --- promise-based HTTP client.
+  \item \textbf{Socket.io} --- real-time bidirectional communication.
+  \item \textbf{Jest} --- testing framework for JavaScript/Node.
+  \item \textbf{Day.js} --- lightweight date/time manipulation.
+  \item \textbf{Three.js} --- 3D graphics in the browser.
+  \item \textbf{Electron} --- build cross-platform desktop apps with web technologies.
+\end{itemize}
+
+\subsection{Bundling for Browsers}
+\begin{itemize}
+  \item Combines multiple JS files into a single (or few) output files for browsers.
+  \item Reduces HTTP requests and improves load performance.
+  \item Handles module resolution, imports, and exports automatically.
+  \item Often includes \textbf{minification} (removing whitespace) and \textbf{tree-shaking} (removing unused code).
+  \item Popular tools: \textbf{Vite}, \textbf{Webpack}, \textbf{Rollup}, \textbf{Parcel}.
+\end{itemize}
+
+\subsection{TypeScript}
+\subsubsection{Motivation}
+\begin{itemize}
+  \item JavaScript is \textbf{dynamically typed} --- variables can change type at runtime.
+  \item Type coercion causes surprises: \texttt{"5" + 2} evaluates to \texttt{"52"}.
+  \item Large codebases are harder to maintain due to hidden type bugs.
+  \item No compile-time checks --- many errors appear only during execution.
+\end{itemize}
+
+\subsubsection{What is TypeScript?}
+\begin{itemize}
+  \item Created by \textbf{Microsoft} in 2012 (lead architect: \textbf{Anders Hejlsberg}).
+  \item A \textbf{statically typed superset} of JavaScript --- all valid JS is valid TS.
+  \item You write TypeScript $\to$ it compiles to JavaScript $\to$ runs anywhere JS runs.
+  \item Designed for gradual, optional adoption.
+  \item Widely used in enterprise and complex web applications.
+\end{itemize}
+
+\subsubsection{Variables and Types}
+\begin{lstlisting}[language=Java, caption={TypeScript variable annotations}]
+let age: number = 25;
+const name: string = "Alice";
+let isAdmin: boolean = false;
+
+// Union type
+let id: number | string = 42;
+id = "abc-123"; // also valid
+
+// TypeScript infers the type if not declared
+let score = 100; // inferred as number
+\end{lstlisting}
+
+\subsubsection{Interfaces}
+\begin{lstlisting}[language=Java, caption={TypeScript interface}]
+interface User {
+  id: number;
+  name: string;
+  email?: string;   // optional
+  readonly role: string; // cannot be changed after creation
+}
+
+function greet(user: User): string {
+  return `Hello, ${user.name}`;
+}
+\end{lstlisting}
+
+\subsubsection{Classes}
+\begin{lstlisting}[language=Java, caption={TypeScript class with access modifiers}]
+class Animal {
+  private name: string;
+  protected age: number;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+
+  public speak(): void {
+    console.log(`${this.name} makes a sound.`);
+  }
+}
+
+class Dog extends Animal {
+  constructor(name: string, age: number) {
+    super(name, age);
+  }
+
+  public speak(): void {
+    console.log("Woof!");
+  }
+}
+\end{lstlisting}
+
+\subsubsection{Generics}
+\begin{lstlisting}[language=Java, caption={TypeScript generics}]
+function identity<T>(arg: T): T {
+  return arg;
+}
+
+identity<string>("hello"); // returns "hello"
+identity<number>(42);      // returns 42
+
+// Generic interface
+interface ApiResponse<T> {
+  data: T;
+  status: number;
+  message: string;
+}
+\end{lstlisting}
+
+\subsubsection{Modules}
+\begin{lstlisting}[language=Java, caption={ES module exports and imports in TypeScript}]
+// math.ts
+export function add(a: number, b: number): number {
+  return a + b;
+}
+
+export default function multiply(a: number, b: number): number {
+  return a * b;
+}
+
+// main.ts
+import multiply, { add } from "./math";
+console.log(add(2, 3));       // 5
+console.log(multiply(2, 3));  // 6
+\end{lstlisting}
+
+\newpage
+% ==================================================
+\section{The DOM and Browser APIs}
+% ==================================================
+
+\subsection{From Markup to DOM}
+\begin{itemize}
+  \item The browser \textbf{parses HTML} into a tree of nodes --- the \textbf{DOM (Document Object Model)}.
+  \item Each HTML tag becomes an \textbf{element node}.
+  \item Text inside tags becomes \textbf{text nodes}.
+  \item Attributes become \textbf{node properties}.
+  \item The DOM is what JavaScript can access and modify.
+\end{itemize}
+
+\subsection{DOM Structure}
+\begin{itemize}
+  \item \textbf{Root node}: \texttt{document}.
+  \item \textbf{window} --- top-level browser object (global scope).
+  \item \textbf{document} --- represents the web page inside the window.
+  \item \textbf{Elements} --- tags (\texttt{<div>}, \texttt{<p>}) as objects in the tree.
+  \item \textbf{Attributes \& Text} --- properties of element nodes.
+  \item \textbf{Events} --- methods and listeners that connect JS to user actions.
+\end{itemize}
+
+\subsection{Querying DOM Elements}
+\begin{lstlisting}[language=Java, caption={DOM querying methods}]
+// By ID (returns a single Element or null)
+const btn = document.getElementById("submit-btn");
+
+// By class name (returns HTMLCollection)
+const cards = document.getElementsByClassName("card");
+
+// By tag name (returns HTMLCollection)
+const paragraphs = document.getElementsByTagName("p");
+
+// CSS selector -- first match (most flexible)
+const nav = document.querySelector("header > nav");
+
+// CSS selector -- all matches (returns NodeList)
+const links = document.querySelectorAll("a[href^='https']");
+\end{lstlisting}
+
+\subsection{Events}
+\begin{itemize}
+  \item Events let webpages react to user actions.
+  \item Common events: \texttt{click}, \texttt{input}, \texttt{change}, \texttt{submit}, \texttt{keydown}, \texttt{keyup}, \texttt{load}, \texttt{scroll}, \texttt{resize}.
+  \item \texttt{addEventListener} is the \textbf{modern, preferred} way to attach events.
+  \item Multiple handlers can be added to the same event on the same element.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={Event handling example}]
+const button = document.querySelector("#myBtn");
+
+button.addEventListener("click", (event) => {
+  console.log("Clicked!", event.target);
+  event.preventDefault(); // prevent default browser action
+});
+
+// Remove listener
+button.removeEventListener("click", handlerFunction);
+\end{lstlisting}
+
+\subsection{Manipulating the DOM}
+
+\subsubsection{Modifying Content and Styles}
+\begin{lstlisting}[language=Java, caption={Changing content and styles}]
+const heading = document.querySelector("h1");
+
+heading.textContent = "New Title";         // safe (plain text)
+heading.innerHTML = "<em>New</em> Title";  // parses HTML
+
+heading.style.color = "crimson";
+heading.style.fontSize = "2rem";
+
+heading.setAttribute("data-active", "true");
+heading.getAttribute("data-active"); // "true"
+heading.removeAttribute("data-active");
+\end{lstlisting}
+
+\subsubsection{Adding and Removing Elements}
+\begin{lstlisting}[language=Java, caption={Creating and removing DOM nodes}]
+// Create and insert
+const div = document.createElement("div");
+div.classList.add("card");
+div.textContent = "Hello!";
+document.body.appendChild(div);
+
+// Insert before another element
+const list = document.querySelector("ul");
+const newItem = document.createElement("li");
+newItem.textContent = "New item";
+list.insertBefore(newItem, list.firstChild);
+
+// Remove
+div.remove();
+// or: list.removeChild(newItem);
+\end{lstlisting}
+
+\subsubsection{Working with Classes}
+\begin{lstlisting}[language=Java, caption={classList API}]
+element.classList.add("active");
+element.classList.remove("hidden");
+element.classList.toggle("dark-mode");     // adds if absent, removes if present
+element.classList.contains("active");      // returns boolean
+element.classList.replace("old", "new");
+\end{lstlisting}
+
+\subsection{Forms and DOM}
+\begin{lstlisting}[language=Java, caption={Reading form input values}]
+const form = document.querySelector("#loginForm");
+const emailInput = document.querySelector("#email");
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault(); // stop page reload
+  const email = emailInput.value;
+  const isChecked = document.querySelector("#remember").checked;
+  console.log(email, isChecked);
+});
+\end{lstlisting}
+
+\subsection{The \texttt{window} Object}
+\begin{itemize}
+  \item Represents the browser window; all global variables and functions belong to it.
+  \item \texttt{alert()}, \texttt{confirm()}, \texttt{prompt()} --- dialogs.
+  \item \texttt{location} --- current URL; can be used to redirect: \texttt{window.location.href = "/new"}.
+  \item \texttt{history} --- browser history (\texttt{back()}, \texttt{forward()}).
+  \item \texttt{navigator} --- browser/device information.
+  \item \texttt{setTimeout(fn, ms)} / \texttt{setInterval(fn, ms)} --- timers.
+  \item \texttt{innerWidth} / \texttt{innerHeight} --- viewport dimensions.
+  \item \texttt{scrollX} / \texttt{scrollY} --- scroll position.
+\end{itemize}
+
+\subsection{Web Storage}
+\subsubsection{\texttt{localStorage}}
+\begin{itemize}
+  \item Stores data \textbf{persistently} in the browser (survives closing the tab/browser).
+  \item Data stored as \textbf{key-value pairs of strings}.
+  \item Same-origin policy: data is isolated per domain.
+  \item Approximately 5--10 MB per site.
+  \item \textbf{Synchronous} and not safe for sensitive information.
+\end{itemize}
+\begin{lstlisting}[language=Java, caption={localStorage usage}]
+// Store
+localStorage.setItem("theme", "dark");
+localStorage.setItem("user", JSON.stringify({ name: "Alice" }));
+
+// Retrieve
+const theme = localStorage.getItem("theme"); // "dark"
+const user = JSON.parse(localStorage.getItem("user"));
+
+// Remove
+localStorage.removeItem("theme");
+localStorage.clear(); // removes all keys
+\end{lstlisting}
+
+\subsubsection{\texttt{sessionStorage}}
+\begin{itemize}
+  \item Data is cleared when the \textbf{tab or window is closed}.
+  \item Same API as \texttt{localStorage}: \texttt{setItem}, \texttt{getItem}, \texttt{removeItem}, \texttt{clear}.
+  \item Useful for temporary session data (e.g.\ multi-step form progress).
+\end{itemize}
+
+\newpage
+% ==================================================
+\section{React --- UIs That React}
+% ==================================================
+
+\subsection{Motivation: Problems with Classic Frontend Development}
+\begin{itemize}
+  \item Tangled DOM manipulation with vanilla JS / jQuery.
+  \item Inconsistent and hard-to-manage \textbf{state}.
+  \item Poor code reuse and maintainability.
+  \item Performance bottlenecks from manual DOM updates.
+  \item Difficult collaboration and scaling.
+\end{itemize}
+
+\subsection{The Rise and Limits of jQuery}
+\begin{itemize}
+  \item jQuery made DOM manipulation simpler and faster, and abstracted cross-browser inconsistencies.
+  \item Popularised easy AJAX requests and brought a cleaner API than raw JavaScript.
+  \item However, jQuery still left \textbf{state management} and \textbf{application structure} problems unsolved.
+  \item As applications grew more complex, jQuery codebases became difficult to maintain and reason about.
+  \item This led to the rise of modern frameworks and libraries like Angular, Vue, and React.
+\end{itemize}
+
+\subsection{Library vs.\ Framework}
+\begin{itemize}
+  \item \textbf{Library}: you call it --- you are in control (e.g.\ React, Axios).
+  \item \textbf{Framework}: it calls you --- it is in control (e.g.\ Angular, Next.js).
+  \item Libraries provide tools; frameworks provide structure and enforce conventions.
+  \item \textbf{React is a library}, not a framework --- it handles the view layer and leaves routing, state, and data-fetching to other tools.
+\end{itemize}
+
+\subsection{What is React?}
+\begin{itemize}
+  \item A \textbf{JavaScript library} for building user interfaces (not a full framework).
+  \item Created by \textbf{Facebook} in 2013, now maintained by Meta and the open-source community.
+  \item \textbf{Component-based}: build UIs from small, reusable pieces.
+  \item \textbf{Declarative}: describe \emph{what} the UI should look like, not \emph{how} to update it.
+  \item Efficient rendering via the \textbf{Virtual DOM}.
+\end{itemize}
+
+\subsection{Setting Up a React Project with Vite}
+\begin{lstlisting}[language={}, caption={Creating a React + Vite project}]
+npm create vite@latest my-app
+# Select "React" or "React + TypeScript" when prompted
+
+cd my-app
+npm install
+npm run dev
+# Opens at http://localhost:5173
+\end{lstlisting}
+
+\begin{itemize}
+  \item \textbf{Vite} uses native ES modules in development, providing near-instant HMR (Hot Module Replacement).
+  \item Uses \textbf{Rollup} for optimised production builds.
+  \item Created by Evan You (Vue.js creator).
+\end{itemize}
+
+\subsection{JSX}
+\begin{itemize}
+  \item A \textbf{syntax extension} for JavaScript that lets you write HTML-like code inside JS.
+  \item \textbf{Not valid JS} --- compiled to plain JavaScript by \textbf{Babel}.
+  \item Rules:
+    \begin{itemize}
+      \item Must return a \textbf{single root element} (use \texttt{<>...</>} fragments if needed).
+      \item Attribute names use \textbf{camelCase}: \texttt{className}, \texttt{onClick}, \texttt{htmlFor}.
+      \item Self-closing tags must close: \texttt{<img />}, \texttt{<input />}.
+      \item JavaScript \textbf{expressions} go inside \texttt{\{\}}.
+      \item Statements (\texttt{if}, \texttt{for}) are \textbf{not} allowed directly inside JSX.
+    \end{itemize}
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={JSX examples}]
+const name = "World";
+const isLoggedIn = true;
+
+return (
+  <div className="container">
+    <h1>Hello, {name}!</h1>
+    <p>{isLoggedIn ? "Welcome back." : "Please log in."}</p>
+    <ul>
+      {["Apple", "Banana", "Cherry"].map((fruit, i) => (
+        <li key={i}>{fruit}</li>
+      ))}
+    </ul>
+  </div>
+);
+\end{lstlisting}
+
+\subsection{React Components}
+\begin{itemize}
+  \item Independent, reusable building blocks of the UI.
+  \item Accept \textbf{props} as input and return JSX.
+  \item Two types: \textbf{Function-based} (modern, preferred) and Class-based (legacy).
+  \item Component names must start with an \textbf{uppercase letter}.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={A functional React component}]
+interface ButtonProps {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}
+
+function Button({ label, onClick, disabled = false }: ButtonProps) {
+  return (
+    <button onClick={onClick} disabled={disabled} className="btn">
+      {label}
+    </button>
+  );
+}
+
+export default Button;
+\end{lstlisting}
+
+\subsection{Props}
+\begin{itemize}
+  \item \textbf{Props} are inputs passed from parent to child components.
+  \item \textbf{Read-only}: child components must not modify them.
+  \item Passed like HTML attributes.
+  \item The special \texttt{children} prop passes nested JSX into a component.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={Using props and children}]
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="card">
+      <h2>{title}</h2>
+      <div className="card-body">{children}</div>
+    </div>
+  );
+}
+
+// Usage:
+<Card title="Hello">
+  <p>This is the card body content.</p>
+</Card>
+\end{lstlisting}
+
+\subsection{State and \texttt{useState}}
+\begin{itemize}
+  \item \textbf{State} is component memory that stores dynamic data.
+  \item Changing state \textbf{triggers a re-render}.
+  \item Managed with the \texttt{useState} hook: \texttt{const [value, setValue] = useState(initialValue)}.
+  \item Always update via the setter --- \textbf{never modify state directly}.
+  \item Use a \textbf{callback form} when new state depends on old state: \texttt{setValue(v => v + 1)}.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={useState example --- counter}]
+import { useState } from "react";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(c => c + 1)}>+</button>
+      <button onClick={() => setCount(c => c - 1)}>-</button>
+      <button onClick={() => setCount(0)}>Reset</button>
+    </div>
+  );
+}
+\end{lstlisting}
+
+\subsection{Event Handling in React}
+\begin{itemize}
+  \item Use camelCase event names: \texttt{onClick}, \texttt{onChange}, \texttt{onSubmit}.
+  \item Pass a \textbf{function reference}, not a function call: \texttt{onClick=\{handleClick\}} not \texttt{onClick=\{handleClick()\}}.
+  \item Access the event object: \texttt{onClick=\{(e) => console.log(e.target)\}}.
+  \item Prevent default behaviour: \texttt{e.preventDefault()}.
+\end{itemize}
+
+\subsection{Lists in JSX}
+\begin{lstlisting}[language=Java, caption={Rendering a list with keys}]
+interface Post { id: number; title: string; }
+
+function PostList({ posts }: { posts: Post[] }) {
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+\end{lstlisting}
+Always provide a stable, unique \texttt{key} for list items. Avoid using array index as key when the list can reorder.
+
+\subsection{The Virtual DOM and Reconciliation}
+\begin{itemize}
+  \item React maintains a \textbf{Virtual DOM} --- a lightweight in-memory copy of the real DOM.
+  \item When state or props change, React builds a \textbf{new VDOM tree}.
+  \item The \textbf{Fiber reconciler} diffs the new tree against the old one (\textbf{O(n)} algorithm with heuristics).
+  \item Only the \textbf{minimal set of real DOM updates} is applied.
+  \item Heuristics: (1) Different element types always produce new subtrees; (2) \texttt{key} props help track moved elements.
+\end{itemize}
+
+\subsection{Component Composition}
+\begin{itemize}
+  \item Building UIs by \textbf{combining} smaller components together.
+  \item Promotes reusability and clean separation of concerns.
+  \item Components can nest inside others: \texttt{<Layout><Header /></Layout>}
+  \item Use \texttt{props} and \texttt{children} to pass content into components.
+  \item Encourages modular, maintainable React architecture.
+  \item Prefer \textbf{composition} over inheritance for sharing logic between components.
+\end{itemize}
+
+\subsection{React Developer Tools}
+\begin{itemize}
+  \item \textbf{React DevTools} is a browser extension for inspecting React applications.
+  \item Allows inspection of the \textbf{component tree} and current props and state.
+  \item Highlights re-renders to help identify performance issues.
+  \item Enables \textbf{editing of props and state} during development without code changes.
+  \item Useful for debugging hooks, context, and component hierarchy.
+  \item Also use \texttt{console.log()} in key spots to trace state and prop values.
+\end{itemize}
+
+\subsection{Styling in React}
+\begin{itemize}
+  \item \textbf{Plain CSS}: import \texttt{.css} files; apply with \texttt{className}.
+  \item \textbf{CSS Modules}: scoped styles per component (filename: \texttt{Button.module.css}).
+  \item \textbf{Inline styles}: \texttt{style=\{\{ backgroundColor: "red", fontSize: "1rem" \}\}} (camelCase).
+  \item \textbf{TailwindCSS}: utility-first classes applied directly in JSX.
+  \item \textbf{shadcn/ui}: accessible, copyable React components built on Radix UI + Tailwind.
+\end{itemize}
+
+\newpage
+% ==================================================
+\section{React --- Act II: Hooks, Lifecycle, and Patterns}
+% ==================================================
+
+\subsection{Component Lifecycle}
+\begin{itemize}
+  \item \textbf{Mount}: component is created and inserted into the DOM.
+  \item \textbf{Update}: state or props change, triggering a re-render.
+  \item \textbf{Unmount}: component is removed from the DOM.
+  \item Rendering must remain \textbf{pure} --- same inputs produce the same output; no side effects during render.
+  \item Side effects are managed with \texttt{useEffect}.
+\end{itemize}
+
+\subsection{The \texttt{useEffect} Hook}
+\begin{itemize}
+  \item Runs \textbf{after} the component renders.
+  \item Used to synchronise the component with external systems: APIs, timers, subscriptions, DOM mutations.
+  \item Accepts a \textbf{dependency array} that controls when the effect re-runs.
+  \item Can return a \textbf{cleanup function} to undo the effect on unmount or before re-running.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={useEffect variations}]
+// Run once on mount
+useEffect(() => {
+  console.log("Component mounted");
+  return () => console.log("Component unmounted"); // cleanup
+}, []);
+
+// Run when `userId` changes
+useEffect(() => {
+  fetchUser(userId).then(setUser);
+}, [userId]);
+
+// Run after every render (omit dependency array -- rarely needed)
+useEffect(() => {
+  document.title = `Count: ${count}`;
+});
+\end{lstlisting}
+
+\subsubsection{Common \texttt{useEffect} Mistakes}
+\begin{itemize}
+  \item \textbf{Missing dependencies}: causes stale closures and hard-to-debug bugs.
+  \item \textbf{Calling \texttt{setState} unconditionally inside effects}: can cause infinite re-render loops.
+  \item \textbf{Deriving state from props inside effects}: compute it during render instead.
+  \item Effects may run \textbf{twice in Strict Mode} (React mounts, unmounts, then mounts again to detect side effects).
+\end{itemize}
+
+\subsection{Fetching Data}
+
+\subsubsection{Using \texttt{fetch}}
+\begin{lstlisting}[language=Java, caption={Data fetching with fetch + useEffect}]
+import { useState, useEffect } from "react";
+
+function UserList() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetch("https://api.example.com/users")
+      .then((res) => {
+        if (!res.ok) throw new Error("Network error");
+        return res.json();
+      })
+      .then((data) => { if (!cancelled) setUsers(data); })
+      .catch((err) => { if (!cancelled) setError(err.message); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+
+    return () => { cancelled = true; }; // prevent state update after unmount
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (error)   return <p>Error: {error}</p>;
+  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+\end{lstlisting}
+
+\subsubsection{Using Axios}
+\begin{lstlisting}[language=Java, caption={Data fetching with Axios}]
+import axios from "axios";
+import { useState, useEffect } from "react";
+
+function UserList() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const source = axios.CancelToken.source();
+    axios.get("/api/users", { cancelToken: source.token })
+      .then(({ data }) => setUsers(data))
+      .catch((err) => {
+        if (!axios.isCancel(err)) console.error(err);
+      });
+    return () => source.cancel("Component unmounted");
+  }, []);
+
+  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+\end{lstlisting}
+
+\subsection{State Management Patterns}
+
+\subsubsection{Pattern I: Lifting State Up}
+\begin{itemize}
+  \item Move shared state to the \textbf{closest common ancestor}.
+  \item Children receive data as props; updates flow upward via callbacks.
+  \item Prevents state divergence between siblings.
+\end{itemize}
+
+\subsubsection{Pattern II: Callbacks as Props}
+\begin{itemize}
+  \item Parent passes a function to a child for state updates.
+  \item The child calls the function to communicate intent, without owning state.
+  \item Enables \textbf{unidirectional data flow}.
+  \item May lead to \textbf{prop drilling} in deep component trees.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={Callback as prop}]
+function Parent() {
+  const [value, setValue] = useState("");
+  return <Input value={value} onChange={setValue} />;
+}
+
+function Input({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <input value={value} onChange={(e) => onChange(e.target.value)} />
+  );
+}
+\end{lstlisting}
+
+\subsubsection{Pattern III: Context API}
+\begin{itemize}
+  \item Provides a way to share state \textbf{without prop drilling}.
+  \item Data is supplied via a \texttt{Provider} and consumed by any descendant via \texttt{useContext}.
+  \item Best for \textbf{global concerns}: theme, authentication, locale, feature flags.
+  \item \textbf{Overusing Context} can cause unnecessary re-renders --- scope it tightly.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={Context API example}]
+import { createContext, useContext, useState } from "react";
+
+const ThemeContext = createContext<"dark" | "light">("dark");
+
+function App() {
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  return (
+    <ThemeContext.Provider value={theme}>
+      <button onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}>
+        Toggle
+      </button>
+      <Page />
+    </ThemeContext.Provider>
+  );
+}
+
+function Page() {
+  const theme = useContext(ThemeContext);
+  return <div className={theme}>Page content</div>;
+}
+\end{lstlisting}
+
+\subsection{Redux}
+\begin{itemize}
+  \item Predictable state management library for React.
+  \item Application state lives in a \textbf{single global store}.
+  \item State updates occur through \textbf{dispatched actions} and \textbf{pure reducer} functions.
+  \item Enables centralised debugging and \textbf{time-travel inspection}.
+  \item Best suited for large applications with complex shared state.
+\end{itemize}
+
+\subsection{React Router}
+\begin{itemize}
+  \item Enables \textbf{client-side routing} in SPAs --- maps URLs to components without full page reloads.
+  \item Provided by the \texttt{react-router-dom} package.
+  \item Core components: \texttt{BrowserRouter}, \texttt{Routes}, \texttt{Route}.
+  \item Hooks: \texttt{useParams}, \texttt{useNavigate}, \texttt{useLocation}.
+  \item Supports nested routes, dynamic segments, and layout composition.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={React Router v6 example}]
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <nav>
+        <Link to="/">Home</Link>
+        <Link to="/about">About</Link>
+        <Link to="/users/42">User 42</Link>
+      </nav>
+      <Routes>
+        <Route path="/"          element={<Home />} />
+        <Route path="/about"     element={<About />} />
+        <Route path="/users/:id" element={<UserDetail />} />
+        <Route path="*"          element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+\end{lstlisting}
+
+\subsection{Forms in React}
+\begin{itemize}
+  \item \textbf{Controlled components}: form input values are driven by React state; use \texttt{value} + \texttt{onChange}.
+  \item \textbf{Uncontrolled components}: rely on \texttt{useRef} to access DOM values directly --- simpler but less React-idiomatic.
+  \item Form submission handled via event handlers rather than default browser behaviour.
+  \item Always call \texttt{e.preventDefault()} to stop the page from reloading on submit.
+  \item Validation can be synchronous (in state) or asynchronous (with effects or libraries like \textbf{React Hook Form}).
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={Controlled form in React}]
+import { useState } from "react";
+
+function LoginForm() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.includes("@")) {
+      setError("Invalid email address");
+      return;
+    }
+    console.log("Submitting:", { email, password });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+      />
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <button type="submit">Log In</button>
+    </form>
+  );
+}
+\end{lstlisting}
+
+\subsection{Error Handling in React}
+\begin{itemize}
+  \item Errors can occur during \textbf{rendering}, \textbf{data fetching}, or \textbf{user interactions}.
+  \item \textbf{Error Boundaries}: class components that catch render-time errors in their subtree and display a fallback UI instead of crashing.
+  \item Async errors (fetch failures, timeouts) must be caught explicitly in \texttt{useEffect} or event handlers.
+  \item Runtime errors should always be anticipated and handled gracefully.
+  \item Proper error handling improves resilience and user experience.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={Simple Error Boundary class component}]
+import { Component, ReactNode } from "react";
+
+interface State { hasError: boolean; }
+
+class ErrorBoundary extends Component<{ children: ReactNode }, State> {
+  state: State = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: any) {
+    console.error("Caught:", error, info);
+  }
+
+  render() {
+    if (this.state.hasError)
+      return <h2>Something went wrong. Please refresh.</h2>;
+    return this.props.children;
+  }
+}
+
+// Usage
+<ErrorBoundary>
+  <MyComponent />
+</ErrorBoundary>
+\end{lstlisting}
+
+\subsection{shadcn/ui}
+\begin{itemize}
+  \item A collection of \textbf{reusable, accessible} React components.
+  \item Components are \textbf{copied into your project} (not installed as a library dependency) --- you own the code.
+  \item Built on top of \textbf{Radix UI} (headless, accessible primitives) and \textbf{TailwindCSS}.
+  \item Fully customisable since the source lives in your codebase.
+  \item Encourages design consistency without locking into a fixed component library.
+  \item Install individual components: \texttt{npx shadcn-ui@latest add button}.
+\end{itemize}
+
+\subsection{TanStack Query}
+\begin{itemize}
+  \item Manages \textbf{server/remote state} that can change outside the UI.
+  \item Standardises loading, error, caching, and refetching behaviour.
+  \item Reduces boilerplate compared to manual \texttt{useEffect} + \texttt{useState}.
+  \item Prevents duplicate requests via \textbf{request deduplication}.
+  \item Improves perceived performance via caching and background updates.
+\end{itemize}
+
+\begin{lstlisting}[language=Java, caption={TanStack Query --- useQuery example}]
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+
+function Users() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => axios.get("/api/users").then(r => r.data),
+    staleTime: 60_000, // 1 min before background refetch
+  });
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error)     return <p>Error!</p>;
+
+  return <ul>{data.map((u: any) => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+
+function CreateUser() {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: (newUser: any) => axios.post("/api/users", newUser),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+  });
+
+  return (
+    <button onClick={() => mutation.mutate({ name: "New User" })}>
+      Add User
+    </button>
+  );
+}
+\end{lstlisting}
+
+\subsection{TanStack Mutations}
+\begin{itemize}
+  \item \texttt{useMutation} handles \textbf{create / update / delete} operations against the server.
+  \item \texttt{onSuccess} handlers typically \textbf{invalidate related queries} to refresh cached data.
+  \item \textbf{Optimistic updates}: update the UI before the server responds for a snappier feel.
+  \item \textbf{Rollbacks}: revert the optimistic update if the server request fails.
+  \item Mutation lifecycle callbacks: \texttt{onMutate}, \texttt{onSuccess}, \texttt{onError}, \texttt{onSettled}.
+\end{itemize}
+
+\subsection{TanStack Best Practices}
+\begin{itemize}
+  \item Treat TanStack Query as the default for \textbf{API/server state} --- use React state or Context for \textbf{UI state}.
+  \item Normalise query keys and keep them consistent across the app.
+  \item Prefer \textbf{invalidation} over manual refetch wiring for correctness.
+  \item Use \texttt{select} / transform patterns to keep components minimal.
+  \item Combine with lightweight client state (Context or Zustand) when needed.
+\end{itemize}
+
+\subsection{Next.js and SSR}
+\begin{itemize}
+  \item \textbf{SSR (Server-Side Rendering)}: HTML is rendered on the \textbf{server} and sent to the client.
+  \item Improves \textbf{initial load performance} and \textbf{SEO} (content visible to crawlers immediately).
+  \item Requires \textbf{hydration} to attach React interactivity on the client.
+  \item \textbf{Next.js}: production-grade React framework with built-in SSR, SSG, file-based routing, and performance optimisations.
+  \item Supports multiple rendering strategies: SSR, SSG (Static Site Generation), CSR (Client-Side Rendering).
+\end{itemize}
+
+\subsection{Recommended Project Structure}
+\begin{lstlisting}[language={}, caption={Typical React project layout}]
+src/
+  assets/          # images, icons, fonts
+  components/      # reusable UI components (Button, Card, Modal)
+  pages/           # route-level components (HomePage, AboutPage)
+  hooks/           # custom React hooks (useAuth, useFetch)
+  services/        # API calls and external integrations
+  context/         # React Context providers
+  store/           # Redux / Zustand state
+  utils/           # helper functions
+  types/           # TypeScript interfaces and types
+  App.tsx
+  main.tsx
+\end{lstlisting}
+
+\newpage
+% ==================================================
+\section{Quick Reference}
+% ==================================================
+
+\subsection{JavaScript Cheat Sheet}
+\begin{itemize}
+  \item \textbf{Declarations}: \texttt{const} (preferred) $>$ \texttt{let} $>$ \texttt{var} (avoid).
+  \item \textbf{Strict equality}: always use \texttt{===} / \texttt{!==}; avoid \texttt{==} to prevent coercion surprises.
+  \item \textbf{Falsy values}: \texttt{false}, \texttt{0}, \texttt{""}, \texttt{null}, \texttt{undefined}, \texttt{NaN}.
+  \item \textbf{Array methods}: \texttt{.map()}, \texttt{.filter()}, \texttt{.reduce()}, \texttt{.find()}, \texttt{.some()}, \texttt{.every()}.
+  \item \textbf{Object spread}: \texttt{\{ ...obj, key: value \}} creates a shallow copy with overrides.
+  \item \textbf{Optional chaining}: \texttt{user?.address?.city} --- short-circuits to \texttt{undefined} instead of throwing.
+  \item \textbf{Nullish coalescing}: \texttt{value ?? "default"} --- uses right side only when left is \texttt{null}/\texttt{undefined}.
+  \item \textbf{Async}: Callbacks $\to$ Promises $\to$ \texttt{async/await} (cleanest).
+  \item \textbf{Modules}: \texttt{export} / \texttt{import}; default vs.\ named exports.
+\end{itemize}
+
+\subsection{HTML Cheat Sheet}
+\begin{itemize}
+  \item \texttt{<!DOCTYPE html>} --- HTML5 declaration.
+  \item \texttt{<html>}, \texttt{<head>}, \texttt{<body>} --- document skeleton.
+  \item \texttt{<h1>}--\texttt{<h6>}, \texttt{<p>}, \texttt{<strong>}, \texttt{<em>} --- text.
+  \item \texttt{<a href>}, \texttt{<img src alt>}, \texttt{<video>}, \texttt{<audio>} --- links and media.
+  \item \texttt{<ul>}, \texttt{<ol>}, \texttt{<li>}, \texttt{<dl>}, \texttt{<dt>}, \texttt{<dd>} --- lists.
+  \item \texttt{<table>}, \texttt{<tr>}, \texttt{<th>}, \texttt{<td>} --- tables.
+  \item \texttt{<form>}, \texttt{<input>}, \texttt{<select>}, \texttt{<textarea>}, \texttt{<button>} --- forms.
+  \item \texttt{<header>}, \texttt{<nav>}, \texttt{<main>}, \texttt{<section>}, \texttt{<footer>} --- semantics.
+\end{itemize}
+
+\subsection{CSS Cheat Sheet}
+\begin{itemize}
+  \item Selectors: \texttt{element}, \texttt{.class}, \texttt{\#id}, \texttt{A > B}, \texttt{A + B}, \texttt{:hover}, \texttt{::before}.
+  \item Box model: \texttt{margin} $\to$ \texttt{border} $\to$ \texttt{padding} $\to$ \texttt{content}.
+  \item Layout: \texttt{display: flex | grid | block | inline}.
+  \item Position: \texttt{static | relative | absolute | fixed | sticky}.
+  \item Responsive: \texttt{@media (min-width: 768px) \{ ... \}}.
+  \item Variables: \texttt{--name: value;} and \texttt{var(--name)}.
+\end{itemize}
+
+\subsection{React Hooks Summary}
+\begin{itemize}
+  \item \texttt{useState(init)} --- local component state; triggers re-render on change.
+  \item \texttt{useEffect(fn, deps)} --- side effects (fetch, subscriptions, timers); runs after render.
+  \item \texttt{useContext(Context)} --- consume a context value provided by a \texttt{Provider} ancestor.
+  \item \texttt{useRef(init)} --- mutable ref that persists across renders without causing re-renders; also used for DOM access.
+  \item \texttt{useMemo(fn, deps)} --- memoised computed value; re-computes only when dependencies change.
+  \item \texttt{useCallback(fn, deps)} --- memoised function reference; prevents unnecessary child re-renders.
+  \item \texttt{useReducer(reducer, init)} --- complex state logic with actions (like a mini Redux).
+  \item \texttt{useLayoutEffect(fn, deps)} --- like \texttt{useEffect} but fires \textbf{synchronously} before the browser paints.
+  \item \textbf{Rules of Hooks}: only call at the \textbf{top level} (not inside loops/conditions), only in \textbf{React function} components or custom hooks.
+\end{itemize}
+
+\end{document}
