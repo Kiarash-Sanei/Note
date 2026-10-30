@@ -1,0 +1,2025 @@
+\documentclass[hidelinks]{article}
+% Page Layout
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+% Colors
+\usepackage[dvipsnames]{xcolor}
+% Math
+\usepackage{amsmath,amssymb,mathrsfs}
+% Lists
+\usepackage{enumitem}
+% Section Styling
+\usepackage{titlesec}
+% Hyperlinks
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+% Code listings
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small\color{white},
+  columns=flexible,
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=single,
+  framesep=6pt,
+  rulecolor=\color{capri},
+  numbers=left,
+  numberstyle=\tiny\color{nudelavender},
+  numbersep=8pt,
+  xleftmargin=2.2em,
+  keywordstyle=\color{brightlavender}\bfseries,
+  commentstyle=\color{SkyBlue}\itshape,
+  stringstyle=\color{capri},
+  showstringspaces=false,
+  tabsize=4,
+  captionpos=b,
+}
+% --------------------------------------------------
+% Color Palette
+% --------------------------------------------------
+\definecolor{carminered}{rgb}{1.0,0.0,0.22}
+\definecolor{capri}{rgb}{0.0,0.75,1.0}
+\definecolor{brightlavender}{rgb}{0.75,0.58,0.89}
+\definecolor{nudelavender}{rgb}{0.78, 0.66, 0.70}
+% --------------------------------------------------
+% Dark Theme
+% --------------------------------------------------
+\pagecolor{black}
+\color{white}
+% --------------------------------------------------
+% Section Style
+% --------------------------------------------------
+\titleformat{\section}
+  {\bfseries\Large\color{brightlavender}}
+  {\thesection}{0.5em}{}
+
+\titleformat{\subsection}
+  {\bfseries\color{Thistle}}
+  {\thesubsection}{0.5em}{}
+
+\titleformat{\subsubsection}
+  {\bfseries\color{nudelavender}}
+  {\thesubsubsection}{0.5em}{}
+% --------------------------------------------------
+% Bullet Style
+% --------------------------------------------------
+\setlist[itemize,1]{label=$\bullet$}
+\setlist[itemize,2]{label=$\circ$}
+\setlist[itemize,3]{label=$\bullet$}
+\setlist[itemize,4]{label=$\circ$}
+% --------------------------------------------------
+% Callout for slide highlight boxes
+% --------------------------------------------------
+\newcommand{\callout}[1]{\par\smallskip\noindent{\color{capri}$\blacktriangleright$}\ \textit{#1}\par\smallskip}
+% --------------------------------------------------
+% Title Style
+% --------------------------------------------------
+\title{\color{carminered}\textbf{Numerical Computations}}
+\author{\color{Thistle}Kiarash Sanei}
+\date{\color{SkyBlue}October 2026}
+
+% --------------------------------------------------
+% Extra helpers for this course
+% --------------------------------------------------
+\usepackage{array}
+\renewcommand{\arraystretch}{1.15}
+\newcommand{\abs}[1]{\left|#1\right|}
+
+\begin{document}
+\maketitle
+\begin{Large}
+\tableofcontents
+\end{Large}
+\newpage
+%=================================================
+\section{Introduction to Numerical Computations}
+%=================================================
+
+\subsection{Course Information}
+
+\begin{itemize}
+    \item \textbf{Lecturers:} Hamid Sarbazi-Azad (\texttt{azad@sharif.edu}, room 621) and Negar Akbarzadeh (\texttt{akbarzadeh@ipm.ir}, room 703).
+    \item \textbf{Head TA:} Atiyeh Gheibi-Fetrat (\texttt{atiye.gheibi@gmail.com}, HPCAN Lab, room 703).
+    \item \textbf{Main reference:} N.~V.~Kopchenova and I.~A.~Maron, \emph{Computational Mathematics}, Mir Publishers (Persian translation: H.~Sarbazi-Azad). GPU references: NVIDIA \emph{CUDA C Programming Guide} (v6.5) and Sanders \& Kandrot, \emph{CUDA by Example}.
+\end{itemize}
+
+\textbf{Grading policy:}
+\[
+\begin{array}{lll}
+\textbf{Item} & \textbf{Weight} & \textbf{Date}\\ \hline
+\text{Assignments} & 10\% & \\
+\text{Project} & 10\% & \\
+\text{Midterm (Sections 1--4)} & 40\% & \text{Thursday 26 Azar, 11:00}\\
+\text{Final (Sections 5--8)} & 40\% & \text{Thursday 7 Bahman, 15:00}\\
+\end{array}
+\]
+
+\textbf{Course outline:}
+\begin{enumerate}[start=0]
+    \item Introduction to NC and parallel programming with GPUs
+    \item Approximate computations and error estimation
+    \item[2+.] Computing the values of functions and solving equations (root finding)
+    \item[3.] Numerical solution of systems of linear equations
+    \item[4.] Numerical solution of systems of nonlinear equations
+    \item[5.] Interpolation of functions
+    \item[6.] Numerical differentiation
+    \item[7.] Numerical integration
+    \item[8.] Approximate solution of ordinary differential equations
+    \item[9.] Boundary value problems for ODEs
+    \item[10.] Numerical solution of PDEs and integral equations
+\end{enumerate}
+
+\callout{This document covers Sections 0--4, i.e.\ everything on the midterm.}
+
+\subsection{What Are Numerical Methods?}
+
+\textbf{Definition.} Numerical computation is the study of \emph{approximation techniques} for solving mathematical problems numerically.
+
+Very few mathematical problems have closed-form solutions, so numerical methods are necessary. Typical examples:
+\begin{itemize}
+    \item extracting the roots of a polynomial of degree $>4$;
+    \item computing the eigenvalues of a matrix (e.g.\ PageRank);
+    \item solving most ODEs and PDEs.
+\end{itemize}
+
+More than 99.9\% of real-world science and engineering problems can only be solved numerically. Analytic solutions are rare, but they remain the ``core truth'': they reveal the structure of a problem and let us test the integrity of numerical schemes.
+
+\subsubsection{Motivating Example: Roots of Polynomials}
+
+\textbf{Bisection idea} (developed fully in Section~\ref{sec:roots}) for a root of $f$ in $[a,b]$:
+\begin{enumerate}
+    \item Pick $a,b$ such that $f(a)$ and $f(b)$ have opposite signs.
+    \item Bisect $(a,b)$ into $(a,m)$ and $(m,b)$, $m=\tfrac{a+b}{2}$; keep the half on whose ends $f$ still has opposite signs.
+    \item Repeat until the interval is short enough; its midpoint is the numerical solution.
+\end{enumerate}
+
+\[
+\begin{array}{lll}
+\textbf{Equation} & \textbf{Analytic solution} & \textbf{Numerical (bisection)}\\ \hline
+z^3+a_2z^2+a_1z+a_0=0 & \text{Cardano's formula (long)} & \text{applies}\\
+z^4+a_3z^3+\dots+a_0=0 & \text{Ferrari's formula (very long)} & \text{applies, nothing changes}\\
+z^5+a_4z^4+\dots+a_0=0 & \text{does not exist (Abel--Ruffini), except special cases} & \text{applies as usual}\\
+\end{array}
+\]
+
+\callout{From degree 5 on, numerical methods are the \emph{only} general option.}
+
+\subsubsection{Numerical Methods in AI, Imaging and Industry}
+
+\textbf{Local search in continuous spaces (AIMA, 3rd ed.).} Place 3 airports so that the sum of squared distances from each city to its nearest airport is minimal. The state is $(x_1,y_1,x_2,y_2,x_3,y_3)$ and
+\[
+f(x_1,x_2,x_3,y_1,y_2,y_3)=\sum_{i=1}^{3}\sum_{c\in C_i}\left[(x_i-x_c)^2+(y_i-y_c)^2\right],
+\]
+where $C_i$ is the set of cities closest to airport $i$. To minimise $f$ we solve $\nabla f=0$ with
+\[
+\nabla f=\left(\frac{\partial f}{\partial x_1},\frac{\partial f}{\partial x_2},\frac{\partial f}{\partial x_3},\frac{\partial f}{\partial y_1},\frac{\partial f}{\partial y_2},\frac{\partial f}{\partial y_3}\right).
+\]
+The most effective algorithm is the \textbf{Newton--Raphson} update
+\[
+\mathbf{x}\leftarrow \mathbf{x}-H_f^{-1}(\mathbf{x})\,\nabla f(\mathbf{x}),
+\]
+where $H_f$ is the Hessian. (This is exactly Newton's method for the nonlinear system $\nabla f=0$; see Section~\ref{sec:nonlinear}.)
+
+\textbf{Other applications:}
+\begin{itemize}
+    \item \textbf{Image processing:} eigenvalues are used for measuring image sharpness, human-face segmentation and whitening.
+    \item \textbf{Google PageRank:} an eigenvector of a matrix of order $\sim 3$ billion --- the world's largest matrix computation.
+    \item \textbf{Airlines:} optimisation for ticket prices, aircraft, fuel and crew assignment.
+    \item \textbf{Car crash simulation:} numerically solving PDEs.
+    \item \textbf{Hedge funds:} numerical analysis to value stocks.
+\end{itemize}
+
+\subsection{Supercomputers and GPUs}
+
+\begin{itemize}
+    \item Moore's law and parallel architectures have driven supercomputer growth for seven decades.
+    \item Supercomputers are ranked every six months at \texttt{top500.org} by computing power in \textbf{FLOPS} (floating-point operations per second). Adding or multiplying two IEEE-754 floating-point numbers counts as one FLOP.
+    \item \textbf{GPUs} dominate today's massively parallel processing and have been the major enabler of deep neural networks.
+\end{itemize}
+
+\textbf{Top-10 list (2026, from the slides):}
+\[
+\begin{array}{clrrr}
+\textbf{Rank} & \textbf{System (site, country)} & \textbf{Cores} & \textbf{Rmax (PF/s)} & \textbf{Power (kW)}\\ \hline
+1 & \text{LineShine (NSC Shenzhen, China)} & 13{,}789{,}440 & 2198.40 & 42{,}220\\
+2 & \text{El Capitan (LLNL, USA)} & 11{,}340{,}000 & 1809.00 & 29{,}685\\
+3 & \text{Frontier (ORNL, USA)} & 9{,}066{,}176 & 1353.00 & 24{,}607\\
+4 & \text{Aurora (Argonne, USA)} & 9{,}264{,}128 & 1012.00 & 38{,}698\\
+5 & \text{JUPITER Booster (FZJ, Germany)} & 4{,}801{,}344 & 1000.00 & 15{,}794\\
+6 & \text{HPC7 (Eni, Italy)} & 3{,}461{,}472 & 571.50 & 8{,}735\\
+7 & \text{Eagle (Microsoft Azure, USA)} & 2{,}073{,}600 & 561.20 & \text{--}\\
+8 & \text{HPC6 (Eni, Italy)} & 3{,}143{,}520 & 477.90 & 8{,}461\\
+9 & \text{Fugaku (RIKEN, Japan)} & 7{,}630{,}848 & 442.01 & 29{,}899\\
+10 & \text{Alps (CSCS, Switzerland)} & 2{,}121{,}600 & 434.90 & 7{,}124\\
+\end{array}
+\]
+
+\callout{Today's computer engineers must know parallel programming, especially GPU programming.}
+
+%=================================================
+\section{Errors and Error Estimation}
+%=================================================
+
+\subsection{Why Errors Matter}
+
+Numbers such as $\pi=3.14159265\ldots$, $e=2.71828182\ldots$, $\sqrt5=2.2360679\ldots$ and $\tfrac13=0.3333333\ldots$ can only ever be stored approximately. Numerical methods give \emph{approximate} results, so we must ask: \emph{how much error is present, and is it tolerable?}
+
+We measure errors
+\begin{itemize}
+    \item to determine the accuracy of numerical results, and
+    \item to develop \textbf{stopping criteria} for iterative algorithms.
+\end{itemize}
+
+\subsubsection{Disasters Caused by Numerical Error}
+
+\textbf{Patriot missile (25 Feb 1991, Dhahran).} The system failed to intercept a Scud; 28 soldiers were killed. The clock tick of $\tfrac1{10}$\,s was stored in a 24-bit fixed-point register. Since $0.1$ has no finite binary expansion, each tick carried an error of $9.5\times10^{-8}$\,s. After 100 hours of operation:
+\[
+9.5\times10^{-8}\ \frac{\text{s}}{\text{tick}}\times 100\,\text{h}\times\frac{3600\,\text{s}}{1\,\text{h}}\times\frac{1\ \text{tick}}{0.1\,\text{s}}=0.342\,\text{s},
+\]
+enough for a Scud to travel about half a kilometre.
+
+\textbf{Ariane 5 (4 June 1996).} 36 seconds after launch the rocket veered off and self-destructed. The Inertial Reference System raised an operand exception converting a 64-bit float to a small signed integer (the slides say 12-bit; the inquiry report says 16-bit) that was too small to hold it; the diagnostic word was interpreted as flight data. Ironically, the code was legacy from Ariane~4 and its result was not needed after lift-off.
+
+\textbf{Vancouver Stock Exchange (1982).} A new index started at $1000$ and was updated after every transaction. After 22 months it had fallen to $520$ because updates were \emph{truncated} instead of \emph{rounded}. Correct rounding gave $1098.892$.
+
+\subsection{Sources and Types of Error}
+
+\textbf{Sources of error:}
+\begin{itemize}
+    \item \textbf{Measurement:} measured data contain error.
+    \item \textbf{Representation:} finite representation of numbers in the machine.
+    \item \textbf{Mathematical model:} some parameters are ignored when modelling.
+\end{itemize}
+
+\textbf{Types of error:}
+\begin{itemize}
+    \item \textbf{Round-off error:} computers work with a finite representation, e.g.\ $\tfrac13\approx0.33333$, $\sqrt2\approx1.4142$.
+    \item \textbf{Truncation error:} an infinite process is cut off, e.g.\ approximating a function by a polynomial. The Taylor series of $e^x$ about $0$,
+    \[
+    e^x=1+x+\frac{x^2}{2!}+\frac{x^3}{3!}+\cdots,
+    \]
+    is truncated after finitely many terms.
+\end{itemize}
+
+\subsection{Accuracy vs.\ Precision}
+
+\begin{itemize}
+    \item \textbf{Accuracy:} how close the value is to the \emph{true} value.
+    \item \textbf{Precision:} how close repeated measured values are to \emph{each other}.
+\end{itemize}
+
+\callout{Think of a target: shots clustered tightly but off-centre are precise but inaccurate; shots scattered around the bull's-eye are accurate on average but imprecise. The goal is both.}
+
+\subsection{Absolute and Relative Error}
+
+Let $a$ be an approximation of the exact value $a_0$.
+
+\textbf{Absolute error:}
+\[
+\Delta_a=\abs{a-a_0}\qquad(\text{always}\ \ge 0;\ \text{in practice we use an upper bound}).
+\]
+
+\textbf{Relative error:}
+\[
+\delta_a=\frac{\Delta_a}{\abs{a}}\qquad(a\neq0).
+\]
+
+In applied sciences accuracy is usually characterised by the \emph{relative} error:
+\[
+\begin{array}{lcc}
+ & \text{Case 1} & \text{Case 2}\\ \hline
+\text{Actual size} & 17.2\,\text{cm} & 82.49\,\text{m}\\
+\text{Measured size} & 18.2\,\text{cm} & 82.50\,\text{m}\\
+\text{Absolute error} & 1\,\text{cm} & 1\,\text{cm}\\
+\text{Relative error} & 0.05 & 0.00012\\
+\end{array}
+\]
+Same absolute error, but the second measurement is far more accurate.
+
+\subsubsection{Example: Area of a Room}
+
+Length and width measured to $1$\,cm: $a=5.43$\,m, $b=3.82$\,m, so $S=ab=20.7426\,\text{m}^2$.
+
+With $\Delta_a=\Delta_b=0.01$\,m, the extreme possible areas are
+\[
+(a+0.01)(b+0.01)=20.8352,\qquad (a-0.01)(b-0.01)=20.6502.
+\]
+Hence $\abs{S-S_0}\le0.0926$ and
+\[
+\delta_S=\frac{0.0926}{20.7426}\approx0.0045=0.45\%.
+\]
+
+\callout{Check with the product rule of Section~\ref{sec:muldiv}: $\delta_S\approx\delta_a+\delta_b=\tfrac{0.01}{5.43}+\tfrac{0.01}{3.82}=0.00184+0.00262=0.0045$. Same answer, much faster.}
+
+\subsection{Correct Digits and Rounding}
+
+\textbf{Definition.} The \textbf{correct digits} of a number are counted from its first significant digit up to the first significant digit (decimal place) of its absolute error.
+
+\textbf{Rounding rule:} if the first discarded digit is $\ge5$, add 1 to the last retained digit.
+
+\callout{When you round a result, the rounding error (the discarded part) must be \textbf{added} to the absolute error.}
+
+\subsubsection{Example: Correct Digits of $s=20.7426$, $\Delta_s=0.0926$}
+
+The first significant digit of $\Delta_s$ is in the $10^{-1}$ place, so the digits $2,0,7$ are correct and we write $s=20.7$. The discarded quantity is $20.7426-20.7=0.0426$, so
+\[
+\Delta_s=0.0926+0.0426=0.1352\approx0.136.
+\]
+Now the error's first significant digit is again in the $10^{-1}$ place, but $0.136>0.1$, so strictly the tenths digit is no longer guaranteed. Rounding again to correct digits gives $s=21$ with
+\[
+\Delta_s=0.136+0.3=0.436.
+\]
+
+\callout{Lesson: rounding a result off to its correct digits is \emph{not always advisable}; each rounding increases the error bound. Keep one or two spare digits during computation.}
+
+\subsection{Error of Sums and Differences}
+
+\textbf{Rule.} The absolute error of an algebraic sum is at most the sum of the absolute errors:
+\[
+S=a_1\pm a_2\pm\cdots\pm a_n\ \Longrightarrow\ \Delta_S=\Delta_{a_1}+\Delta_{a_2}+\cdots+\Delta_{a_n}.
+\]
+If one term's error dominates the others, the error of the sum is taken to be that greatest error.
+
+\textbf{Remark (same-sign terms).} If $a_1,\dots,a_n$ all have the same sign, then
+\[
+\delta_{\min}\le\delta_S\le\delta_{\max}.
+\]
+\emph{Proof sketch (HW\#1).} $\delta_S=\frac{\sum\Delta_{a_i}}{\sum\abs{a_i}}=\frac{\sum\delta_{a_i}\abs{a_i}}{\sum\abs{a_i}}$ is a weighted average of the $\delta_{a_i}$ with positive weights, hence lies between their minimum and maximum. $\blacksquare$
+
+\subsubsection{Example: Summing Numbers of Different Accuracy}
+
+Sum $0.348,\ 0.1834,\ 345.4,\ 235.2,\ 11.75,\ 9.27,\ 0.0849,\ 0.0214,\ 0.000354$, all digits correct (each error $\le$ half a unit of the last digit).
+
+The least accurate terms are $345.4$ and $235.2$ ($\Delta=0.05$ each). Round all other terms to one spare digit (hundredths) and add:
+\[
+345.4+235.2+11.75+9.27+0.35+0.18+0.08+0.02+0.00=602.25\approx602.3.
+\]
+Error: the two dominant terms give $2\times0.05=0.1$; the final rounding adds $0.05$:
+\[
+\Delta_S=0.1+0.05=0.15.
+\]
+
+\callout{Procedure: (1) find the least accurate terms; (2) round the others to one more decimal place than those; (3) add; (4) round the result and add up the errors.}
+
+\subsubsection{Subtracting Nearly Equal Numbers}
+
+For $c=a-b$ with $a,b>0$, the relative error of the difference can be much larger than those of $a$ and $b$, especially when $a\approx b$ (\textbf{catastrophic cancellation}).
+
+\textbf{Example.} $a^*=1.137$, $b^*=1.073$, $\Delta_a=\Delta_b=0.011$ (so $\delta_a\approx\delta_b\approx1\%$):
+\[
+c^*=0.064,\qquad \Delta_c=0.022,\qquad \delta_c=\frac{0.022}{0.064}\approx35\%.
+\]
+
+\callout{Avoid subtracting nearly equal numbers; rewrite formulas when possible, e.g.\ $\sqrt{x+1}-\sqrt{x}=\dfrac{1}{\sqrt{x+1}+\sqrt{x}}$.}
+
+\subsection{Error of Products and Quotients}\label{sec:muldiv}
+
+\textbf{Proposition (product).} If $p=ab$ then $\delta_p=\delta_a+\delta_b$.
+
+\emph{Proof.}
+\[
+p_{\max}=(a+\Delta_a)(b+\Delta_b)=ab+b\Delta_a+a\Delta_b+\Delta_a\Delta_b,\qquad
+p_{\min}=(a-\Delta_a)(b-\Delta_b)=ab-b\Delta_a-a\Delta_b+\Delta_a\Delta_b.
+\]
+Since $\Delta_a,\Delta_b\approx0$, neglect $\Delta_a\Delta_b$: $\Delta_p\le\abs{b}\Delta_a+\abs{a}\Delta_b$, so
+\[
+\delta_p\le\frac{\abs{b}\Delta_a+\abs{a}\Delta_b}{\abs{ab}}=\delta_a+\delta_b.\qquad\blacksquare
+\]
+
+\textbf{Proposition (quotient).} If $p=\dfrac ab$ then $\delta_p=\delta_a+\delta_b$.
+
+\emph{Proof.} $p_{\max}=\frac{a+\Delta_a}{b-\Delta_b}$, $p_{\min}=\frac{a-\Delta_a}{b+\Delta_b}$, and
+\[
+p_{\max}-p=\frac{b\Delta_a+a\Delta_b}{b(b-\Delta_b)},\qquad
+p-p_{\min}=\frac{b\Delta_a+a\Delta_b}{b(b+\Delta_b)}.
+\]
+For $\Delta_b\to0$, $\Delta_p\le\dfrac{\abs b\Delta_a+\abs a\Delta_b}{b^2}$, so $\delta_p=\dfrac{\Delta_p}{\abs{a/b}}\le\delta_a+\delta_b$. $\blacksquare$
+
+\textbf{General rule.} For
+\[
+r=\frac{a_1a_2\cdots a_m}{b_1b_2\cdots b_n}:\qquad \delta_r=\delta_{a_1}+\cdots+\delta_{a_m}+\delta_{b_1}+\cdots+\delta_{b_n},\qquad \Delta_r=\abs{r}\,\delta_r.
+\]
+
+\textbf{Statistical estimate.} If $m+n>10$ and all factors have roughly the same relative error $\delta$, errors of different signs partly cancel, and it is more realistic to use
+\[
+\delta_r=\sqrt{3(m+n)}\;\delta .
+\]
+
+\subsubsection{Example: Product/Quotient}
+
+Compute $r=\dfrac{3.2\times356.7\times0.04811}{7.1948\times34.56}$ and its error (all digits correct).
+
+The least accurate factor is $3.2$ (two significant digits): $\delta=\dfrac{0.05}{3.2}\approx0.016$. It dominates, so round the other factors to one spare digit (three significant digits):
+\[
+r=\frac{3.2\times357\times0.0481}{7.19\times34.6}=0.221,\qquad \Delta_r=r\delta_r=0.221\times0.016=0.0036.
+\]
+Rounding to correct digits: $r=0.22$.
+
+\callout{Rule of thumb: the result of $\times$/$\div$ has about as many correct significant digits as the \emph{least} accurate factor.}
+
+\subsection{Error in Computing Values of Functions}
+
+\textbf{One variable.} For differentiable $y=f(x)$ and a small error $\Delta_x$ (linearisation via the mean value theorem):
+\[
+\Delta_y=\abs{f'(x)}\,\Delta_x,\qquad
+\delta_y=\frac{\abs{f'(x)}}{\abs{f(x)}}\Delta_x=\abs{\big[\ln f(x)\big]'}\,\Delta_x .
+\]
+
+\textbf{Several variables.} For $y=f(x_1,\dots,x_n)$:
+\[
+\Delta_y=\sum_{i=1}^n\abs{\frac{\partial f}{\partial x_i}}\Delta_{x_i},\qquad
+\delta_y=\frac1{\abs f}\sum_{i=1}^n\abs{\frac{\partial f}{\partial x_i}}\Delta_{x_i}=\sum_{i=1}^n\abs{\frac{\partial \ln f}{\partial x_i}}\Delta_{x_i}\quad(f>0).
+\]
+
+\callout{The sum, product and quotient rules above are all special cases: e.g.\ $\ln(ab)=\ln a+\ln b$ gives $\delta_{ab}=\frac{\Delta_a}{a}+\frac{\Delta_b}{b}$.}
+
+\textbf{Useful special cases:}
+\begin{itemize}
+    \item Logarithm: $\Delta_{\ln x}=\dfrac{\Delta_x}{x}=\delta_x$ (absolute error of $\ln x$ = relative error of $x$).
+    \item Power: $\delta_{x^k}=\abs{k}\,\delta_x$ (e.g.\ $\delta_{\sqrt x}=\tfrac12\delta_x$, $\delta_{x^2}=2\delta_x$).
+    \item Trigonometric:
+    \[
+    \Delta_{\sin x}=\abs{\cos x}\Delta_x\le\Delta_x,\quad
+    \Delta_{\cos x}=\abs{\sin x}\Delta_x\le\Delta_x,
+    \]
+    \[
+    \Delta_{\tan x}=(1+\tan^2x)\Delta_x\ge\Delta_x,\quad
+    \Delta_{\cot x}=(1+\cot^2x)\Delta_x\ge\Delta_x.
+    \]
+\end{itemize}
+
+\subsubsection{Example: $z=\ln(10.3+\sqrt{4.4})$}
+
+All digits of $x=10.3$, $y=4.4$ are correct, so $\Delta_x=\Delta_y=0.05$.
+\begin{enumerate}
+    \item $\delta_y=\dfrac{0.05}{4.4}\approx1.2\%$, so $\delta_{\sqrt y}=\tfrac12\delta_y\approx0.6\%$.
+    \item $\sqrt y=\sqrt{4.4}=2.10$, $\Delta_{\sqrt y}=2.10\times0.006=0.013$.
+    \item $x+\sqrt y=10.3+2.10=12.4$, $\Delta=0.05+0.013=0.063$, $\delta_{x+\sqrt y}=\dfrac{0.063}{12.4}\approx0.5\%$.
+    \item $z=\ln12.4=2.517$, and $\Delta_z=\delta_{x+\sqrt y}\approx0.005$.
+\end{enumerate}
+So $z=2.517\pm0.005$, i.e.\ $z\approx2.52$.
+
+\subsubsection{Example: Area of a Circle}
+
+The diameter, measured to within $1$\,mm, is $d=0.842$\,m. Find $S=\pi d^2/4$ and its error.
+
+$\pi$ can be taken as accurately as we like, so the error comes from $d^2$:
+\[
+\delta_{d^2}=2\delta_d=2\times\frac{1}{842}\approx0.24\%,\qquad \delta_S=\delta_{\pi}+2\delta_d .
+\]
+Take $\pi$ with at least four correct digits so that $\delta_\pi\ll\delta_{d^2}$:
+\[
+S=\frac{3.1416}{4}\times0.842^2=0.7854\times0.7090=0.5568\,\text{m}^2,\qquad
+\Delta_S=0.5568\times0.0024=0.0013.
+\]
+After rounding to $S=0.557\,\text{m}^2$: $\Delta_S=0.0013+0.0002=0.0015\approx0.002$.
+
+\subsection{Inverse Problem: Determining the Error of Arguments}
+
+Given the permissible error $\Delta_y$ of the result, how accurately must the arguments be known?
+
+\textbf{One variable:}
+\[
+\Delta_x=\frac{\Delta_y}{\abs{f'(x)}},\qquad f'(x)\neq0.
+\]
+
+\textbf{Several variables} (principle of \textbf{equal effects}: each argument contributes the same share of the error):
+\[
+\Delta_{x_i}=\frac{\Delta_y}{n\abs{\partial f/\partial x_i}},\qquad i=1,\dots,n.
+\]
+
+\subsubsection{Example: Accuracy of an Angle for $\sin x$ with Five Correct Digits}
+
+For $x>6^\circ$ (first quadrant) we have $\sin x>0.1$, so five correct digits require
+\[
+\Delta_{\sin x}<0.5\times10^{-5}.
+\]
+Then
+\[
+\Delta_x=\frac{\Delta_{\sin x}}{\abs{\cos x}} .
+\]
+\callout{The slides write $\Delta_x>2\times0.5\times10^{-5}=10^{-5}$. Since $\abs{\cos x}\le1$, the safe requirement valid for every first-quadrant angle is $\Delta_x\le0.5\times10^{-5}$ rad ($\approx1''$); near $x=60^\circ$ ($\cos x=\tfrac12$) one may relax it to $10^{-5}$ rad ($\approx2''$).}
+%=================================================
+\section{Computing the Values of Functions}
+%=================================================
+
+\subsection{Overview}
+
+Computers natively perform only $+,-,\times,\div$. So computing the value of any function means reducing it to a \emph{sequence of elementary arithmetic operations}. Two tools:
+\begin{itemize}
+    \item \textbf{Horner's scheme} for polynomials (William George Horner, 1786--1837);
+    \item \textbf{Taylor / Maclaurin series} for analytic functions (Colin Maclaurin, 1698--1746), with an error bound that tells us how many terms to keep.
+\end{itemize}
+
+\subsection{Horner's Scheme}
+
+\subsubsection{The Idea}
+
+Let $P(x)=a_0x^n+a_1x^{n-1}+\cdots+a_{n-1}x+a_n$ be a real polynomial of degree $n$. We want $P(\xi)$. Factor out $\xi$ repeatedly (nested form):
+\[
+P(\xi)=\Big(\cdots\big((a_0\xi+a_1)\xi+a_2\big)\xi+\cdots+a_{n-1}\Big)\xi+a_n .
+\]
+Compute successively
+\[
+b_0=a_0,\qquad b_k=b_{k-1}\,\xi+a_k\quad(k=1,\dots,n),\qquad P(\xi)=b_n .
+\]
+
+\textbf{Tableau:}
+\[
+\begin{array}{c|ccccc}
+ & a_0 & a_1 & a_2 & \cdots & a_n\\
+\xi & & b_0\xi & b_1\xi & \cdots & b_{n-1}\xi\\ \hline
+ & b_0 & b_1 & b_2 & \cdots & b_n=P(\xi)\\
+\end{array}
+\]
+
+\textbf{Cost:} $n$ multiplications and $n-k$ additions, where $k$ is the number of zero coefficients. (Naive evaluation needs about $2n-1$ multiplications, or $n(n+1)/2$ if powers are recomputed.)
+
+\subsubsection{Example: $P(-1.5)$}
+
+$P(x)=x^7-2x^6+x^5-3x^4+4x^3-x^2+6x-1$, $\xi=-1.5$:
+\[
+\begin{array}{c|rrrrrrrr}
+ & 1 & -2 & 1 & -3 & 4 & -1 & 6 & -1\\
+-1.5 & & -1.5 & 5.25 & -9.375 & 18.5625 & -33.8438 & 52.2656 & -87.3984\\ \hline
+ & 1 & -3.5 & 6.25 & -12.375 & 22.5625 & -34.8438 & 58.2656 & \mathbf{-88.3984}\\
+\end{array}
+\]
+So $P(-1.5)\approx-88.3984$.
+
+\callout{The slides print the 7th product as $-52.2657$; the correct value is $(-34.84375)(-1.5)=+52.265625$, which is what gives $58.2656$ in the bottom row.}
+
+\subsubsection{Horner's Scheme as Synthetic Division}
+
+Divide $P(x)$ by $x-\xi$: $P(x)=Q(x)(x-\xi)+\beta_n$ with $Q(x)=\beta_0x^{n-1}+\beta_1x^{n-2}+\cdots+\beta_{n-1}$. Expanding,
+\[
+P(x)=\beta_0x^n+(\beta_1-\beta_0\xi)x^{n-1}+(\beta_2-\beta_1\xi)x^{n-2}+\cdots+(\beta_{n-1}-\beta_{n-2}\xi)x+(\beta_n-\beta_{n-1}\xi).
+\]
+Comparing coefficients with $P(x)=a_0x^n+\cdots+a_n$:
+\[
+\beta_0=a_0=b_0,\qquad \beta_k=a_k+\beta_{k-1}\xi=b_k\quad(k=1,\dots,n).
+\]
+
+\callout{The intermediate numbers $b_0,\dots,b_{n-1}$ of Horner's scheme are exactly the coefficients of the quotient $Q(x)$, and $b_n=P(\xi)$ is the remainder (the Remainder Theorem). No division is needed.}
+
+\subsubsection{Example: Dividing by $x-3$}
+
+$P(x)=x^6+2x^5+3x^4+4x^3+5x^2+6x-1$:
+\[
+\begin{array}{c|rrrrrrr}
+ & 1 & 2 & 3 & 4 & 5 & 6 & -1\\
+3 & & 3 & 15 & 54 & 174 & 537 & 1629\\ \hline
+ & 1 & 5 & 18 & 58 & 179 & 543 & 1628\\
+\end{array}
+\]
+\[
+P(x)=(x^5+5x^4+18x^3+58x^2+179x+543)(x-3)+1628 .
+\]
+
+\callout{Applying Horner again to $Q$ at the same $\xi$ gives $P'(\xi)=Q(\xi)$ --- useful later for Newton's method on polynomials.}
+
+\subsection{Power Series and Taylor's Theorem}
+
+\subsubsection{Evaluating a Function by a Power Series}
+
+Suppose $f(0)$ and all $f^{(n)}(0)$ are known and we seek $f(x)=a_0+a_1x+a_2x^2+\cdots$. Differentiating term by term,
+\[
+f'(x)=a_1+2a_2x+\cdots,\quad\dots,\quad f^{(n)}(x)=n!\,a_n+\cdots,
+\]
+and putting $x=0$ gives $a_n=\dfrac{f^{(n)}(0)}{n!}$.
+
+\subsubsection{Analytic Functions, Taylor and Maclaurin Series}
+
+\textbf{Definition.} $f$ is \textbf{analytic} at $\xi$ iff its Taylor series converges to $f(x)$ for every $x$ in some neighbourhood $\abs{x-\xi}<R$.
+
+\textbf{Taylor series:}
+\[
+f(x)=f(\xi)+f'(\xi)(x-\xi)+\frac{f''(\xi)}{2!}(x-\xi)^2+\cdots+\frac{f^{(n)}(\xi)}{n!}(x-\xi)^n+\cdots
+\]
+\textbf{Maclaurin series} ($\xi=0$):
+\[
+f(x)=f(0)+f'(0)x+\frac{f''(0)}{2!}x^2+\cdots+\frac{f^{(n)}(0)}{n!}x^n+\cdots
+\]
+
+\textbf{Taylor polynomial and remainder.} Replacing $f$ by
+\[
+P_n(x)=\sum_{k=0}^n\frac{f^{(k)}(\xi)}{k!}(x-\xi)^k
+\]
+gives the error (remainder term) $R_n(x)=f(x)-P_n(x)$, and there is $0<\theta<1$ with (Lagrange form)
+\[
+R_n(x)=\frac{f^{(n+1)}\big(\xi+\theta(x-\xi)\big)}{(n+1)!}(x-\xi)^{n+1}.
+\]
+
+\textbf{Mean Value Theorem.} If $f$ is continuous on $[a,b]$ and differentiable on $(a,b)$, there is $c\in(a,b)$ with
+\[
+\frac{f(b)-f(a)}{b-a}=f'(c).
+\]
+
+\textbf{Taylor's Theorem.} Let $f$ be real on $[a,b]$, $n$ a positive integer, $f',\dots,f^{(n)}$ continuous on $[a,b]$ and $f^{(n+1)}$ existing on $(a,b)$. Let $\xi\in(a,b)$. Then for every $x\in(a,b)$ there is $c$ between $\xi$ and $x$ with
+\[
+f(x)=P_n(x)+\frac{f^{(n+1)}(c)}{(n+1)!}(x-\xi)^{n+1}.
+\]
+For $n=0$ this is the Mean Value Theorem: $f(x)-f(\xi)=f'(c)(x-\xi)$. The theorem lets us \emph{bound the error} once we have a bound on $\abs{f^{(n+1)}}$.
+
+\textbf{Sketch of proof.} Fix $x$ and choose $M$ so that $f(x)=P_n(x)+M(x-\xi)^{n+1}$. Define
+\[
+g(t)=f(t)-f(\xi)-\frac{f'(\xi)}{1!}(t-\xi)-\cdots-\frac{f^{(n)}(\xi)}{n!}(t-\xi)^n-M(t-\xi)^{n+1}.
+\]
+With $a_i=f^{(i)}(\xi)/i!$,
+\[
+g^{(k)}(t)=f^{(k)}(t)-\sum_{i\ge k}\frac{i!}{(i-k)!}a_i(t-\xi)^{i-k}-\frac{(n+1)!}{(n+1-k)!}M(t-\xi)^{n+1-k},\qquad
+g^{(n+1)}(t)=f^{(n+1)}(t)-(n+1)!\,M .
+\]
+So $g(\xi)=g'(\xi)=\cdots=g^{(n)}(\xi)=0$ and, by the choice of $M$, $g(x)=0$. Apply the MVT repeatedly:
+\[
+0=g(x)-g(\xi)=g'(c_1)(x-\xi)\Rightarrow g'(c_1)=0;\quad
+0=g'(c_1)-g'(\xi)=g''(c_2)(c_1-\xi)\Rightarrow g''(c_2)=0;\ \dots
+\]
+up to $g^{(n+1)}(c_{n+1})=0$, i.e.\ $f^{(n+1)}(c_{n+1})-(n+1)!M=0$, so $M=\dfrac{f^{(n+1)}(c_{n+1})}{(n+1)!}$. $\blacksquare$
+
+\textbf{Remarks.}
+\begin{enumerate}
+    \item A standard way to compute $f$ is to expand it in a Taylor/Maclaurin series.
+    \item If $f(\xi)$ is known and we need $f(\xi+h)$ for a small correction $h$:
+    \[
+    f(\xi+h)=f(\xi)+f'(\xi)h+\frac{f''(\xi)}{2!}h^2+\cdots+\frac{f^{(n)}(\xi)}{n!}h^n+R_n(h),\quad
+    R_n(h)=\frac{f^{(n+1)}(\xi+\theta h)}{(n+1)!}h^{n+1},\ 0<\theta<1.
+    \]
+\end{enumerate}
+
+\subsubsection{Example: $\sqrt{10}$ by Taylor Series about 9}
+
+$\sqrt{10}=\sqrt{3^2+1}$, so take $f(x)=x^{1/2}$, $\xi=9$, $h=1$:
+\[
+\begin{array}{ll}
+f'(x)=\tfrac12x^{-1/2}, & f'(9)=\tfrac16,\\[2pt]
+f''(x)=-\tfrac1{2^2}x^{-3/2}, & f''(9)=-\tfrac1{108},\\[2pt]
+f'''(x)=\tfrac3{2^3}x^{-5/2}, & f'''(9)=\tfrac1{648}.\\
+\end{array}
+\]
+\[
+\sqrt{10}=3+\frac16-\frac1{2\cdot108}+\frac1{6\cdot648}+R_3=3.16229+R_3\approx3.162+R_3,
+\]
+\[
+\abs{R_3}=\abs{\frac{f^{(4)}(9+\theta)}{4!}}=\frac1{4!}\cdot\frac{3\cdot5}{2^4}(9+\theta)^{-7/2}<\frac{15}{384}\cdot9^{-7/2}\approx0.0000179 .
+\]
+\callout{True value $\sqrt{10}=3.1622777$. (The slides quote the bound as $0.0000123$; either way three decimals are guaranteed.)}
+
+\subsubsection{Example: $\sqrt{10}$ by Maclaurin Series}
+
+$\sqrt{10}=3\left(1+\tfrac19\right)^{1/2}$; take $f(x)=(1+x)^{1/2}$, $x=\tfrac19$:
+\[
+f'(0)=\tfrac12,\quad f''(0)=-\tfrac14,\quad f'''(0)=\tfrac38,
+\]
+\[
+\left(1+\tfrac19\right)^{1/2}=1+\frac12\cdot\frac19-\frac18\cdot\frac1{81}+\frac1{16}\cdot\frac1{729}+R_3=1.05410+R_3,
+\]
+\[
+R_3=\frac{f^{(4)}(\theta/9)}{4!}\left(\frac19\right)^4=\frac{1}{4!}\cdot\frac{-15}{16}\left(1+\frac\theta9\right)^{-7/2}\frac1{9^4},\qquad \abs{R_3}<\frac{15}{2519424}<0.000006 .
+\]
+Hence $\sqrt{10}\approx3\times1.05410=3.1623$.
+
+\subsection{The Exponential Function}
+
+\[
+e^x=1+x+\frac{x^2}{2!}+\cdots+\frac{x^n}{n!}+\cdots,\qquad -\infty<x<\infty,
+\qquad R_n(x)=\frac{e^{\theta x}}{(n+1)!}x^{n+1}\ (0<\theta<1).
+\]
+For large $\abs x$ the error of $P_n(x)$ is intolerable (and many terms are needed), so split $x$:
+\[
+x=E(x)+q,\qquad E(x)=\text{integer part},\quad 0\le q<1,\qquad e^x=e^{E(x)}\cdot e^{q}.
+\]
+\begin{itemize}
+    \item $e^{E(x)}$ by repeated multiplication: $e\cdot e\cdots e$ ($E(x)$ times) if $E(x)\ge0$, or $\frac1e\cdots\frac1e$ ($-E(x)$ times) if $E(x)<0$, with $e=2.718281828459045\ldots$ and $\frac1e=0.367879441171442\ldots$
+    \item $e^q=\sum_{n\ge0}\dfrac{q^n}{n!}$ with a small argument.
+\end{itemize}
+
+\subsubsection{A Sharper Remainder Bound}
+
+The crude bound is $0\le R_n(q)=\dfrac{e^{\theta q}}{(n+1)!}q^{n+1}<\dfrac{3}{(n+1)!}q^{n+1}$. Better:
+\[
+\begin{aligned}
+R_n(q)&=\frac{q^{n+1}}{(n+1)!}\left[1+\frac{q}{n+2}+\frac{q^2}{(n+2)(n+3)}+\cdots\right]\\
+&<\frac{q^{n+1}}{(n+1)!}\left[1+\frac{q}{n+2}+\left(\frac{q}{n+2}\right)^2+\cdots\right]
+=\frac{q^{n+1}}{(n+1)!}\cdot\frac{1}{1-\frac{q}{n+2}} ,
+\end{aligned}
+\]
+using the geometric series $a+ar+ar^2+\cdots=\frac{a}{1-r}$, $\abs r<1$. Since $\dfrac{n+2}{(n+1)(n+2-q)}\le\dfrac{n+2}{(n+1)^2}<\dfrac1n$ for $0\le q<1$,
+\[
+\boxed{\,0<R_n(q)<\frac{q^n}{n!}\cdot\frac{q}{n}=u_n\frac{q}{n}\,},\qquad u_k=\frac{q^k}{k!}.
+\]
+
+\textbf{Recurrence (one multiplication + one division per term):}
+\[
+u_0=1,\qquad u_k=u_{k-1}\cdot\frac qk,\qquad e^q=u_0+u_1+\cdots+u_n+R_n(q).
+\]
+
+\textbf{Stopping rule.} For $n\ge2\abs q$,
+\[
+\abs{R_n(q)}<\frac{\abs q^{n+1}}{(n+1)!}\cdot\frac1{1-\frac{\abs q}{n+2}}<\frac{2\abs q^{n+1}}{(n+1)!}=\frac{2\abs q}{n+1}\cdot\frac{\abs q^n}{n!}<\abs{u_n}.
+\]
+\callout{So it suffices to stop as soon as $\abs{u_n}\le\epsilon$: the first neglected-tail is smaller than the last term kept.}
+
+\subsubsection{Example: $\sqrt e=e^{1/2}$ within $10^{-5}$}
+
+$q=\tfrac12$, $u_k=u_{k-1}\cdot\dfrac{1}{2k}$:
+\[
+\begin{array}{ll}
+u_0=1, & u_1=u_0/2=0.5000000,\\
+u_2=u_1/4=0.1250000, & u_3=u_2/6=0.0208333,\\
+u_4=u_3/8=0.0026042, & u_5=u_4/10=0.0002604,\\
+u_6=u_5/12=0.0000217, & u_7=u_6/14=0.0000016.\\
+\end{array}
+\]
+$S_7=1.6487212$, so $\sqrt e=1.64872$ (true: $1.6487213$).
+
+\subsection{Sine and Cosine}
+
+By periodicity and symmetry it suffices to compute on $0\le x\le\frac\pi4$:
+\[
+\sin x=\sum_{k=0}^\infty(-1)^k\frac{x^{2k+1}}{(2k+1)!},\qquad
+\cos x=\sum_{k=0}^\infty(-1)^k\frac{x^{2k}}{(2k)!}.
+\]
+If $\frac\pi4\le x\le\frac\pi2$, use $z=\frac\pi2-x\in[0,\frac\pi4]$ and $\sin x=\cos z$ (similarly $\cos x=\sin z$).
+
+\textbf{Recurrences:}
+\[
+\sin x=\sum_{k=1}^n u_k+R_n(x),\qquad u_1=x,\quad u_{k+1}=-\frac{x^2}{2k(2k+1)}\,u_k ;
+\]
+\[
+\cos x=\sum_{k=1}^n v_k+R_n(x),\qquad v_1=1,\quad v_{k+1}=-\frac{x^2}{(2k-1)2k}\,v_k .
+\]
+
+\textbf{Error.} Both series are alternating with decreasing terms (for $0\le x\le\frac\pi4$), so the error is at most the first omitted term:
+\[
+\abs{R_n(x)}\le\frac{\abs x^{2n+1}}{(2n+1)!}=\abs{u_{n+1}}\ (\sin),\qquad \abs{R_n(x)}\le\abs{v_{n+1}}\ (\cos).
+\]
+
+\subsubsection{Example: $\sin(23^\circ54')$ within $10^{-4}$}
+
+Convert to radians: $23^\circ54'=23+\tfrac{54}{60}=23.9^\circ$ (in general degree $+\frac{\text{min}}{60}+\frac{\text{sec}}{3600}$), $x=\frac{23.9}{180}\pi=0.41713$.
+\[
+u_1=0.41713,\quad u_2=-\frac{x^2u_1}{2\cdot3}=-0.01210,\quad u_3=-\frac{x^2u_2}{4\cdot5}=+0.00011,\quad u_4=-\frac{x^2u_3}{6\cdot7}=-0.000002 .
+\]
+$\abs{u_4}<10^{-4}$, so $\sin(23^\circ54')\approx0.41713-0.01210+0.00011=0.4051$ (true: $0.405142$).
+
+\subsection{Hyperbolic Sine and Cosine}
+
+\[
+\sinh x=\frac{e^x-e^{-x}}2=x+\frac{x^3}{3!}+\frac{x^5}{5!}+\cdots,\qquad
+\cosh x=\frac{e^x+e^{-x}}2=1+\frac{x^2}{2!}+\frac{x^4}{4!}+\cdots
+\]
+(all terms positive, so no alternating-series bound).
+
+\textbf{Recurrences:}
+\[
+u_1=x,\quad u_{k+1}=\frac{x^2}{2k(2k+1)}u_k\ (\sinh);\qquad
+v_1=1,\quad v_{k+1}=\frac{x^2}{(2k-1)2k}v_k\ (\cosh).
+\]
+
+\textbf{Error for $\sinh$.} Since $\sinh(-x)=-\sinh x$ assume $x>0$, and let $0\le x\le n$:
+\[
+\begin{aligned}
+R_n(x)&=\frac{x^{2n+1}}{(2n+1)!}+\frac{x^{2n+3}}{(2n+3)!}+\cdots\\
+&<\frac{x^{2n+1}}{(2n+1)!}\left[1+\frac{x^2}{(2n+2)(2n+3)}+\frac{x^4}{(2n+2)^2(2n+3)^2}+\cdots\right]
+=\frac{x^{2n+1}}{(2n+1)!}\cdot\frac{1}{1-\frac{x^2}{(2n+2)(2n+3)}} .
+\end{aligned}
+\]
+With $x\le n$: $\dfrac{x^2}{(2n+2)(2n+3)}\le\dfrac{n^2}{(2n+2)(2n+3)}\le\dfrac14$, so the factor is $\le\frac43$, and
+\[
+R_n<\frac43u_{n+1}=\frac43\cdot\frac{x^2}{2n(2n+1)}u_n<\frac43\cdot\frac14u_n\ \Longrightarrow\ \boxed{R_n(x)<\tfrac13u_n}.
+\]
+
+\textbf{Error for $\cosh$.} Similarly (assume $x>0$, $x\le n$):
+\[
+R_n<\frac43v_{n+1}=\frac43\cdot\frac{x^2}{(2n-1)2n}v_n\le\frac43\cdot\frac{n^2}{(2n-1)2n}v_n\le\frac43\cdot\frac12v_n\ \Longrightarrow\ \boxed{R_n(x)<\tfrac23v_n},
+\]
+using $x\le n$ and $2n-1\ge n$ (so $\frac{n^2}{(2n-1)2n}=\frac{n}{2(2n-1)}\le\frac12$). The factor $\frac43$ comes from the same geometric-series argument, since $\frac{x^2}{(2n+1)(2n+2)}\le\frac14$.
+
+\subsubsection{Example: $\sinh1.4$ within $10^{-5}$}
+
+$x^2=1.96$:
+\[
+\begin{array}{ll}
+u_1=1.4, & u_2=\dfrac{x^2u_1}{2\cdot3}=0.4573333,\\[4pt]
+u_3=\dfrac{x^2u_2}{4\cdot5}=0.0448187, & u_4=\dfrac{x^2u_3}{6\cdot7}=0.0020915,\\[4pt]
+u_5=\dfrac{x^2u_4}{8\cdot9}=0.0000569, & u_6=\dfrac{x^2u_5}{10\cdot11}=0.0000010.\\
+\end{array}
+\]
+$\tfrac13u_6<10^{-5}$, so $\sinh1.4=1.904301$ (true: $1.9043015$).
+
+\subsection{The Natural Logarithm}
+
+From
+\[
+\ln(1+x)=x-\frac{x^2}2+\frac{x^3}3-\cdots+(-1)^{n-1}\frac{x^n}n+\cdots\quad(-1<x\le1),
+\]
+\[
+\ln(1-x)=-x-\frac{x^2}2-\frac{x^3}3-\cdots,
+\]
+subtracting gives a series with only odd powers (converges twice as fast):
+\[
+\ln\frac{1-x}{1+x}=-2\left(x+\frac{x^3}3+\frac{x^5}5+\cdots\right).
+\]
+Put $\dfrac{1-x}{1+x}=z$, i.e.\ $x=\dfrac{1-z}{1+z}$:
+\[
+\ln z=-2\left[\frac{1-z}{1+z}+\frac13\left(\frac{1-z}{1+z}\right)^3+\frac15\left(\frac{1-z}{1+z}\right)^5+\cdots\right],\qquad 0<z<\infty .
+\]
+
+\subsubsection{Range Reduction and Error Bound}
+
+For $x>0$ write $x=2^m z$ with integer $m$ and $\frac12\le z<1$. Then $\ln x=m\ln2+\ln z$. Let $\xi=\dfrac{1-z}{1+z}$; then $0<\xi\le\frac13$ and
+\[
+\ln x=m\ln2-2\left(\xi+\frac{\xi^3}3+\frac{\xi^5}5+\cdots+\frac{\xi^{2n-1}}{2n-1}\right)-R_n(\xi).
+\]
+The total error is the error of $m\ln2$ plus $R_n$:
+\[
+R_n(\xi)=2\left(\frac{\xi^{2n+1}}{2n+1}+\frac{\xi^{2n+3}}{2n+3}+\cdots\right)
+<\frac{2\xi^{2n+1}}{2n+1}(1+\xi^2+\xi^4+\cdots)=\frac{2}{1-\xi^2}\cdot\frac{\xi^{2n+1}}{2n+1}.
+\]
+For $0<\xi\le\frac13$: $\dfrac{2}{1-\xi^2}\le\dfrac94$, so
+\[
+0<R_n<\frac94\cdot\frac{\xi^{2n+1}}{2n+1}\le\frac94\cdot\frac{\xi^2\,\xi^{2n-1}}{2n-1}\le\frac94\cdot\frac19u_n\ \Longrightarrow\ \boxed{R_n<\tfrac14u_n},\qquad u_k=\frac{\xi^{2k-1}}{2k-1}.
+\]
+\textbf{Summary:} $\ln x=m\ln2-2(u_1+u_2+\cdots+u_n)-R_n$, with $\ln2=0.6931472\ldots$
+
+\subsubsection{Example: $\ln3$ within $10^{-5}$}
+
+$3=2^2\times\frac34$, so $m=2$, $z=0.75$, $\xi=\dfrac{0.25}{1.75}=\dfrac17=0.1428571$.
+\[
+u_1=\xi=0.1428571,\quad u_2=\frac{\xi^3}3=0.0009718,\quad u_3=\frac{\xi^5}5=0.0000119,\quad u_4=\frac{\xi^7}7=0.0000002 .
+\]
+$u_1+u_2+u_3+u_4=0.1438410$, so
+\[
+\ln3=2\times0.6931472-2\times0.1438410=1.09861 .
+\]
+\callout{The slides use $\ln2=0.6931718$ (a typo) and get $1.09866$. With the correct $\ln2=0.6931472$ the result is $1.098612$, matching the true $\ln3=1.0986123$.}
+
+\subsection{Summary of Series Recurrences}
+
+\[
+\begin{array}{llll}
+\textbf{Function} & \textbf{Reduction} & \textbf{Recurrence} & \textbf{Stop when}\\ \hline
+e^x & x=E(x)+q & u_0=1,\ u_k=u_{k-1}\,q/k & \abs{u_n}\le\epsilon\ (n\ge2\abs q)\\
+\sin x & [0,\pi/4],\ \sin x=\cos(\tfrac\pi2-x) & u_1=x,\ u_{k+1}=-\frac{x^2}{2k(2k+1)}u_k & \abs{u_{n+1}}\le\epsilon\\
+\cos x & [0,\pi/4] & v_1=1,\ v_{k+1}=-\frac{x^2}{(2k-1)2k}v_k & \abs{v_{n+1}}\le\epsilon\\
+\sinh x & x>0 & u_1=x,\ u_{k+1}=\frac{x^2}{2k(2k+1)}u_k & \tfrac13u_n\le\epsilon\\
+\cosh x & x>0 & v_1=1,\ v_{k+1}=\frac{x^2}{(2k-1)2k}v_k & \tfrac23v_n\le\epsilon\\
+\ln x & x=2^mz,\ \xi=\frac{1-z}{1+z} & u_k=\frac{\xi^{2k-1}}{2k-1} & \tfrac14u_n\le\epsilon\\
+\end{array}
+\]
+%=================================================
+\section{Root-Finding Methods}\label{sec:roots}
+%=================================================
+
+\subsection{Overview}
+
+Goal: compute a root $\alpha$ of $f(x)=0$. Methods covered: \textbf{Bisection}, \textbf{False Position}, \textbf{Newton--Raphson}, \textbf{Secant}, \textbf{Fixed Point}.
+
+\subsubsection{Plotting to Find Roots}
+
+Plot $f$ and read off its intersections with the $x$-axis.
+\begin{itemize}
+    \item $f(x)=x^4+2x^3-x-1$: roots $x\approx0.86$ and $x\approx-1.86$.
+    \item $f(x)=\sin x+x-1$: root $x\approx0.5$.
+\end{itemize}
+Problem: plotting is often hard or imprecise. Solution: numerical methods --- but plotting is still the best way to get a good \emph{initial guess}.
+
+\subsubsection{General Structure of an Iterative Method}
+
+\begin{enumerate}
+    \item \textbf{Initial guess:} a point $x_0$ or an interval $[x_0,x_1]$.
+    \item \textbf{Iteration:} produce the sequence $x_0,x_1,x_2,\dots$
+    \item \textbf{Analysis:} the rate of convergence of the sequence.
+\end{enumerate}
+
+\subsubsection{Rate (Degree) of Convergence}
+
+Let $x_n\to\alpha$ and $e_n=\abs{\alpha-x_n}$. If
+\[
+\lim_{n\to\infty}\frac{e_{n+1}}{e_n^{\,p}}=\lambda\qquad(\lambda>0\ \text{constant}),
+\]
+then $p$ is the \textbf{degree (order) of convergence}. $p=1$ (with $0<\lambda<1$) is \emph{linear}, $p=2$ is \emph{quadratic}.
+
+\callout{Intuition: with $p=2$ the number of correct digits roughly \emph{doubles} each step; with $p=1$ a fixed number of digits is gained per step.}
+
+\subsection{Bolzano's Theorem and the IVT}
+
+\textbf{Bolzano's Theorem (1817).} If $f$ is continuous on $[a,b]$ and $f(x_0)<0<f(x_1)$ for some $x_0,x_1\in[a,b]$, then $f$ is zero at some point between $x_0$ and $x_1$. Equivalently: $f(a)f(b)<0\Rightarrow$ at least one root in $(a,b)$.
+
+\textbf{Intermediate Value Theorem.} If $f$ is continuous on $[a,b]$ and $f(a)\ne f(b)$, then for every $\gamma$ between $f(a)$ and $f(b)$ there is $a<c<b$ with $f(c)=\gamma$. (Bolzano is the case $\gamma=0$.)
+
+\callout{Bolzano guarantees \emph{at least one} root; there may be several (an odd number, counted with multiplicity). A root of even multiplicity (e.g.\ $x^2=0$) produces no sign change and cannot be bracketed.}
+
+\subsection{Bisection Method}
+
+\textbf{Requirements:} $f$ real and continuous on $[a,b]$, $f(a)\cdot f(b)<0$.
+
+\textbf{Algorithm.} Let $x_0=a$, $x_1=b$, $x_2=\dfrac{x_0+x_1}{2}$. Then exactly one holds:
+\begin{itemize}
+    \item $f(x_2)=0$: $x_2$ is a root;
+    \item $f(x_0)f(x_2)<0$: a root lies in $(x_0,x_2)$;
+    \item $f(x_1)f(x_2)<0$: a root lies in $(x_2,x_1)$.
+\end{itemize}
+Keep the half containing the sign change and repeat.
+
+\textbf{Flowchart:}
+\begin{lstlisting}[language=Python]
+def bisection(f, a, b, eps):
+    assert f(a) * f(b) < 0          # Bolzano condition
+    while b - a >= eps:
+        m = (a + b) / 2
+        s = f(a) * f(m)
+        if s == 0:  return m         # exact root
+        if s < 0:   b = m            # root in [a, m]
+        else:       a = m            # root in [m, b]
+    return (a + b) / 2               # or a, or b
+\end{lstlisting}
+
+\textbf{Error and number of iterations} (not on the slides, but standard and useful). After $n$ halvings the bracket has length $\dfrac{b-a}{2^n}$, so the midpoint is within $\dfrac{b-a}{2^{n+1}}$ of a root. To guarantee $\abs{x-\alpha}<\varepsilon$ with the final midpoint we need
+\[
+n\ \ge\ \log_2\frac{b-a}{\varepsilon}-1 .
+\]
+Convergence is linear with $\lambda=\tfrac12$: one binary digit per step, about $3.3$ steps per decimal digit.
+
+\subsubsection{Example: $f(x)=0.25e^{2x}-1.5$}
+
+Take $x_0=1$ ($f=+0.347$) and $x_1=-0.2$ ($f=-1.332$):
+\[
+\begin{array}{cccc}
+\textbf{step} & \textbf{midpoint} & f & \textbf{new bracket}\\ \hline
+x_2 & 0.4 & -0.944 & [0.4,\ 1]\\
+x_3 & 0.7 & -0.486 & [0.7,\ 1]\\
+x_4 & 0.85 & -0.132 & [0.85,\ 1]\\
+x_5 & 0.925 & +0.090 & [0.85,\ 0.925]\\
+\end{array}
+\]
+Exact root: $\alpha=\tfrac12\ln6=0.89588$.
+
+\subsubsection{Advantages and Disadvantages}
+
+\textbf{Advantages:}
+\begin{itemize}
+    \item Always convergent (when the requirements hold).
+    \item Very simple.
+    \item Only the \emph{sign} of $f$ is needed, not its exact value.
+    \item The number of iterations does not depend on $f$ (only on $b-a$ and $\varepsilon$).
+\end{itemize}
+\textbf{Disadvantage:} very slow convergence.
+
+\callout{Typical use: get a rough initial estimate, then switch to a fast method such as Newton--Raphson, which needs a good starting point.}
+
+\subsection{False Position (Regula Falsi) Method}
+
+\textbf{Requirements:} same as bisection --- $f$ continuous on $[x_l,x_u]$ and $f(x_l)f(x_u)<0$.
+
+\textbf{Idea:} instead of the midpoint, join $(x_l,f(x_l))$ and $(x_u,f(x_u))$ with a straight line and take the line's $x$-intercept:
+\[
+\frac{0-f(x_u)}{x-x_u}=\frac{f(x_u)-f(x_l)}{x_u-x_l}
+\quad\Longrightarrow\quad
+x=x_u-f(x_u)\frac{x_u-x_l}{f(x_u)-f(x_l)}=\frac{x_l f(x_u)-x_u f(x_l)}{f(x_u)-f(x_l)} .
+\]
+Then, as in bisection, replace the endpoint whose $f$ has the same sign as $f(x)$, so the root stays bracketed.
+
+\textbf{General step} (slides' notation): after $x_0,\dots,x_n$,
+\[
+x_{n+1}=x_n-\frac{x_n-x_{n-1}}{f(x_n)-f(x_{n-1})}\,f(x_n),
+\]
+where $x_{n-1}$ here denotes the \emph{other endpoint of the current bracket}. \textbf{Termination:} $\abs{x_{n+1}-x_n}<\varepsilon$.
+
+\callout{Why does it converge? The root always stays inside the bracket, which can only shrink. Often one endpoint gets ``stuck'' (all new points fall on one side of the root), which makes the method slower than expected.}
+
+\subsubsection{Example: $2x-\ln x=7$}
+
+$f(x)=2x-\ln x-7$; $f(4)=-0.38629=f(x_l)$, $f(4.5)=0.49592=f(x_u)$. The first chord gives
+\[
+x_2=4.5-0.49592\cdot\frac{0.5}{0.49592+0.38629}=4.5-0.28107=4.21893 .
+\]
+\[
+\begin{array}{ccc}
+n & x_n & f(x_n)\\ \hline
+2 & 4.218934 & -1.71\times10^{-3}\\
+3 & 4.219902 & -7.30\times10^{-6}\\
+4 & 4.219906 & -3.1\times10^{-8}\\
+\end{array}
+\]
+Root $\alpha=4.21991$.
+\callout{The slides show $0.88221(x-4.5)=-0.24796$, i.e.\ $x=4.281$; that has two factor-of-2 slips (slope is $1.76442$, not $0.88221$). The correct first iterate is $4.21893$.}
+
+\subsubsection{Rate of Convergence (Slides' Derivation)}
+
+Let $x_n=\alpha+e_n$. From the iteration,
+\[
+e_{n+1}=e_n-\frac{(e_n-e_{n-1})f(\alpha+e_n)}{f(\alpha+e_n)-f(\alpha+e_{n-1})}
+=\frac{e_{n-1}f(\alpha+e_n)-e_nf(\alpha+e_{n-1})}{f(\alpha+e_n)-f(\alpha+e_{n-1})}.
+\]
+Taylor-expand $f(\alpha+h)=f(\alpha)+hf'(\alpha)+\frac{h^2}{2!}f''(\alpha)+\cdots$ with $f(\alpha)=0$:
+\[
+e_{n+1}=\frac{e_{n-1}\big[e_nf'+\frac{e_n^2}2f''+\cdots\big]-e_n\big[e_{n-1}f'+\frac{e_{n-1}^2}2f''+\cdots\big]}{\big[e_nf'+\frac{e_n^2}2f''+\cdots\big]-\big[e_{n-1}f'+\frac{e_{n-1}^2}2f''+\cdots\big]}
+=\frac{\frac{e_{n-1}e_n}{2}f''(\alpha)+\cdots}{f'(\alpha)+\frac{e_n+e_{n-1}}2f''(\alpha)+\cdots}.
+\]
+Neglecting higher powers:
+\[
+e_{n+1}=e_ne_{n-1}\frac{f''(\alpha)}{2f'(\alpha)}.\tag{2}
+\]
+Assume $e_{n+1}=ce_n^p$ (3), hence $e_n=ce_{n-1}^p$, i.e.\ $e_{n-1}=c^{-1/p}e_n^{1/p}$ (4). Substituting (3),(4) into (2):
+\[
+ce_n^p=e_n^{1+\frac1p}\,c^{-\frac1p}\frac{f''(\alpha)}{2f'(\alpha)}
+\ \Longrightarrow\
+p=1+\frac1p,\qquad c^{1+\frac1p}=\frac{f''(\alpha)}{2f'(\alpha)} .
+\]
+$p^2-p-1=0$ gives
+\[
+p=\frac{1+\sqrt5}{2}\approx1.618\quad(\text{the golden ratio}).
+\]
+\callout{Exam note: this derivation assumes the two \emph{most recent} iterates are used, which is exactly the Secant method. Classical regula falsi keeps a fixed endpoint once it gets stuck, and then converges only \emph{linearly}. The slides attribute $p=1.618$ to false position; know both statements.}
+
+\subsubsection{Advantages and Disadvantages}
+
+\textbf{Advantages:} always converges; usually faster than bisection.\\
+\textbf{Disadvantages:} more operations per step than bisection; if all (or most) iterates lie on one side of the root, convergence is slow.
+
+\subsection{Newton--Raphson Method}
+
+Isaac Newton (1642--1726), Joseph Raphson (1648--1715).
+
+\subsubsection{Derivation}
+
+Let $x_0$ approximate a root and $f$ be differentiable near $x_0$. By Taylor,
+\[
+f(x)=f(x_0)+(x-x_0)f'(x_0)+\frac{(x-x_0)^2}{2!}f''(\gamma),\qquad \gamma\ \text{between}\ x_0,x .
+\]
+At the root $\alpha$: $0=f(x_0)+(\alpha-x_0)f'(x_0)+\frac{(\alpha-x_0)^2}{2!}f''(\gamma)$. If $f'(x_0)\neq0$,
+\[
+-\frac{f(x_0)}{f'(x_0)}=(\alpha-x_0)+\frac{(\alpha-x_0)^2}{2!}\frac{f''(\gamma)}{f'(x_0)}.
+\]
+If $x_0$ is close to $\alpha$, the last term is negligible, so $\alpha\approx x_0-\dfrac{f(x_0)}{f'(x_0)}$.
+
+\textbf{Iteration:}
+\[
+\boxed{\,x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}\,}\qquad\text{Termination: }\abs{x_n-x_{n-1}}<\varepsilon .
+\]
+\textbf{Geometry:} $x_{n+1}$ is where the \emph{tangent} line at $(x_n,f(x_n))$ crosses the $x$-axis.
+
+\subsubsection{Quadratic Convergence}
+
+Substituting $x_n=\alpha+e_n$:
+\[
+e_{n+1}=e_n-\frac{f(\alpha+e_n)}{f'(\alpha+e_n)}
+=e_n-\frac{e_nf'(\alpha)+\frac{e_n^2}{2}f''(\alpha)+\cdots}{f'(\alpha)+e_nf''(\alpha)+\cdots}
+=\frac{\frac{e_n^2}{2}f''(\alpha)+\cdots}{f'(\alpha)+e_nf''(\alpha)+\cdots}.
+\]
+\[
+=\frac{e_n^2f''(\alpha)}{2f'(\alpha)}\cdot\frac{1}{1+e_n\frac{f''(\alpha)}{f'(\alpha)}}
+=\frac{e_n^2f''(\alpha)}{2f'(\alpha)}\left(1-e_n\frac{f''(\alpha)}{f'(\alpha)}+\cdots\right)
+=\frac{e_n^2}{2}\frac{f''(\alpha)}{f'(\alpha)}-\frac{e_n^3}{2}\left(\frac{f''(\alpha)}{f'(\alpha)}\right)^2+\cdots
+\]
+Hence
+\[
+\lim_{n\to\infty}\frac{e_{n+1}}{e_n^2}=\frac{f''(\alpha)}{2f'(\alpha)},\qquad p=2 .\qquad\blacksquare
+\]
+\callout{This requires $f'(\alpha)\neq0$ (a \emph{simple} root). At a multiple root Newton's method degrades to linear convergence.}
+
+\subsubsection{Example: $x^4-x=10$}
+
+$f(x)=x^4-x-10$, $f'(x)=4x^3-1$:
+\[
+x_{n+1}=x_n-\frac{x_n^4-x_n-10}{4x_n^3-1}=\frac{3x_n^4+10}{4x_n^3-1}.
+\]
+$x_0=2,\ x_1=1.871,\ x_2=1.85578,\ x_3=1.855585,\ x_4=1.85558452522$.
+
+\subsubsection{Example: $e^{-x}=\sin x$}
+
+$f(x)=e^{-x}-\sin x$, $f'(x)=-e^{-x}-\cos x$:
+\[
+x_{n+1}=x_n+\frac{e^{-x_n}-\sin x_n}{e^{-x_n}+\cos x_n}.
+\]
+$x_0=0.6,\ x_1=0.5885,\ x_2=0.58853274$.
+
+\subsubsection{Example: $\sqrt5$ (and $\sqrt[k]{a}$ in general)}
+
+Newton is a good method for $\sqrt[k]{a}$: solve $f(x)=x^k-a=0$. For $\sqrt5$: $f(x)=x^2-5$, $f'(x)=2x$,
+\[
+x_{i+1}=x_i-\frac{x_i^2-5}{2x_i}=\frac{x_i^2+5}{2x_i}=\frac12\left(x_i+\frac5{x_i}\right)\quad(\text{Heron's formula}).
+\]
+\[
+\begin{array}{cc}
+i & x_i\\ \hline
+0 & 2\\
+1 & 2.25\\
+2 & 2.236111111\\
+3 & 2.236067978\\
+4 & 2.236067978\\
+\end{array}
+\]
+In general, $x_{i+1}=\dfrac1k\left[(k-1)x_i+\dfrac{a}{x_i^{k-1}}\right]$.
+
+\subsubsection{Newton Does Not Always Converge}
+
+Let $f(x)=\operatorname{sign}(x)\sqrt{\abs x}$ (root at $0$). Since $\sqrt{\abs x}=\sqrt{x\operatorname{sign}x}$,
+\[
+f'(x)=\frac{1}{2\sqrt{\abs x}}\quad(x\neq0),\qquad
+x_{n+1}=x_n-\frac{\operatorname{sign}(x_n)\sqrt{\abs{x_n}}}{\frac{1}{2\sqrt{\abs{x_n}}}}=x_n-2\operatorname{sign}(x_n)\abs{x_n}=x_n-2x_n=-x_n .
+\]
+The iterates oscillate $x_0,-x_0,x_0,\dots$ forever (here $f'(\alpha)=\infty$).
+
+\callout{Other classic failures: $f'(x_n)=0$ (horizontal tangent, division by zero); starting far from the root (divergence or jumping to another root); cycles.}
+
+\subsubsection{Advantages and Disadvantages}
+
+\textbf{Advantage:} converges very fast (quadratically) --- if it converges.\\
+\textbf{Disadvantages:} no guarantee of convergence; computing $f'$ may be hard; everything depends strongly on $f$ and on $x_0$.
+
+\callout{Choosing $x_0$ is crucial; it is best to estimate $x_0$ by plotting $f$ (or by a few bisection steps).}
+
+\subsection{Secant Method}
+
+\textbf{Motivation:} Newton needs both $f$ and $f'$ every iteration. Replace the derivative by a difference quotient:
+\[
+f'(x)\approx\frac{f(x)-f(x-h)}{h}
+\ \Longrightarrow\
+x_{n+1}=x_n-\frac{h\,f(x_n)}{f(x_n)-f(x_n-h)} .
+\]
+Taking $x_n-h=x_{n-1}$:
+\[
+\boxed{\,x_{n+1}=x_n-\frac{x_n-x_{n-1}}{f(x_n)-f(x_{n-1})}f(x_n)=\frac{x_{n-1}f(x_n)-x_nf(x_{n-1})}{f(x_n)-f(x_{n-1})}\,}
+\]
+\begin{itemize}
+    \item \textbf{Initial approximations:} two points $x_0,x_1$ (no sign condition needed).
+    \item \textbf{Termination:} $\abs{x_n-x_{n-1}}<\varepsilon$.
+    \item \textbf{Order of convergence:} $p=\dfrac{1+\sqrt5}{2}\approx1.618$ (superlinear), from the derivation above.
+\end{itemize}
+
+\callout{Secant vs.\ false position: identical formula, but secant always uses the \emph{two latest} points and does \textbf{not} check Bolzano's condition. It is faster but can diverge.}
+
+\textbf{Advantages:} faster than bisection; Bolzano not needed; only one new $f$ evaluation per step (no derivative).\\
+\textbf{Disadvantages:} harder than bisection; may fail to converge; no guarantee if the initial guess is far from the root.
+
+\subsection{Comparison Example: $\sqrt{11}$ by All Four Methods}
+
+$f(x)=x^2-11$. Since $3^2=9<11<16=4^2$: $x_l=3$, $x_u=4$. True value $\sqrt{11}=3.31662479$.
+
+\[
+\begin{array}{c|cc|cc}
+ & \multicolumn{2}{c|}{\textbf{Bisection}} & \multicolumn{2}{c}{\textbf{False position}}\\
+\text{iter} & x & f(x) & x & f(x)\\ \hline
+1 & 3.5 & 1.25 & 3.28571429 & -0.2040816\\
+2 & 3.25 & -0.4375 & 3.31372549 & -0.0192234\\
+3 & 3.375 & 0.390625 & 3.31635389 & -0.0017969\\
+4 & 3.3125 & -0.02734375 & 3.31659949 & -0.0001678\\
+5 & 3.34375 & 0.18066406 & 3.31662243 & -0.0000157\\
+6 & 3.328125 & 0.07641602 & 3.31662457 & -0.0000015\\
+\end{array}
+\]
+
+\[
+\begin{array}{c|cc}
+ & \multicolumn{2}{c}{\textbf{Newton--Raphson}\ (x_0=3)}\\
+\text{iter} & x & f(x)\\ \hline
+0 & 3 & -2\\
+1 & 3.33333333 & 0.1111111\\
+2 & 3.31666667 & 0.0002778\\
+3 & 3.31662479 & 0.0000000\\
+\end{array}
+\qquad
+\begin{array}{c|cc|cc}
+ & \multicolumn{4}{c}{\textbf{Secant}}\\
+\text{iter} & x & f(x) & x & f(x)\\ \hline
+-1 & 3 & -2 & 2 & -7\\
+0 & 4 & 5 & 3 & -2\\
+1 & 3.28571429 & -0.2040816 & 3.4 & 0.56\\
+2 & 3.31372549 & -0.0192234 & 3.3125 & -0.0273438\\
+3 & 3.31663837 & 0.0000901 & 3.31657356 & -0.0003398\\
+4 & 3.31662478 & 0.0000000 & 3.31662482 & 0.0000002\\
+\end{array}
+\]
+
+\callout{Observations: bisection gains $\sim$1 bit/step and oscillates; false position keeps $x_u=4$ fixed (all iterates below the root) so it is only linear; Newton doubles correct digits each step; secant is between the two. Note that from $(3,4)$ the first two steps of false position and secant coincide (both use $x=4$); from step 3 secant drops $x=4$ and pulls ahead. In the second secant run the start $[2,3]$ does \emph{not} bracket the root, yet secant still converges.}
+
+\subsection{Fixed-Point Iteration}
+
+\textbf{Definition.} $\alpha\in[a,b]$ is a \textbf{fixed point} of $g$ if $g(\alpha)=\alpha$.\\
+Example: $g(x)=x^2-3x+4$ has $g(2)=2$, so $2$ is a fixed point.
+
+\textbf{Method.} Rewrite $f(x)=0$ in the form $x=g(x)$ so that fixed points of $g$ are roots of $f$. Then
+\[
+x_0\ \text{given},\qquad x_{n+1}=g(x_n).
+\]
+\textbf{Graphically:} the root is the intersection of $y=x$ and $y=g(x)$; iterates form a ``staircase'' or ``cobweb''. (Equivalently, writing $f=f_1-f_2$, the root is the intersection of $y=f_1(x)$ and $y=f_2(x)$.)
+
+\subsubsection{Convergence Theorem}
+
+\textbf{Theorem.} Let $g:[a,b]\to[a,b]$ be differentiable with
+\[
+\abs{g'(x)}\le q<1\qquad\text{for all }x\in[a,b].
+\]
+Then $g$ has \textbf{exactly one} fixed point $\xi\in[a,b]$, and for every $x_0\in[a,b]$ the sequence $x_{n+1}=g(x_n)$ converges to $\xi$.
+
+\callout{Why: by the MVT, $\abs{x_{n+1}-\xi}=\abs{g(x_n)-g(\xi)}=\abs{g'(c)}\abs{x_n-\xi}\le q\abs{x_n-\xi}$, so $\abs{x_n-\xi}\le q^n\abs{x_0-\xi}\to0$. A useful a-posteriori bound: $\abs{x_n-\xi}\le\dfrac{q}{1-q}\abs{x_n-x_{n-1}}$. Convergence is linear with ratio $\approx\abs{g'(\xi)}$; the smaller $\abs{g'}$, the faster. Note also: Newton's method is the fixed-point iteration with $g(x)=x-f(x)/f'(x)$, for which $g'(\alpha)=0$.}
+
+\textbf{Flowchart:}
+\begin{lstlisting}[language=Python]
+def fixed_point(g, x0, eps):
+    x = x0
+    while True:
+        x_new = g(x)
+        if abs(x_new - x) < eps:
+            return x_new          # root is x_new
+        x = x_new
+\end{lstlisting}
+
+\subsubsection{Example: $3x-2e^{-x}=0$}
+
+$f(0)=-2<0$ and $f(1)=3-\frac2e>0$, so there is a root in $[0,1]$; plotting $y=e^{-x}$ and $y=\frac32x$ shows it is unique. Take
+\[
+g(x)=\frac23e^{-x},\qquad \abs{g'(x)}=\frac23e^{-x}\le\frac23<1\ \text{on }[0,1].
+\]
+With $x_0=0.5$:
+\[
+\begin{array}{cc|cc}
+n & x_n & n & x_n\\ \hline
+1 & 0.40435 & 6 & 0.43299\\
+2 & 0.44494 & 7 & 0.43238\\
+3 & 0.42724 & 8 & 0.43264\\
+4 & 0.43487 & 9 & 0.43253\\
+5 & 0.43157 & 10 & 0.43258\\
+\end{array}
+\]
+$\abs{x_{10}-x_9}<0.0001$, so $x\approx0.4326$. (Since $g'<0$ the iterates alternate around the root.)
+
+\subsubsection{Example: Choice of $g$ Matters --- $x^2-x-2=0$}
+
+Roots: $x=2$ and $x=-1$.
+\begin{itemize}
+    \item $g(x)=x^2-2$: $g'(x)=2x$, and $\abs{g'}<1$ only for $-0.5<x<0.5$, which contains neither root. \textbf{Diverges.}
+    \item $g(x)=\sqrt{2+x}$: $g'(x)=\dfrac{1}{2\sqrt{2+x}}\le\dfrac{1}{2\sqrt2}<1$ for all $x>0$. \textbf{Converges} to $2$.
+    \item $g(x)=1+\dfrac2x$: $g'(x)=-\dfrac2{x^2}$, and $\abs{g'(x)}<1$ for $x>\sqrt2$ (slides state $x>\tfrac32$). \textbf{Converges} to $2$.
+\end{itemize}
+\callout{The slides write $g'(x)\le\frac25$ for $\sqrt{2+x}$ and $g'(x)=\frac{-1}{x^2}$ for $1+\frac2x$; the correct values are $\frac{1}{2\sqrt{2+x}}<\frac{1}{2\sqrt2}\approx0.354$ and $-\frac{2}{x^2}$.}
+
+\subsubsection{Advantages and Disadvantages}
+
+\textbf{Advantages:} none in particular (the slides say ``None!''), though it is simple and is the framework behind Newton's method and iterative linear/nonlinear system solvers.\\
+\textbf{Disadvantages:} no guarantee of convergence; convergence conditions are hard to check; convergence is only linear (degree 1); everything depends on the choice of $g$ and $x_0$.
+
+\subsection{Summary of Root-Finding Methods}
+
+\[
+\begin{array}{lllll}
+\textbf{Method} & \textbf{Start} & \textbf{Needs} & \textbf{Order }p & \textbf{Guaranteed?}\\ \hline
+\text{Bisection} & [a,b],\ f(a)f(b)<0 & \text{sign of }f & 1\ (\lambda=\tfrac12) & \text{yes}\\
+\text{False position} & [a,b],\ f(a)f(b)<0 & f & 1.618\ \text{(slides)}/1 & \text{yes}\\
+\text{Newton--Raphson} & x_0 & f,\ f' & 2 & \text{no}\\
+\text{Secant} & x_0,\ x_1 & f & 1.618 & \text{no}\\
+\text{Fixed point} & x_0 & g\ \text{with}\ \abs{g'}<1 & 1 & \text{if }\abs{g'}\le q<1\\
+\end{array}
+\]
+
+\subsection{Homework Problems (Chapter 2+)}
+
+\begin{enumerate}
+    \item Solve $2x-\ln x=7$ with all the methods above, $\varepsilon<10^{-4}$.
+    \item $3x-2e^{-x}=0$ was solved by fixed point; solve it with the other methods, $\varepsilon<10^{-4}$.
+    \item Solve $x^2-x-2=0$ by fixed point with $g(x)=\sqrt{2+x}$ and $g(x)=1+\frac2x$, $\varepsilon<10^{-4}$.
+\end{enumerate}
+%=================================================
+\section{Systems of Linear Equations}\label{sec:linear}
+%=================================================
+
+\subsection{Overview}
+
+Methods for solving linear systems fall into two groups:
+\begin{itemize}
+    \item \textbf{Exact (direct) methods:} a finite number of operations; if computed exactly they yield the exact solution (only round-off spoils it). Examples: Cramer's rule, Gaussian elimination and its compact/LU variants, principal elements, Khaletsky.
+    \item \textbf{Iterative methods:} start from an initial guess and improve it each iteration. Examples: Jacobi and Gauss--Seidel (successive approximations).
+\end{itemize}
+
+\textbf{Chapter topics (from the slides):} Cramer's rule; the Gaussian method; the Gaussian compact method; the Crout--Doolittle modification; the method of principal elements; the scheme of Khaletsky; the method of successive approximations (Jacobi, Gauss--Seidel).
+
+\callout{The posted slides work out Cramer, Gauss and the compact scheme in detail. The remaining methods appear in the chapter outline only, so Sections~\ref{sec:principal}--\ref{sec:iterative} below summarise them from the course textbook (Kopchenova \& Maron) with small worked examples verified numerically.}
+
+\subsection{Notation}
+
+A system of $n$ equations in $n$ unknowns:
+\[
+\begin{aligned}
+a_{11}x_1+a_{12}x_2+\cdots+a_{1n}x_n&=a_{1,n+1}\\
+a_{21}x_1+a_{22}x_2+\cdots+a_{2n}x_n&=a_{2,n+1}\\
+&\ \,\vdots\\
+a_{n1}x_1+a_{n2}x_2+\cdots+a_{nn}x_n&=a_{n,n+1}
+\end{aligned}
+\qquad\Longleftrightarrow\qquad A\mathbf x=\mathbf b,
+\]
+with $A=[a_{ij}]_{n\times n}$, $\mathbf b=(a_{1,n+1},\dots,a_{n,n+1})^T$, $\mathbf x=(x_1,\dots,x_n)^T$. Writing the constants as column $n+1$ of the augmented matrix is the convention used in all the tableaux below.
+
+\subsection{Cramer's Rule}
+
+If $A$ is non-singular ($\det A\ne0$) the system has the unique solution $\mathbf x=A^{-1}\mathbf b$, and
+\[
+x_j=\frac{\det B_j}{\det A},
+\]
+where $B_j$ is $A$ with its $j$-th column replaced by $\mathbf b$.
+
+\textbf{Cost.} Cramer needs $n+1$ determinants --- very laborious for large $n$. Computing a determinant costs $\mathcal O(n^\omega)$ for some $\omega\ge2$; the fastest matrix-multiplication algorithms (Coppersmith--Winograd) reach $\mathcal O(n^{2.376})$ but use heavy machinery and are impractical. (By cofactor expansion a determinant costs $\mathcal O(n!)$.)
+
+\callout{In practice: Cramer is fine for $n=2,3$ by hand (we use it in Newton's method for 2 equations, Section~\ref{sec:nonlinear}), but never for large $n$.}
+
+\subsection{The Gaussian Method (Successive Elimination)}
+
+Carl Friedrich Gauss (1777--1855).
+
+\subsubsection{Warm-up Example ($3\times3$, row operations)}
+
+\[
+\begin{cases}
+x_1+2x_2+3x_3=6\\
+2x_1-x_2+4x_3=8\\
+-x_1+8x_2+2x_3=12
+\end{cases}
+\]
+\[
+\left[\begin{array}{rrr|r}1&2&3&6\\2&-1&4&8\\-1&8&2&12\end{array}\right]
+\xrightarrow[R_3+R_1]{R_2-2R_1}
+\left[\begin{array}{rrr|r}1&2&3&6\\0&-5&-2&-4\\0&10&5&18\end{array}\right]
+\xrightarrow{R_3+2R_2}
+\left[\begin{array}{rrr|r}1&2&3&6\\0&-5&-2&-4\\0&0&1&10\end{array}\right]
+\]
+Back substitution: $x_3=10$, $x_2=-\frac{16}{5}$, $x_1=-\frac{88}{5}$.
+
+\subsubsection{The General Scheme (shown for $n=4$)}
+
+\textbf{Forward procedure (elimination).}
+
+\emph{Step 1.} Let $a_{11}\neq0$ be the \textbf{leading element}. Divide equation 1 by it:
+\[
+x_1+b_{12}x_2+b_{13}x_3+b_{14}x_4=b_{15},\qquad b_{1j}=\frac{a_{1j}}{a_{11}}\ (j=2,\dots,5).
+\]
+Eliminate $x_1$ from equations $2,3,4$:
+\[
+a^{(1)}_{ij}=a_{ij}-a_{i1}b_{1j},\qquad i=2,3,4;\ j=2,\dots,5 .
+\]
+
+\emph{Step 2.} Divide the first reduced equation by $a^{(1)}_{22}$:
+\[
+x_2+b^{(1)}_{23}x_3+b^{(1)}_{24}x_4=b^{(1)}_{25},\qquad b^{(1)}_{2j}=\frac{a^{(1)}_{2j}}{a^{(1)}_{22}}\ (j=3,4,5),
+\]
+and eliminate $x_2$: $a^{(2)}_{ij}=a^{(1)}_{ij}-a^{(1)}_{i2}b^{(1)}_{2j}$, $i=3,4$; $j=3,4,5$.
+
+\emph{Step 3.} $x_3+b^{(2)}_{34}x_4=b^{(2)}_{35}$ with $b^{(2)}_{3j}=a^{(2)}_{3j}/a^{(2)}_{33}$; eliminate $x_3$: $a^{(3)}_{4j}=a^{(2)}_{4j}-a^{(2)}_{43}b^{(2)}_{3j}$, $j=4,5$.
+
+The result is an equivalent \textbf{triangular} system:
+\[
+\begin{aligned}
+x_1+b_{12}x_2+b_{13}x_3+b_{14}x_4&=b_{15}\\
+x_2+b^{(1)}_{23}x_3+b^{(1)}_{24}x_4&=b^{(1)}_{25}\\
+x_3+b^{(2)}_{34}x_4&=b^{(2)}_{35}\\
+a^{(3)}_{44}x_4&=a^{(3)}_{45}
+\end{aligned}
+\]
+
+\textbf{Reverse procedure (back substitution):}
+\[
+x_4=\frac{a^{(3)}_{45}}{a^{(3)}_{44}},\quad
+x_3=b^{(2)}_{35}-b^{(2)}_{34}x_4,\quad
+x_2=b^{(1)}_{25}-b^{(1)}_{24}x_4-b^{(1)}_{23}x_3,\quad
+x_1=b_{15}-b_{14}x_4-b_{13}x_3-b_{12}x_2 .
+\]
+
+\textbf{General formulas} (step $k=1,\dots,n$):
+\[
+b^{(k-1)}_{kj}=\frac{a^{(k-1)}_{kj}}{a^{(k-1)}_{kk}},\qquad
+a^{(k)}_{ij}=a^{(k-1)}_{ij}-a^{(k-1)}_{ik}\,b^{(k-1)}_{kj}\quad(i,j>k),\qquad
+x_i=b^{(i-1)}_{i,n+1}-\sum_{j=i+1}^{n}b^{(i-1)}_{ij}x_j .
+\]
+
+\subsubsection{Operation Count}
+
+For $n$ equations:
+\[
+\begin{array}{ll}
+\text{Multiplications (left side)} & (n^2-n)+\big((n-1)^2-(n-1)\big)+\cdots+1=\dfrac{n^3-n}{3}\\[6pt]
+\text{Multiplications (right side)} & (n-1)+(n-2)+\cdots+1=\dfrac{n(n-1)}{2}\\[6pt]
+\text{Divisions} & 1+\cdots+(n-1)+n+n=\dfrac{n(n+1)}{2}+n\\[6pt]
+\textbf{Total} & \dfrac{n^3-n}{3}+n^2+n\ \simeq\ \dfrac13n^3\\
+\end{array}
+\]
+\callout{Gauss is $\mathcal O(n^3)$, while Cramer with cofactor determinants is $\mathcal O(n!)$ --- this is why elimination is the standard direct method.}
+
+\subsubsection{Worked Example ($4\times4$)}
+
+\[
+\begin{aligned}
+2.0x_1+1.0x_2-0.1x_3+1.0x_4&=2.7\\
+0.4x_1+0.5x_2+4.0x_3-8.5x_4&=21.9\\
+0.3x_1-1.0x_2+1.0x_3+5.2x_4&=-3.9\\
+1.0x_1+0.2x_2+2.5x_3-1.0x_4&=9.9
+\end{aligned}
+\]
+
+\textbf{Step 1.} Divide by $a_{11}=2$: $x_1+0.5x_2-0.05x_3+0.5x_4=1.35$. For $i=2$:
+\[
+a^{(1)}_{22}=0.5-0.4(0.5)=0.3,\ \ a^{(1)}_{23}=4+0.4(0.05)=4.02,\ \ a^{(1)}_{24}=-8.5-0.4(0.5)=-8.7,\ \ a^{(1)}_{25}=21.9-0.4(1.35)=21.36 .
+\]
+Similarly for $i=3,4$, giving
+\[
+\begin{aligned}
+0.3x_2+4.02x_3-8.7x_4&=21.36\\
+-1.15x_2+1.015x_3+5.05x_4&=-4.305\\
+-0.3x_2+2.55x_3-1.5x_4&=8.55
+\end{aligned}
+\]
+
+\textbf{Step 2.} Divide by $a^{(1)}_{22}=0.3$: $x_2+13.40x_3-29.00x_4=71.20$. Then
+\[
+a^{(2)}_{33}=1.015+1.15(13.40)=16.425,\quad a^{(2)}_{34}=5.05-1.15(29.00)=-28.300,\quad a^{(2)}_{35}=-4.305+1.15(71.20)=77.575,
+\]
+and similarly for $i=4$:
+\[
+16.425x_3-28.300x_4=77.575,\qquad 6.570x_3-10.200x_4=29.910 .
+\]
+
+\textbf{Step 3.} Divide by $16.425$: $x_3-1.72298x_4=4.72298$. Then
+\[
+a^{(3)}_{44}=-10.200+6.570(1.72298)=1.11998,\qquad a^{(3)}_{45}=29.910-6.570(4.72298)=-1.11998 .
+\]
+
+\textbf{Back substitution:}
+\[
+x_4=-1.00000,\quad x_3=4.72298-1.72298=3.00000,
+\]
+\[
+x_2=71.20-13.40(3)+29.0=2.00000,\quad x_1=1.35-0.5(2)+0.05(3)+0.5=1.00000 .
+\]
+
+\subsubsection{Check Sums}
+
+Add a control column
+\[
+a_{i,n+2}=\sum_{j=1}^{n}a_{ij}+a_{i,n+1}\qquad(\text{row sum including the constant term}).
+\]
+Treat it as an extra right-hand side and apply \emph{every} operation to it too. Since
+\[
+\sum_{j=1}^n a_{ij}(x_j+1)=\sum_{j=1}^n a_{ij}x_j+\sum_{j=1}^n a_{ij}=a_{i,n+1}+\sum_{j=1}^na_{ij}=a_{i,n+2},
+\]
+the system with right-hand side $a_{i,n+2}$ has the solution $\tilde x_j=x_j+1$.
+\begin{itemize}
+    \item \textbf{During the forward pass:} in every new row, the transformed control entry must equal the sum of the other entries of that row (up to one unit of the last retained digit).
+    \item \textbf{After the reverse pass:} the control solutions must satisfy $\tilde x_i=x_i+1$.
+\end{itemize}
+
+\subsection{The Gaussian Compact Scheme}
+
+When computing by hand (or on a desk calculator) with single division, much time is spent writing down intermediate systems. The \textbf{compact scheme} records \emph{all} results in one table, together with check sums.
+
+\subsubsection{Structure of the Table ($n=4$)}
+
+Columns: $i$, $a_{i1},\dots,a_{i4}$, $a_{i5}$ (constants), $a_{i6}=\sum_{j=1}^5a_{ij}$ (control). Sections:
+\begin{description}[leftmargin=1.5em]
+    \item[Section I.] Rows $1$--$4$: the original coefficients and their row sums. A fifth (\emph{marked}) row: row 1 divided by $a_{11}$, i.e.\ $1,\,b_{12},\dots,b_{15}$ and $b_{16}=a_{16}/a_{11}$.\\
+    \emph{Check:} $b_{16}=1+\sum_{j=2}^5b_{1j}$ to within one unit of the last digit; otherwise redo the step.
+    \item[Section II.] Rows $2$--$4$: $a^{(1)}_{ij}=a_{ij}-a_{i1}b_{1j}$ ($j=2,\dots,6$), checked against row sums; then the marked row: row 2 of Section II divided by $a^{(1)}_{22}$, giving $1,\,b^{(1)}_{23},b^{(1)}_{24},b^{(1)}_{25},b^{(1)}_{26}$.
+    \item[Section III.] Rows $3$--$4$: $a^{(2)}_{ij}=a^{(1)}_{ij}-a^{(1)}_{i2}b^{(1)}_{2j}$ ($j=3,\dots,6$); marked row: divided by $a^{(2)}_{33}$.
+    \item[Section IV.] $a^{(3)}_{4j}=a^{(2)}_{4j}-a^{(2)}_{43}b^{(2)}_{3j}$, $j=4,5,6$.
+    \item[Section V (reverse).] $x_4=a^{(3)}_{45}/a^{(3)}_{44}$; then $x_3,x_2,x_1$ from the \emph{marked} rows of III, II, I (the ``1'' entries show which coefficient multiplies which unknown). The control column is solved the same way and must give $\tilde x_i=x_i+1$.
+\end{description}
+
+\subsubsection{Example (same $4\times4$ system)}
+
+\[
+\begin{array}{c|c|rrrrr|r}
+ & i & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} & a_{i6}=\Sigma\\ \hline
+\text{I} & 1 & 2.0 & 1.0 & -0.1 & 1.0 & 2.7 & 6.6\\
+ & 2 & 0.4 & 0.5 & 4.0 & -8.5 & 21.9 & 18.3\\
+ & 3 & 0.3 & -1.0 & 1.0 & 5.2 & -3.9 & 1.6\\
+ & 4 & 1.0 & 0.2 & 2.5 & -1.0 & 9.9 & 12.6\\
+ & & \mathbf{1} & 0.50 & -0.05 & 0.50 & 1.35 & 3.30\\ \hline
+\text{II} & 2 & & 0.30 & 4.02 & -8.70 & 21.36 & 16.98\\
+ & 3 & & -1.15 & 1.015 & 5.05 & -4.305 & 0.610\\
+ & 4 & & -0.30 & 2.55 & -1.50 & 8.55 & 9.300\\
+ & & & \mathbf{1} & 13.40 & -29.00 & 71.20 & 56.60\\ \hline
+\text{III} & 3 & & & 16.425 & -28.300 & 77.575 & 65.700\\
+ & 4 & & & 6.570 & -10.200 & 29.910 & 26.280\\
+ & & & & \mathbf{1} & -1.72298 & 4.72298 & 4.00000\\ \hline
+\text{IV} & 4 & & & & 1.11998 & -1.11998 & 0\\ \hline
+\text{V} & & & & & x_4=-1.00000 & & \tilde x_4=0.00000\\
+ & & & & x_3=3.00000 & & & \tilde x_3=4.00000\\
+ & & & x_2=2.00000 & & & & \tilde x_2=3.00000\\
+ & & x_1=1.00000 & & & & & \tilde x_1=2.00000\\
+\end{array}
+\]
+Checks: e.g.\ $1+0.50-0.05+0.50+1.35=3.30$ \checkmark; $0.30+4.02-8.70+21.36=16.98$ \checkmark; and every $\tilde x_i=x_i+1$ \checkmark.
+
+\subsection{Method of Principal Elements (Pivoting)}\label{sec:principal}
+
+\textbf{Problem with plain Gauss:} it fails if a leading element is $0$, and loses accuracy when a leading element is small (we divide by it, magnifying round-off).
+
+\textbf{Method of principal elements} (complete pivoting):
+\begin{enumerate}
+    \item In the matrix $[a_{ij}]$ (coefficients only) choose the element of \textbf{largest modulus}, $a_{pq}$: the \emph{principal element}. Row $p$ is the \emph{principal row}.
+    \item For every other row $i\neq p$ compute the multiplier $m_i=-\dfrac{a_{iq}}{a_{pq}}$ and add $m_i\times$(principal row) to row $i$. This eliminates $x_q$.
+    \item Delete the principal row (store it) and column $q$; repeat on the reduced $(n-1)\times(n-1)$ system.
+    \item Finally solve the stored principal rows in reverse order (each contains one new unknown).
+\end{enumerate}
+Variants: \emph{partial pivoting} (largest $\abs{a_{ik}}$ in the current column only, then swap rows) is the usual practical compromise.
+
+\callout{Gauss's elimination is the special case with principal element $a_{11},a^{(1)}_{22},\dots$ chosen by position. Choosing the largest element keeps all multipliers $\abs{m_i}\le1$, which limits the growth of round-off error.}
+
+\subsubsection{Example: Why Pivoting Matters}
+
+Solve with 3 significant digits:
+\[
+0.0001x+y=1,\qquad x+y=2\qquad(\text{exact: }x=1.0001\ldots,\ y=0.9999\ldots).
+\]
+\textbf{Without pivoting:} $m=10^4$; $y(1-10^4)=2-10^4$ gives $-9999y=-9998$, rounded $-1.00\times10^4\,y=-1.00\times10^4$, so $y=1.00$; then $x=(1-y)/0.0001=0$. \textbf{Wrong.}
+
+\textbf{With pivoting} (principal element $1$ in row 2): subtract $0.0001\times$row 2 from row 1: $(1-0.0001)y=1-0.0002$, so $y=1.00$, then $x=2-y=1.00$. \textbf{Correct.}
+
+\subsubsection{Example: Principal Elements on the $3\times3$ System}
+
+\[
+\left[\begin{array}{rrr|r}1&2&3&6\\2&-1&4&8\\-1&8&\mathbf 2&12\end{array}\right]:\quad
+\text{principal element } a_{32}=8 .
+\]
+$m_1=-\frac28=-\frac14$, $m_2=-\frac{-1}{8}=\frac18$. Adding $m_i\times R_3$ eliminates $x_2$:
+\[
+1.25x_1+2.5x_3=3,\qquad 1.875x_1+4.25x_3=9.5 .
+\]
+Principal element now $4.25$ (coefficient of $x_3$): $m=-\frac{2.5}{4.25}$, giving $\frac{5}{34}x_1=-\frac{44}{17}$, so $x_1=-\frac{88}{5}=-17.6$. Back through the stored principal rows:
+\[
+x_3=\frac{9.5-1.875(-17.6)}{4.25}=10,\qquad
+8x_2=12+x_1-2x_3=12-17.6-20=-25.6\ \Rightarrow\ x_2=-3.2,
+\]
+where the last line uses the first principal row $-x_1+8x_2+2x_3=12$. Same answer as before.
+
+\subsection{LU Factorisation: Crout--Doolittle and the Khaletsky Scheme}\label{sec:lu}
+
+\subsubsection{Idea}
+
+Gaussian elimination secretly factors $A$ into a lower-triangular and an upper-triangular matrix. Once
+\[
+A=LU,
+\]
+solving $A\mathbf x=\mathbf b$ reduces to two triangular solves:
+\[
+L\mathbf y=\mathbf b\ \ (\text{forward substitution}),\qquad U\mathbf x=\mathbf y\ \ (\text{back substitution}).
+\]
+The factorisation costs $\sim\frac13n^3$ once; each new right-hand side then costs only $\sim n^2$.
+
+\begin{itemize}
+    \item \textbf{Doolittle:} $L$ has unit diagonal ($l_{ii}=1$).
+    \item \textbf{Crout / Khaletsky:} $U$ has unit diagonal ($c_{ii}=1$). The \textbf{Khaletsky scheme} writes $A=BC$ with $B$ lower triangular and $C$ unit upper triangular.
+    \item \textbf{Crout--Doolittle modification of the compact scheme:} compute each entry of the factors directly as an \emph{accumulated sum of products} (one pass per entry), instead of storing all intermediate $a^{(k)}_{ij}$; this saves writing and, on a calculator, round-off.
+\end{itemize}
+
+\subsubsection{Khaletsky (Crout) Formulas}
+
+For $A=BC$, $B=[b_{ij}]$ lower triangular, $C=[c_{ij}]$ upper triangular with $c_{ii}=1$:
+\[
+b_{i1}=a_{i1},\qquad c_{1j}=\frac{a_{1j}}{b_{11}},
+\]
+\[
+b_{ij}=a_{ij}-\sum_{k=1}^{j-1}b_{ik}c_{kj}\quad(i\ge j>1),\qquad
+c_{ij}=\frac{1}{b_{ii}}\left(a_{ij}-\sum_{k=1}^{i-1}b_{ik}c_{kj}\right)\quad(1<i<j).
+\]
+Order: alternate --- column $j$ of $B$, then row $j$ of $C$.\\
+Solve $B\mathbf y=\mathbf b$ and $C\mathbf x=\mathbf y$:
+\[
+y_i=\frac{1}{b_{ii}}\left(a_{i,n+1}-\sum_{k=1}^{i-1}b_{ik}y_k\right),\qquad
+x_n=y_n,\quad x_i=y_i-\sum_{k=i+1}^nc_{ik}x_k .
+\]
+\callout{Applying the same formulas to the $(n+1)$-st column treats $\mathbf y$ as an extra column of $C$; adding the control column $n+2$ gives the usual check sums.}
+
+\subsubsection{Example: Khaletsky on the $4\times4$ System}
+
+The factors are exactly the numbers from the Gauss example: the columns of $B$ are the pivot columns, and $C$ holds the $b$-coefficients.
+\[
+B=\begin{bmatrix}2&0&0&0\\0.4&0.3&0&0\\0.3&-1.15&16.425&0\\1.0&-0.3&6.57&1.11998\end{bmatrix},\qquad
+C=\begin{bmatrix}1&0.5&-0.05&0.5\\0&1&13.4&-29\\0&0&1&-1.72298\\0&0&0&1\end{bmatrix}.
+\]
+For instance $b_{32}=a_{32}-b_{31}c_{12}=-1.0-0.3(0.5)=-1.15$ and $c_{23}=\frac{a_{23}-b_{21}c_{13}}{b_{22}}=\frac{4+0.4(0.05)}{0.3}=13.4$.\\
+Forward: $\mathbf y=(1.35,\ 71.2,\ 4.72298,\ -1)^T$. Back: $\mathbf x=(1,2,3,-1)^T$.
+
+\subsubsection{Example: Doolittle on the $3\times3$ System}
+
+\[
+\begin{bmatrix}1&2&3\\2&-1&4\\-1&8&2\end{bmatrix}
+=\underbrace{\begin{bmatrix}1&0&0\\2&1&0\\-1&-2&1\end{bmatrix}}_{L}
+\underbrace{\begin{bmatrix}1&2&3\\0&-5&-2\\0&0&1\end{bmatrix}}_{U}.
+\]
+The multipliers $2,-1,-2$ of the row operations $R_2-2R_1$, $R_3+R_1$, $R_3+2R_2$ are the entries of $L$.\\
+$L\mathbf y=(6,8,12)^T$: $y=(6,-4,10)$. $U\mathbf x=\mathbf y$: $x_3=10$, $x_2=-\frac{16}5$, $x_1=-\frac{88}5$.
+
+\subsection{Iterative Methods: Successive Approximations}\label{sec:iterative}
+
+\subsubsection{General Form}
+
+Rewrite $A\mathbf x=\mathbf b$ as
+\[
+\mathbf x=B\mathbf x+\boldsymbol\beta
+\]
+and iterate $\mathbf x^{(k+1)}=B\mathbf x^{(k)}+\boldsymbol\beta$ from some $\mathbf x^{(0)}$ (often $\mathbf x^{(0)}=\boldsymbol\beta$ or $\mathbf 0$). This is the fixed-point method of Section~\ref{sec:roots} in vector form.
+
+\textbf{Sufficient convergence condition.} If some matrix norm satisfies $\|B\|<1$, e.g.
+\[
+\|B\|_\infty=\max_i\sum_j\abs{b_{ij}}<1\quad\text{or}\quad\|B\|_1=\max_j\sum_i\abs{b_{ij}}<1,
+\]
+then the iteration converges for every $\mathbf x^{(0)}$ to the unique solution, and
+\[
+\|\mathbf x-\mathbf x^{(k)}\|\le\frac{\|B\|}{1-\|B\|}\,\|\mathbf x^{(k)}-\mathbf x^{(k-1)}\| .
+\]
+(Necessary and sufficient: spectral radius $\rho(B)<1$.)
+
+\subsubsection{Jacobi's Method}
+
+Solve equation $i$ for $x_i$ (requires $a_{ii}\neq0$):
+\[
+x_i^{(k+1)}=\frac{1}{a_{ii}}\left(a_{i,n+1}-\sum_{j\neq i}a_{ij}x_j^{(k)}\right),\qquad i=1,\dots,n .
+\]
+So $b_{ij}=-a_{ij}/a_{ii}$ ($i\neq j$), $b_{ii}=0$, $\beta_i=a_{i,n+1}/a_{ii}$.
+
+\textbf{Condition:} if $A$ is \textbf{strictly diagonally dominant}, $\abs{a_{ii}}>\sum_{j\ne i}\abs{a_{ij}}$ for all $i$, then $\|B\|_\infty<1$ and Jacobi converges.
+
+\callout{Before iterating, reorder equations / take linear combinations so that the diagonal dominates.}
+
+\subsubsection{Gauss--Seidel Method}
+
+Same as Jacobi, but each newly computed component is used \emph{immediately}:
+\[
+x_i^{(k+1)}=\frac{1}{a_{ii}}\left(a_{i,n+1}-\sum_{j<i}a_{ij}x_j^{(k+1)}-\sum_{j>i}a_{ij}x_j^{(k)}\right).
+\]
+Diagonal dominance also guarantees convergence of Gauss--Seidel, which usually converges faster than Jacobi and needs only one vector of storage.
+
+\subsubsection{Example: Jacobi vs.\ Gauss--Seidel}
+
+\[
+\begin{aligned}
+10x_1+x_2+x_3&=12\\
+2x_1+10x_2+x_3&=13\\
+2x_1+2x_2+10x_3&=14
+\end{aligned}
+\qquad(\text{exact: }x_1=x_2=x_3=1).
+\]
+Strictly diagonally dominant; $\|B\|_\infty=\max(0.2,0.3,0.4)=0.4<1$.
+\[
+\text{Jacobi: }\ x_1=1.2-0.1x_2-0.1x_3,\quad x_2=1.3-0.2x_1-0.1x_3,\quad x_3=1.4-0.2x_1-0.2x_2 .
+\]
+From $\mathbf x^{(0)}=\mathbf0$:
+\[
+\begin{array}{c|ccc|ccc}
+ & \multicolumn{3}{c|}{\textbf{Jacobi}} & \multicolumn{3}{c}{\textbf{Gauss--Seidel}}\\
+k & x_1 & x_2 & x_3 & x_1 & x_2 & x_3\\ \hline
+1 & 1.2000 & 1.3000 & 1.4000 & 1.20000 & 1.06000 & 0.94800\\
+2 & 0.9300 & 0.9200 & 0.9000 & 0.99920 & 1.00536 & 0.99909\\
+3 & 1.0180 & 1.0240 & 1.0300 & 0.99956 & 1.00018 & 1.00005\\
+4 & 0.9946 & 0.9934 & 0.9916 & 0.99998 & 1.00000 & 1.00000\\
+5 & 1.0015 & 1.0019 & 1.0024 & & & \\
+6 & 0.9996 & 0.9995 & 0.9993 & & & \\
+\end{array}
+\]
+\callout{Gauss--Seidel reaches 4-digit accuracy in 4 iterations; Jacobi needs about 6--7.}
+
+\subsection{Summary of Linear-System Methods}
+
+\[
+\begin{array}{lll}
+\textbf{Method} & \textbf{Type} & \textbf{Key fact}\\ \hline
+\text{Cramer} & \text{direct} & n+1\ \text{determinants; only for tiny }n\\
+\text{Gauss} & \text{direct} & \tfrac13n^3\ \text{ops; forward + back substitution}\\
+\text{Gauss compact} & \text{direct} & \text{one table + check-sum column }\Sigma\\
+\text{Principal elements} & \text{direct} & \text{pivot on largest }\abs{a_{pq}};\ \text{stable}\\
+\text{Crout--Doolittle / Khaletsky} & \text{direct} & A=LU\ (=BC);\ \text{cheap for many RHS}\\
+\text{Jacobi} & \text{iterative} & \text{converges if }\|B\|<1\ \text{(diag.\ dominant)}\\
+\text{Gauss--Seidel} & \text{iterative} & \text{uses new values at once; usually faster}\\
+\end{array}
+\]
+%=================================================
+\section{Systems of Nonlinear Equations}\label{sec:nonlinear}
+%=================================================
+
+\subsection{Overview}
+
+One way to solve a nonlinear system is to approximate it, step by step, by a \emph{linear} system. The principal tool of Section~\ref{sec:roots} was Newton's method; here it is extended to systems. As in one variable, Newton for systems is costly (Jacobian + linear solve each step), which motivates cheaper secant-like modifications.
+
+\textbf{Chapter topics:}
+\begin{itemize}
+    \item Newton's method for a system of two equations (with Cramer's rule);
+    \item Newton's method for $n$ equations in $n$ unknowns;
+    \item the method of simple iteration (contraction mapping theorem) for $2$ and for $n$ equations.
+\end{itemize}
+
+\subsection{Newton's Method for Two Equations}
+
+\subsubsection{Derivation}
+
+Given
+\[
+\begin{cases}f(x_1,x_2)=0\\ g(x_1,x_2)=0\end{cases}
+\]
+suppose $(x_1^{(p)},x_2^{(p)})$ is the $p$-th approximation of an isolated root $(\alpha,\beta)$, and write
+\[
+(\alpha,\beta)=\big(x_1^{(p)}+e_1^{(p)},\ x_2^{(p)}+e_2^{(p)}\big),
+\]
+where $e^{(p)}=(e_1^{(p)},e_2^{(p)})$ is the error. By Taylor's theorem (keeping linear terms):
+\[
+0=f(\alpha,\beta)\approx f(x_1^{(p)},x_2^{(p)})+e_1^{(p)}\frac{\partial f}{\partial x_1}+e_2^{(p)}\frac{\partial f}{\partial x_2},\qquad
+0\approx g(x_1^{(p)},x_2^{(p)})+e_1^{(p)}\frac{\partial g}{\partial x_1}+e_2^{(p)}\frac{\partial g}{\partial x_2},
+\]
+all derivatives evaluated at $(x_1^{(p)},x_2^{(p)})$. In matrix form:
+\[
+-\begin{bmatrix}f\\ g\end{bmatrix}=J\begin{bmatrix}e_1^{(p)}\\ e_2^{(p)}\end{bmatrix},\qquad
+J(x_1,x_2)=\begin{bmatrix}\dfrac{\partial f}{\partial x_1}&\dfrac{\partial f}{\partial x_2}\\[8pt]\dfrac{\partial g}{\partial x_1}&\dfrac{\partial g}{\partial x_2}\end{bmatrix}
+\quad(\textbf{Jacobi matrix}).
+\]
+
+\subsubsection{Solving the $2\times2$ System by Cramer's Rule}
+
+If
+\[
+\det J=\frac{\partial f}{\partial x_1}\frac{\partial g}{\partial x_2}-\frac{\partial f}{\partial x_2}\frac{\partial g}{\partial x_1}\neq0,
+\]
+then
+\[
+e_1^{(p)}=\frac{\begin{vmatrix}-f&f_{x_2}\\-g&g_{x_2}\end{vmatrix}}{\det J},\qquad
+e_2^{(p)}=\frac{\begin{vmatrix}f_{x_1}&-f\\g_{x_1}&-g\end{vmatrix}}{\det J}.
+\]
+Define
+\[
+\Delta x_1^{(p)}=\begin{vmatrix}f&f_{x_2}\\ g&g_{x_2}\end{vmatrix},\qquad
+\Delta x_2^{(p)}=\begin{vmatrix}f_{x_1}&f\\ g_{x_1}&g\end{vmatrix},
+\]
+(replace the column of the unknown by $(f,g)^T$). Then the Newton update is
+\[
+\boxed{\,x_1^{(p+1)}=x_1^{(p)}-\frac{\Delta x_1^{(p)}}{\det J(x_1^{(p)},x_2^{(p)})},\qquad
+x_2^{(p+1)}=x_2^{(p)}-\frac{\Delta x_2^{(p)}}{\det J(x_1^{(p)},x_2^{(p)})}\,}
+\]
+The initial approximation $(x_1^{(0)},x_2^{(0)})$ is found roughly, usually graphically.
+
+\textbf{Summary (matrix form):}
+\[
+\begin{bmatrix}x_1^{(p+1)}\\x_2^{(p+1)}\end{bmatrix}=\begin{bmatrix}x_1^{(p)}\\x_2^{(p)}\end{bmatrix}-J\big(x_1^{(p)},x_2^{(p)}\big)^{-1}\begin{bmatrix}f(x_1^{(p)},x_2^{(p)})\\ g(x_1^{(p)},x_2^{(p)})\end{bmatrix}.
+\]
+\callout{Compare with one variable: $x_{n+1}=x_n-f(x_n)/f'(x_n)$. The derivative becomes the Jacobian, and ``divide by $f'$'' becomes ``multiply by $J^{-1}$''. Convergence is again quadratic near a root with $\det J(\alpha,\beta)\neq0$.}
+
+\subsubsection{Example 1: $2x^3-y^2-1=0,\ \ xy^3-y-4=0$}
+
+Graphically $x_0=1.2$, $y_0=1.7$.
+\[
+J(x,y)=\begin{bmatrix}6x^2&-2y\\ y^3&3xy^2-1\end{bmatrix},\qquad
+\det J(1.2,1.7)=\begin{vmatrix}8.64&-3.40\\4.91&9.40\end{vmatrix}=97.910 .
+\]
+$f(1.2,1.7)=-0.434$, $g(1.2,1.7)=0.1956$. Hence
+\[
+x^{(1)}=1.2-\frac{1}{97.910}\begin{vmatrix}-0.434&-3.40\\0.1956&9.40\end{vmatrix}=1.2+0.0349=1.2349,
+\]
+\[
+y^{(1)}=1.7-\frac{1}{97.910}\begin{vmatrix}8.64&-0.434\\4.91&0.1956\end{vmatrix}=1.7-0.0390=1.6610 .
+\]
+Continuing: $x^{(2)}=1.2343$, $y^{(2)}=1.6615$, and so on (converged value $1.23427,\ 1.66153$).
+
+\subsubsection{Example 2: $\cos(0.4y+x^2)+x^2+y^2-1.6=0,\ \ 1.5x^2-\frac{y^2}{0.36}-1=0$}
+
+Graphically $x^{(0)}=1.04$, $y^{(0)}=0.47$. Partial derivatives:
+\[
+f_x=2x\big(1-\sin(0.4y+x^2)\big),\quad f_y=-0.4\sin(0.4y+x^2)+2y,\quad g_x=3x,\quad g_y=-\frac{2y}{0.36}.
+\]
+\[
+\begin{array}{l|rr}
+ & p=0 & p=1\\ \hline
+x & 1.04 & 1.03864\\
+y & 0.47 & 0.47173\\
+f & -0.00084 & 0.00000\\
+g & 0.00879 & 0.00002\\
+f'_x & 0.09364 & 0.09483\\
+f'_y & 0.55801 & 0.56172\\
+g'_x & 3.12 & 3.11592\\
+g'_y & -2.61111 & -2.62072\\
+\det J & -1.985549 & -1.99889\\
+\Delta x & -0.00271 & 0.00001\\
+\Delta y & +0.00344 & 0.00000\\
+-\Delta x/\det J & -0.00136 & 0.00000\\
+-\Delta y/\det J & 0.00173 & 0.00000\\
+\end{array}
+\]
+Root: $x=1.03864$, $y=0.47173$ (after one step the corrections vanish to 5 decimals).
+
+\subsection{Newton's Method for $n$ Equations in $n$ Unknowns}
+
+Given $f_j(x_1,\dots,x_n)=0$, $j=1,\dots,n$, and the $p$-th approximation $\mathbf x^{(p)}$, Taylor around $\mathbf x^{(p)}$ gives the linearised system
+\[
+f_j(\mathbf x^{(p)})+\frac{\partial f_j}{\partial x_1}e_1^{(p)}+\cdots+\frac{\partial f_j}{\partial x_n}e_n^{(p)}=0,\qquad j=1,\dots,n .
+\]
+With
+\[
+J(\mathbf x)=\begin{bmatrix}
+\frac{\partial f_1}{\partial x_1}&\cdots&\frac{\partial f_1}{\partial x_n}\\
+\vdots&\ddots&\vdots\\
+\frac{\partial f_n}{\partial x_1}&\cdots&\frac{\partial f_n}{\partial x_n}
+\end{bmatrix},\qquad
+F(\mathbf x)=\begin{bmatrix}f_1(\mathbf x)\\ \vdots\\ f_n(\mathbf x)\end{bmatrix},\ F:\mathbb R^n\to\mathbb R^n,
+\]
+this reads $J(\mathbf x^{(p)})\,\mathbf e^{(p)}=-F(\mathbf x^{(p)})$, so
+\[
+\boxed{\,\mathbf x^{(p+1)}=\mathbf x^{(p)}+\mathbf e^{(p)}=\mathbf x^{(p)}-J(\mathbf x^{(p)})^{-1}F(\mathbf x^{(p)})\,}
+\]
+This is \textbf{Newton's method for nonlinear systems}.
+
+\callout{Computing (and inverting) the Jacobian is the weak point of Newton's method. In practice one does not invert $J$: solve $J\mathbf e=-F$ by Gaussian elimination (Section~\ref{sec:linear}). Cheaper variants freeze $J$ for several steps or approximate it by differences (the multidimensional secant idea).}
+
+\subsubsection{Example: $x^2+y^2+z^2=1,\ 2x^2+y^2-4z=0,\ 3x^2-4y+z^2=0$}
+
+Positive solution, starting from $x_0=y_0=z_0=0.5$.
+\[
+F(\mathbf x)=\begin{bmatrix}x^2+y^2+z^2-1\\2x^2+y^2-4z\\3x^2-4y+z^2\end{bmatrix},\qquad
+J(\mathbf x)=\begin{bmatrix}2x&2y&2z\\4x&2y&-4\\6x&-4&2z\end{bmatrix}.
+\]
+
+\textbf{Iteration 1.}
+\[
+F(\mathbf x^{(0)})=\begin{bmatrix}-0.25\\-1.25\\-1.00\end{bmatrix},\quad
+J(\mathbf x^{(0)})=\begin{bmatrix}1&1&1\\2&1&-4\\3&-4&1\end{bmatrix},\quad \det J=-40,
+\]
+\[
+J^{-1}=-\frac{1}{40}\begin{bmatrix}-15&-5&-5\\-14&-2&6\\-11&7&-1\end{bmatrix}
+=\begin{bmatrix}\frac38&\frac18&\frac18\\[2pt]\frac7{20}&\frac1{20}&-\frac3{20}\\[2pt]\frac{11}{40}&-\frac7{40}&\frac1{40}\end{bmatrix},
+\]
+\[
+\mathbf x^{(1)}=\begin{bmatrix}0.5\\0.5\\0.5\end{bmatrix}-J^{-1}\begin{bmatrix}-0.25\\-1.25\\-1.00\end{bmatrix}
+=\begin{bmatrix}0.5\\0.5\\0.5\end{bmatrix}-\begin{bmatrix}-0.375\\0\\0.125\end{bmatrix}
+=\begin{bmatrix}0.875\\0.500\\0.375\end{bmatrix}.
+\]
+
+\textbf{Iteration 2.}
+\[
+F(\mathbf x^{(1)})=\begin{bmatrix}0.15625\\0.28125\\0.43750\end{bmatrix},\quad
+J(\mathbf x^{(1)})=\begin{bmatrix}1.750&1&0.750\\3.500&1&-4\\5.250&-4&0.750\end{bmatrix},\quad\det J=-64.75,
+\]
+\[
+J^{-1}=-\frac{1}{64.75}\begin{bmatrix}-15.25&-3.75&-4.75\\-23.625&-2.625&9.625\\-19.25&12.25&-1.75\end{bmatrix},\qquad
+\mathbf x^{(2)}=\mathbf x^{(1)}-J^{-1}F(\mathbf x^{(1)})=\begin{bmatrix}0.875\\0.500\\0.375\end{bmatrix}-\begin{bmatrix}0.08519\\0.00338\\0.00507\end{bmatrix}=\begin{bmatrix}0.78981\\0.49662\\0.36993\end{bmatrix}.
+\]
+
+\textbf{Iteration 3.}
+\[
+\mathbf x^{(3)}=\begin{bmatrix}0.78521\\0.49661\\0.36992\end{bmatrix},\qquad F(\mathbf x^{(3)})\approx\begin{bmatrix}0.00002\\0.00004\\0.00006\end{bmatrix}.
+\]
+Stopping at the third approximation: $x=0.7852$, $y=0.4966$, $z=0.3699$.
+
+\callout{The slides' 2nd-iteration formula writes $F(\mathbf x^{(0)})$; it must be $F(\mathbf x^{(1)})$, as used in the numbers.}
+
+\subsection{Newton as a Fixed-Point Problem}
+
+Let $G(\mathbf x)=\mathbf x-J(\mathbf x)^{-1}F(\mathbf x)$. Then $F(\mathbf x)=\mathbf 0$ has a solution iff $G$ has a fixed point, $G(\mathbf x)=\mathbf x$, and Newton's method is the iteration $\mathbf x^{(p+1)}=G(\mathbf x^{(p)})$.
+
+\textbf{Question:} when does such a map have a (unique) fixed point that the iteration finds? Answer: the contraction mapping theorem.
+
+\subsection{Simple Iteration and the Contraction Mapping Theorem}
+
+\subsubsection{Setting}
+
+A system $f_1(\mathbf x)=0,\dots,f_m(\mathbf x)=0$ is an equation $\mathbf f(\mathbf x)=\mathbf 0$ with $\mathbf f:\mathbb R^n\to\mathbb R^m$. The linear system $A\mathbf x-\mathbf b=\mathbf 0$ is a special case.
+
+\textbf{Number of solutions.} There is no general rule:
+\begin{itemize}
+    \item $x_1+2x_2-3=0,\ 2x_1^2+x_2^2-5=0$ (a line and an ellipse) has \textbf{two} solutions, $A$ and $B$.
+    \item In general a system may have no solution, infinitely many, or any finite number.
+\end{itemize}
+
+We restrict to $m=n$ and rewrite the system as
+\[
+\mathbf x=\mathbf g(\mathbf x),
+\]
+which generalises both the scalar fixed-point form $x=g(x)$ (Section~\ref{sec:roots}) and the linear iterative form $\mathbf x=B\mathbf x+\boldsymbol\beta$ (Section~\ref{sec:iterative}). Then iterate
+\[
+\mathbf x_{r+1}=\mathbf g(\mathbf x_r),\qquad \mathbf x_0\ \text{given}.
+\]
+
+\subsubsection{Contraction Mapping}
+
+\textbf{Definition.} $\mathbf g:S\subseteq\mathbb R^n\to S$ is a \textbf{contraction mapping} on a closed region $S$ with respect to a norm $\|\cdot\|$ if there is $L<1$ with
+\[
+\|\mathbf g(\mathbf x)-\mathbf g(\mathbf x')\|\le L\,\|\mathbf x-\mathbf x'\|\qquad\text{for all }\mathbf x,\mathbf x'\in S .
+\]
+
+\textbf{Theorem (contraction mapping).} If $\mathbf g:S\to S$ is a contraction on a closed region $S\subseteq\mathbb R^n$, then
+\begin{enumerate}[label=(\roman*)]
+    \item $\mathbf x=\mathbf g(\mathbf x)$ has a \textbf{unique} solution $\boldsymbol\alpha\in S$;
+    \item for every $\mathbf x_0\in S$ the sequence $\mathbf x_{r+1}=\mathbf g(\mathbf x_r)$ converges to $\boldsymbol\alpha$.
+\end{enumerate}
+Moreover $\|\mathbf x_r-\boldsymbol\alpha\|\le\dfrac{L^r}{1-L}\|\mathbf x_1-\mathbf x_0\|$.
+
+\subsubsection{A Practical Test via Partial Derivatives}
+
+Let $\mathbf g=(g_1,\dots,g_n)^T$ with continuous $\partial g_i/\partial x_j$ on a \emph{convex} region $S$. By Taylor's theorem in several variables, for $\mathbf x,\mathbf x'\in S$,
+\[
+g_i(\mathbf x)-g_i(\mathbf x')=\frac{\partial g_i(\boldsymbol\eta_i)}{\partial x_1}(x_1-x_1')+\cdots+\frac{\partial g_i(\boldsymbol\eta_i)}{\partial x_n}(x_n-x_n'),
+\]
+with $\boldsymbol\eta_i=(1-\theta)\mathbf x+\theta\mathbf x'$ for some $\theta\in(0,1)$. Let
+\[
+g_{ij}=\sup_{\mathbf x\in S}\abs{\frac{\partial g_i(\mathbf x)}{\partial x_j}},\qquad G=[g_{ij}] .
+\]
+By Cauchy--Schwarz (Euclidean norm),
+\[
+\|\mathbf g(\mathbf x)-\mathbf g(\mathbf x')\|\le\sqrt{\sum_{i,j}g_{ij}^2}\ \|\mathbf x-\mathbf x'\| .
+\]
+\callout{\textbf{Test:} if $\mathbf g(S)\subseteq S$ and $L=\sqrt{\sum_{i,j}g_{ij}^2}<1$, then $\mathbf g$ is a contraction on $S$. Other usable sufficient conditions (any norm works): $\max_i\sum_jg_{ij}<1$ (row sums) or $\max_j\sum_ig_{ij}<1$ (column sums). For two equations $x=\varphi_1(x,y)$, $y=\varphi_2(x,y)$, the textbook condition is $\abs{\partial_x\varphi_1}+\abs{\partial_x\varphi_2}\le q<1$ and $\abs{\partial_y\varphi_1}+\abs{\partial_y\varphi_2}\le q<1$ in the region.}
+
+\subsubsection{Example: Line and Ellipse}
+
+Solve $x_1+2x_2-3=0$, $2x_1^2+x_2^2-5=0$ on $S:\ 1\le x_1\le2,\ 0.5\le x_2\le1.5$ (the root $A$). Rewrite:
+\[
+x_1=g_1(\mathbf x)=\left(\frac{5-x_2^2}{2}\right)^{1/2},\qquad x_2=g_2(\mathbf x)=\frac{3-x_1}{2}.
+\]
+\textbf{Derivatives:}
+\[
+\frac{\partial g_1}{\partial x_2}=-\frac{x_2}{(10-2x_2^2)^{1/2}},\ \text{max modulus at }x_2=1.5:\ \frac{3}{\sqrt{22}};\qquad
+\frac{\partial g_2}{\partial x_1}=-\frac12;\qquad \frac{\partial g_1}{\partial x_1}=\frac{\partial g_2}{\partial x_2}=0 .
+\]
+\[
+G=\begin{bmatrix}0&\frac{3}{\sqrt{22}}\\[2pt]\frac12&0\end{bmatrix},\qquad
+\sqrt{\sum_{i,j}g_{ij}^2}=\sqrt{\frac9{22}+\frac14}=\sqrt{\frac{29}{44}}\approx0.81<1 .
+\]
+Also $\mathbf g(S)\subseteq S$: $g_1\in[1.17,1.54]\subset[1,2]$ and $g_2\in[0.5,1]\subset[0.5,1.5]$. So $\mathbf g$ is a contraction on $S$ and the root is unique there.
+
+Starting from the centre of $S$, $(1.5,\,1)$:
+\[
+\begin{array}{c|ccccccc}
+r & 0 & 1 & 2 & 3 & 4 & 5 & 6\\ \hline
+x_1 & 1.5 & 1.414 & 1.490 & 1.478 & 1.488 & 1.487 & 1.488\\
+x_2 & 1.0 & 0.750 & 0.793 & 0.755 & 0.761 & 0.756 & 0.756\\
+\end{array}
+\]
+\callout{Convergence is linear with ratio about $L$ (here $\approx0.8$ by the bound, faster in practice), compared to Newton's quadratic convergence --- but no Jacobian is needed.}
+
+\subsection{Homework (Chapter 4)}
+
+\textbf{Problem.} Using the contraction mapping theorem, show that
+\[
+\begin{cases}x^3-y^3-6y+2=0\\ x^3+y^3-6x+3=0\end{cases}
+\]
+has a unique solution in $S:\ 0\le x\le1,\ 0\le y\le1$. Then solve it by both Newton's method and simple iteration with at least 3 correct digits.
+
+\textbf{Hints (worked check).} Natural rewrite:
+\[
+x=g_1=\frac{x^3+y^3+3}{6},\qquad y=g_2=\frac{x^3-y^3+2}{6}.
+\]
+\begin{itemize}
+    \item On $S$: $g_1\in[\frac12,\frac56]$, $g_2\in[\frac16,\frac12]$, so $\mathbf g(S)\subseteq S'=[\frac12,\frac56]\times[\frac16,\frac12]\subset S$.
+    \item $\abs{\partial g_i/\partial x}=\frac{x^2}{2}$, $\abs{\partial g_i/\partial y}=\frac{y^2}{2}$. On all of $S$ these reach $\frac12$ and $\sqrt{\sum g_{ij}^2}=1$ (inconclusive), but on $S'$: $g_{i1}\le\frac{25}{72}$, $g_{i2}\le\frac18$, so $\sqrt{\sum g_{ij}^2}=\sqrt{2\big(\frac{625}{5184}+\frac1{64}\big)}\approx0.52<1$. Every fixed point in $S$ lies in $S'$, hence it is unique.
+    \item Simple iteration from $(0.5,0.5)$: $(0.54167,0.33333)$, $(0.53266,0.35365)$, $(0.53256,0.35115)$, $(0.53239,0.35129)$, $(0.53238,0.35126)$, \dots
+    \item Newton from $(0.5,0.5)$: $(0.52688,0.35484)$, $(0.53236,0.35125)$, $(0.53237,0.35126)$.
+\end{itemize}
+Solution: $x\approx0.53237$, $y\approx0.35126$.
+%=================================================
+\section{Exam Cheat Sheet (Sections 1--4)}
+%=================================================
+
+\subsection{Errors}
+\[
+\begin{array}{ll}
+\Delta_a=\abs{a-a_0},\quad \delta_a=\Delta_a/\abs a & \text{absolute / relative error}\\
+\Delta_{a\pm b}=\Delta_a+\Delta_b & \text{sums: add absolute errors}\\
+\delta_{ab}=\delta_{a/b}=\delta_a+\delta_b,\quad \delta_{x^k}=\abs k\delta_x & \text{products: add relative errors}\\
+\delta_r=\sqrt{3(m+n)}\,\delta & \text{statistical estimate, }m+n>10\\
+\Delta_y=\sum_i\abs{\partial f/\partial x_i}\Delta_{x_i},\quad \Delta_{\ln x}=\delta_x & \text{function of approximate arguments}\\
+\Delta_{x_i}=\Delta_y/(n\abs{\partial f/\partial x_i}) & \text{inverse problem (equal effects)}\\
+\end{array}
+\]
+Correct digits: up to the decimal place of the first significant digit of $\Delta$. Rounding adds the discarded part to $\Delta$.
+
+\subsection{Values of Functions}
+\begin{itemize}
+    \item Horner: $b_0=a_0$, $b_k=b_{k-1}\xi+a_k$, $P(\xi)=b_n$; $b_0,\dots,b_{n-1}$ = quotient by $(x-\xi)$. Cost: $n$ mult., $n-k$ add.
+    \item Taylor remainder: $R_n=\dfrac{f^{(n+1)}(c)}{(n+1)!}(x-\xi)^{n+1}$.
+    \item $e^x=e^{E(x)}e^q$; $R_n<u_n\frac qn$ and for $n\ge2\abs q$ stop when $\abs{u_n}\le\epsilon$.
+    \item $\sin,\cos$ on $[0,\pi/4]$; alternating, error $\le$ first omitted term.
+    \item $\sinh$: $R_n<\frac13u_n$;\ \ $\cosh$: $R_n<\frac23v_n$;\ \ $\ln$: $x=2^mz$, $\xi=\frac{1-z}{1+z}\le\frac13$, $R_n<\frac14u_n$.
+\end{itemize}
+
+\subsection{Root Finding}
+\[
+\begin{array}{ll}
+\text{Bisection} & m=\frac{a+b}2;\ \text{keep sign change};\ n\ge\log_2\frac{b-a}\varepsilon-1\\[4pt]
+\text{False position} & x=\dfrac{x_lf(x_u)-x_uf(x_l)}{f(x_u)-f(x_l)};\ \text{keep sign change}\\[8pt]
+\text{Newton--Raphson} & x_{n+1}=x_n-\dfrac{f(x_n)}{f'(x_n)};\ \ e_{n+1}\approx\dfrac{f''(\alpha)}{2f'(\alpha)}e_n^2\\[8pt]
+\text{Secant} & x_{n+1}=x_n-\dfrac{x_n-x_{n-1}}{f(x_n)-f(x_{n-1})}f(x_n);\ \ p=\frac{1+\sqrt5}2\\[8pt]
+\text{Fixed point} & x_{n+1}=g(x_n);\ \text{converges if }g:[a,b]\to[a,b],\ \abs{g'}\le q<1\\
+\end{array}
+\]
+
+\subsection{Linear Systems}
+\begin{itemize}
+    \item Cramer: $x_j=\det B_j/\det A$.
+    \item Gauss: $b^{(k-1)}_{kj}=a^{(k-1)}_{kj}/a^{(k-1)}_{kk}$, $a^{(k)}_{ij}=a^{(k-1)}_{ij}-a^{(k-1)}_{ik}b^{(k-1)}_{kj}$; cost $\approx\frac13n^3$.
+    \item Check column $a_{i,n+2}=\sum_{j\le n+1}a_{ij}$; control solution $\tilde x_i=x_i+1$.
+    \item Principal elements: pivot on the largest $\abs{a_{pq}}$, multipliers $m_i=-a_{iq}/a_{pq}$.
+    \item Khaletsky / Crout: $A=BC$, $C$ unit upper; $b_{ij}=a_{ij}-\sum_{k<j}b_{ik}c_{kj}$, $c_{ij}=(a_{ij}-\sum_{k<i}b_{ik}c_{kj})/b_{ii}$.
+    \item Jacobi / Gauss--Seidel: $x_i=\frac1{a_{ii}}(a_{i,n+1}-\sum_{j\ne i}a_{ij}x_j)$; converge if strictly diagonally dominant ($\|B\|<1$).
+\end{itemize}
+
+\subsection{Nonlinear Systems}
+\begin{itemize}
+    \item Newton (2 eqs): $x^{(p+1)}=x^{(p)}-\dfrac{\begin{vmatrix}f&f_y\\g&g_y\end{vmatrix}}{\det J}$, $y^{(p+1)}=y^{(p)}-\dfrac{\begin{vmatrix}f_x&f\\g_x&g\end{vmatrix}}{\det J}$.
+    \item Newton ($n$ eqs): $\mathbf x^{(p+1)}=\mathbf x^{(p)}-J(\mathbf x^{(p)})^{-1}F(\mathbf x^{(p)})$ (solve $J\mathbf e=-F$).
+    \item Simple iteration $\mathbf x=\mathbf g(\mathbf x)$: converges if $\mathbf g(S)\subseteq S$ and $\sqrt{\sum_{i,j}\sup_S\abs{\partial g_i/\partial x_j}^2}<1$.
+\end{itemize}
+
+\end{document}
